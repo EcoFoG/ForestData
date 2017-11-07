@@ -31,3 +31,12 @@ vignettes/*.pdf
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
+
+# C binaries
+src/*.o
+src/*.so
+src/*.dll
+
+# Extras
+.#Extra
+.Rproj.user

@@ -1,0 +1,17 @@
+Package: ForestData
+Type: Package
+Title: Post-inventory processing of forest plot data
+Version: 0.1.0
+Authors@R: c(
+    person("Géraldine", "Derroire", email="geraldine.derroire@ecofog.gf", role="aut"),
+    person("Bruno", "Hérault", email="bruno.herault@cirad.fr", role="aut"),
+    person("Eric", "Marcon", email="eric.marcon@ecofog.gf", role="aut"),
+    person("Elie", "Guedj", email="elie.guedj@ecofog.gf", role=c("aut", "cre")),
+    person("Gaëlle", "Jaouen", email="gaelle.jaouen@ecofog.gf", role="aut"),
+    person("Camille", "Piponiot", email="camille.piponiot@ecofog.gf", role="aut")
+    )
+Description: TODO
+License: GNU General Public License
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
