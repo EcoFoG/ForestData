@@ -1,7 +1,8 @@
-setwd("P:/Private/IR BDD/Projets/Guyafor/MàJ et Modifications/21-Mars2017(MesuresCorrigées)")
-
 ##Connexion à la base de donnees
 library("RODBC")
+
+setwd(choose.dir(getwd()))
+
 Connex=odbcConnect(dsn="Guyafor")
 
 ##Selection des donnees (toutes les mesures de toutes les placettes ayant au moins 3 campagnes)
@@ -16,7 +17,7 @@ sqlQuery(Connex,req)->MesuresGuyafor
 
 ##Préparation des données pour l'analyse
 library(data.table)
-source("corrections_GJ.R")
+source("R/correctionsV1.0.R")
 data = data.table(MesuresGuyafor) ## open data as data.table (= data frame for fast calculation on large data)
 
 ## Correction des DBH sur les mesures d'arbres vivants
