@@ -1,5 +1,4 @@
 source("R/corrections.R")
-library("data.table")
 library("dplyr")
 forestData.clearCircumference <- function(data, idTree, Measure, MeasureDate, Status = FALSE, idTaxon = FALSE, Genus = FALSE, Specie = FALSE, returnFullDataFrame = TRUE, replace = FALSE)
 {
@@ -76,21 +75,17 @@ forestData.clearDiameter <- function(data, idTree, Measure, MeasureDate, Status 
   data[[MeasureDate]] <- as.numeric(format(data[[MeasureDate]], "%Y")) # Extract Year from the date
 
   if (replace) {
-    data <- data %>% # Apply functions repl_missing and mega_correction from the corrections.R file to the dataframe
+    data <- data %>% # Apply functions repl_missing and mega_correction from the corrections.R file to the Measure column specified by user
       group_by_(idTree) %>%
       mutate_(.dots=setNames(
         mega_correction(Measure, MeasureDate, Status),
         Measure
       ))
   } else {
-    data <- data %>% # Apply functions repl_missing and mega_correction from the corrections.R file to the dataframe
+    data <- data %>% # Apply functions repl_missing and mega_correction from the corrections.R file to a new column
       group_by_(idTree) %>%
       mutate_(dbh_corr = mega_correction(Measure, MeasureDate, Status))
   }
-
-  data <- data %>% # Apply functions repl_missing and mega_correction from the corrections.R file to the dataframe
-    group_by_(idTree) %>%
-    mutate_(dbh_corr = mega_correction(Measure, MeasureDate, Status))
 
   return(data)
 
