@@ -1,8 +1,6 @@
 ##Connexion à la base de donnees
 library("RODBC")
 
-setwd(choose.dir(getwd()))
-
 Connex=odbcConnect(dsn="Guyafor")
 
 ##Selection des donnees (toutes les mesures de toutes les placettes ayant au moins 3 campagnes)
@@ -17,15 +15,17 @@ sqlQuery(Connex,req)->MesuresGuyafor
 
 ##Préparation des données pour l'analyse
 library(data.table)
-source("R/correctionsV1.0.R")
+source("R/functions.R")
 data = data.table(MesuresGuyafor) ## open data as data.table (= data frame for fast calculation on large data)
+
+#clearForestCirc.dataframe <- function
 
 ## Correction des DBH sur les mesures d'arbres vivants
 names(data)<-c("idtree","dbh","status","campagne","idMesure")
 data <- data[order(campagne)]
 dbh_corrige <- subset(data, status==1)[,.(campagne, idMesure, mega_correction(dbh, campagne, status)), by=.(idtree)]
 
-##Mise en forme des données
+## Mise en forme des données
 dbh_corrige<-dbh_corrige[order(dbh_corrige[,4],decreasing=F)]
 dbh_corrige<-dbh_corrige[order(dbh_corrige[,3],decreasing=F)]
 dbh_corrige1 = dbh_corrige[seq(0, nrow(dbh_corrige), 2),]
@@ -74,7 +74,7 @@ paste(dbh_corrige$code_corr[dbh_corrige$idMesure %in% Arbres888BuguBugu$idMesure
 
 ##Expédition des données vers SQLServer
 sqlClear(channel=Connex, "dbo.taMesure_Corr", errors = TRUE)
-sqlSave(channel= Connex, dat= dbh_corrige, tablename = "dbo.taMesure_Corr", append = TRUE, rownames = FALSE, colnames = FALSE, verbose = FALSE, safer = FALSE, addPK = FALSE, fast = TRUE, test = FALSE, nastring = NULL)####
+#sqlSave(channel= Connex, dat= dbh_corrige, tablename = "dbo.taMesure_Corr", append = TRUE, rownames = FALSE, colnames = FALSE, verbose = FALSE, safer = FALSE, addPK = FALSE, fast = TRUE, test = FALSE, nastring = NULL)####
 
 ##Cloture de la connection odbc
 odbcClose(Connex)
