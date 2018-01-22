@@ -6,7 +6,7 @@ forestData.clearCircumference <- function(data, idTree, Measure, MeasureDate, St
 
   if (is.character(idTaxon)) {
 
-  } else if(!isTRUE(idTaxon) && (is.character(Genus) && is.character(Specie))){ # If idTaxon doesn't exists generate it with the couple Genus and Species
+  } else if(identical(idTaxon,FALSE) && (is.character(Genus) && is.character(Specie))){ # If idTaxon doesn't exists generate it with the couple Genus and Species
       data$idTaxon <- paste(data[[Genus]],data[[Specie]])
       data$idTaxon <- as.numeric(as.factor(data$idTaxon))
   } else {
@@ -15,7 +15,7 @@ forestData.clearCircumference <- function(data, idTree, Measure, MeasureDate, St
 
   if (is.character(Status)) {
 
-  } else { # if Status column doesn't exists create it with the tree.status function of the corrections.R code
+  } else if(identical(Status,FALSE)) { # if Status column doesn't exists create it with the tree.status function of the corrections.R code
     data <- data %>%
       group_by_(idTree) %>%
       mutate_(status = tree.status(idTree))
@@ -54,7 +54,7 @@ forestData.clearDiameter <- function(data, idTree, Measure, MeasureDate, Status 
 
   if (is.character(idTaxon)) {
 
-  } else if(!isTRUE(idTaxon) && (is.character(Genus) && is.character(Specie))){ # If idTaxon doesn't exists generate it with the couple Genus and Species
+  } else if(identical(idTaxon,FALSE) && (is.character(Genus) && is.character(Specie))){ # If idTaxon doesn't exists generate it with the couple Genus and Species
     data$idTaxon <- paste(data[[Genus]],data[[Specie]])
     data$idTaxon <- as.numeric(as.factor(data$idTaxon))
   } else {
@@ -90,5 +90,5 @@ forestData.clearDiameter <- function(data, idTree, Measure, MeasureDate, Status 
   return(data)
 
 }
+forestData.clearCirconference(data, "ffqsdf", "dsfsdfsdf", "rhfgdssfdghdgf","gdfgsdfgsdf","dfgsdfg")
 
-data <- forestData.clearCircumference(DataGuyafor,"i_arbre", "circonf", "DateMesure", "code_vivant" , Genus = "Genre", Specie = "Espece", replace = TRUE)

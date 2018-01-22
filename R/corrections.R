@@ -45,7 +45,12 @@ mega_correction <- function(X, tm, status, limit=20) {
     cresc[which(!is.na(X))[-1]-1] <- diff(X[!is.na(X)])/diff(tm[!is.na(X)])
     cresc_abs[which(!is.na(X))[-1]-1] <- diff(X[!is.na(X)])
   }
-  recr <- last(which(is.na(status)))+1  # recruitment census
+  recr_temp <- which(is.na(status))
+  recr_temp2 <- last(recr_temp)
+  recr <- recr_temp2+1 # recruitment census
+
+  #recr <- na.omit(recr)
+  #cresc <- na.omit(cresc)
 
   if (length(cresc)>0){
 
