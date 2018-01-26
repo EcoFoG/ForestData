@@ -1,6 +1,6 @@
 source("R/corrections.R")
 library("dplyr")
-forestData.clearCircumference <- function(data, idTree, Measure, MeasureDate, Status = FALSE, idTaxon = FALSE, Genus = FALSE, Specie = FALSE, returnFullDataFrame = TRUE, replace = FALSE)
+forestData.clearCircumference <- function(data, idTree = "idTree", Measure = "Circ", MeasureDate = "Year", Status = FALSE, idTaxon = FALSE, Genus = FALSE, Specie = FALSE, replace = FALSE)
 {
   stopifnot(is.data.frame(data),is.character(idTree), is.character(Measure), is.character(MeasureDate))
 

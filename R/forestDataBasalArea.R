@@ -28,7 +28,6 @@ forestData.guyafor_BasalArea <- function(data, forest, plot = F, subplot = F, ta
 }
 
 forestData.BasalArea <- function(Measures, Surface) { # Generic Basal Area Function, with vectors
-  browser()
   BasalArea <- Measures^2/4/pi
   BasalArea <- sum(BasalArea)
   BasalArea <- BasalArea/Surface
@@ -36,4 +35,4 @@ forestData.BasalArea <- function(Measures, Surface) { # Generic Basal Area Funct
 }
 
 
-forestData.guyafor_BasalArea(data = DataGuyafor,forest = "Paracou", plot=1, subplot =  1, year =  2016, surface = 500, Dmin = 20)
+forestData.guyafor_BasalArea(data = DataGuyafor, forest = "Paracou", plot=1, subplot =  1, year =  2016, surface = 500, Dmin = 20)

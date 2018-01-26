@@ -1,5 +1,21 @@
-forestData.map <- function(){
-
+library(dplyr)
+library("ggrepel")
+library("ggplot2")
+forestData.map <- function(data, X = "X", Y = "Y", IdTree = "idTree", Measures = F, Status = F, title = "Map"){
+  # browser()
+  carre <- data %>%
+    select_(X, Y, IdTree)
+  if (Measures == F) {
+    carre$circonf <- 1
+  } else {
+    carre$circonf <- data[[Measures]]
+  }
+  if (Status == F) {
+    carre$code_vivant <- 1
+  } else {
+    carre$code_vivant <- data[[Status]]
+  }
+  return(graphCarre(carre, title = title))
 }
 
 graphCarre <- function(carre, title, text_size = 7, title_size = 50, legend_size = 25, axis_size = 25, repel = TRUE) {
@@ -37,3 +53,6 @@ graphCarre <- function(carre, title, text_size = 7, title_size = 50, legend_size
 
   return(graph)
 }
+data <- DataGuyafor %>%
+  filter(n_parcelle == "1", n_carre=="1", campagne =="2016")
+forestData.map(data, IdTree = "n_arbre", Measures = "circonf", Status = "code_vivant")
