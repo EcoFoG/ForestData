@@ -1,7 +1,7 @@
 library(dplyr)
 library("ggrepel")
 library("ggplot2")
-forestData.map <- function(data, X = "X", Y = "Y", IdTree = "idTree", Measures = F, Status = F, title = "Map"){
+forestData.map <- function(data, X = "X", Y = "Y", IdTree = "idTree", Measures = F, Status = F, title = "Map", label_size = 2){
   # browser()
   carre <- data %>%
     select_(X, Y, IdTree)
@@ -15,10 +15,10 @@ forestData.map <- function(data, X = "X", Y = "Y", IdTree = "idTree", Measures =
   } else {
     carre$code_vivant <- data[[Status]]
   }
-  return(graphCarre(carre, title = title))
+  return(graphCarre(carre, title = title, text_size = text_size))
 }
 
-graphCarre <- function(carre, title, text_size = 7, title_size = 50, legend_size = 25, axis_size = 25, repel = TRUE) {
+graphCarre <- function(carre, title, text_size = 3, repel = TRUE) {
 
   carre$code_vivant[carre$recrute == TRUE] <- 2
   carre$code_vivant <- factor(carre$code_vivant)
@@ -32,23 +32,17 @@ graphCarre <- function(carre, title, text_size = 7, title_size = 50, legend_size
 
   graph <- ggplot(carre, aes(x = X, y = Y, label=n_arbre)) +
     coord_fixed(ratio = 1) +
-    geom_point(aes(x=X, y=Y, shape=code_vivant, size=circonf)) +
+    geom_point(aes(x=X, y=Y, shape=code_vivant, size=circonf*0.1)) +
     legende_texte +
     scale_shape_manual(values=c(3,16,17), name=" ", label=c("Vivant","Mort","Recrute"), breaks=c(1,0,2)) +
     scale_size_continuous(range = c(1, 5), name = "Vivant") +
     theme_bw() +
     ggtitle(title) +
-    guides(shape = guide_legend(override.aes = list(size = 5))) +
     theme(axis.line = element_line(colour = "black"),
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
           panel.border = element_blank(),
-          panel.background = element_blank(),
-          plot.title = element_text(size=title_size),
-          legend.text = element_text(size=legend_size),
-          legend.title = element_text(size=30),
-          axis.text =element_text(size = axis_size),
-          axis.title =element_text(size = axis_size+10)
+          panel.background = element_blank()
     )
 
   return(graph)
