@@ -146,7 +146,6 @@ mega_correction <- function(X, tm, status, limit=20) {
       }
     }
   }
-
   return(X)
 }
 
