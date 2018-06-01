@@ -49,9 +49,6 @@ mega_correction <- function(X, tm, status, limit=20) {
   recr_temp2 <- last(recr_temp)
   recr <- recr_temp2+1 # recruitment census
 
-  #recr <- na.omit(recr)
-  #cresc <- na.omit(cresc)
-
   if (length(cresc)>0){
 
     ### increase > 5cm/year ###
@@ -61,27 +58,34 @@ mega_correction <- function(X, tm, status, limit=20) {
       ab <- which.max(cresc)
       # surrounding values
       existing <- c(ab-2,ab-1,ab+1,ab+2)
+      # Test if the surrounding values are in the boundaries
       existing <- existing[existing > 0 & existing <= length(cresc)]
+
+      # Mean of the cresc of the surrounding values
       meancresc <- max(mean(cresc[existing], na.rm=TRUE), 0)
 
       up <- which.max(cresc[existing])
       down <- which.min(cresc[existing])
 
+      browser()
+
       # 1st case : excessive increase/decrease offset by a similar decrease in dbh, plus 5cm/yr
       if ( length(existing)>0 ) {
-        if ((down>up & max(cresc_abs[existing]) + min(cresc_abs[existing])  < 5*(tm[existing[down]+1] - tm[existing[up]]) ) |
-           (up>down &  max(cresc_abs[existing]) + min(cresc_abs[existing]) < 5*(tm[existing[up]+1] - tm[existing[down]])) ){
-        # correction: abnormal values are deleted and will be replaced later on (see missing)
-        first <- min(which.max(cresc), which.min(cresc))+1
-        last <- max(which.max(cresc), which.min(cresc))
-        X[first:last] <- NA
-      } }
-      else {
-        # 2nd case: increase of more than 5 cm/yr with no return to initial values
-         # we trust the "new measurements and change the 1st set of"block" with more values
-        if (sum(!is.na(X[1:ab]))<sum(!is.na(X))/2) {
-          X[1:ab] <- X[1:ab] + cresc_abs[which.max(cresc)] - meancresc*diff(tm)[ab]}
-        else { X[(ab+1):length(X)] <- X[(ab+1):length(X)] - cresc_abs[which.max(cresc)] + meancresc*diff(tm)[ab]}
+        if ((down>up &&(max(cresc_abs[existing]) + min(cresc_abs[existing]) < 5*(tm[existing[down]+1] - tm[existing[up]]))) |
+            (up>down && (max(cresc_abs[existing]) + min(cresc_abs[existing]) < 5*(tm[existing[up]+1] - tm[existing[down]]))))
+        {
+          # correction: abnormal values are deleted and will be replaced later on (see missing)
+          first <- min(which.max(cresc), which.min(cresc))+1
+          last <- max(which.max(cresc), which.min(cresc))
+          X[first:last] <- NA
+        } else { # 2nd case: increase of more than 5 cm/yr with no return to initial values
+          # we trust the "new measurements and change the 1st set of"block" with more values
+          if ( sum(!is.na(X[1:ab])) < sum(!is.na(X))/2 ) {
+            X[1:ab] <- X[1:ab] + cresc_abs[which.max(cresc)] - meancresc*diff(tm)[ab]
+          } else {
+            X[(ab+1):length(X)] <- X[(ab+1):length(X)] - cresc_abs[which.max(cresc)] + meancresc*diff(tm)[ab]
+          }
+        }
       }
 
       ## update cresc
@@ -135,7 +139,6 @@ mega_correction <- function(X, tm, status, limit=20) {
     ## replace missing values
     X <- repl_missing(X, tm, status)
 
-
     ### overgrown recruit
     if ( length(recr)>0 & sum(!is.na(X))>0 ) {    ## recruited during measurement interval
       if( X[recr] > limit + diff(tm)[recr-1]*5) {  ### tolerated growth rate: 5cm/yr
@@ -145,7 +148,6 @@ mega_correction <- function(X, tm, status, limit=20) {
       }
     }
   }
-
   return(X)
 }
 
