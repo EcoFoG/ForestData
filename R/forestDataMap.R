@@ -1,8 +1,21 @@
-library(dplyr)
-library("ggrepel")
-library("ggplot2")
-forestData.map <- function(data, X = "X", Y = "Y", IdTree = "idTree", Measures = F, Status = F, title = "Map", label_size = 2){
-  # browser()
+#' plotMap
+#'
+#' This function take a dataframe and draw a logging map
+#'
+#' @param data Dataframe containing the data of the plot
+#' @param X Name of the X coordinate column in the dataframe
+#' @param Y Name of the Y coordinate column in the dataframe
+#' @param IdTree Name of the ID tree column in the dataframe
+#' @param Measures Name of the measure column in the dataframe
+#' @param Status Name of the status column in the dataframe
+#' @param title Title of the plot, will be placed on the top of the draw
+#' @param label_size Size of the label of each tree
+#'
+#' @return A ggplot2 plot
+#' @export
+#'
+#' @examples
+plotMap <- function(data, X = "X", Y = "Y", IdTree = "idTree", Measures = F, Status = F, title = "Map", label_size = 2){
   carre <- data %>%
     select_(X, Y, IdTree)
   if (Measures == F) {
@@ -47,6 +60,3 @@ graphCarre <- function(carre, title, text_size = 3, repel = TRUE) {
 
   return(graph)
 }
-data <- DataGuyafor %>%
-  filter(n_parcelle == "1", n_carre=="1", campagne =="2016")
-forestData.map(data, IdTree = "n_arbre", Measures = "circonf", Status = "code_vivant")
