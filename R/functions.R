@@ -67,8 +67,6 @@ mega_correction <- function(X, tm, status, limit=20) {
       up <- which.max(cresc[existing])
       down <- which.min(cresc[existing])
 
-      browser()
-
       # 1st case : excessive increase/decrease offset by a similar decrease in dbh, plus 5cm/yr
       if ( length(existing)>0 ) {
         if ((down>up &&(max(cresc_abs[existing]) + min(cresc_abs[existing]) < 5*(tm[existing[down]+1] - tm[existing[up]]))) |
@@ -148,6 +146,7 @@ mega_correction <- function(X, tm, status, limit=20) {
       }
     }
   }
+
   return(X)
 }
 
