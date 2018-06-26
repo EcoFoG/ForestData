@@ -18,15 +18,21 @@
 #' @examples
 #' clearCircumference(data, idTree = "idTree", Measure = "Circ", MeasureYear = "Year", Status = "Status", Genus = "Genus", Specie = "Specie", replace = FALSE)
 #'
-clearCircumference <- function(data, idTree = "idTree", Measure = "Circ", MeasureYear = "CensusYear", Status = FALSE, idTaxon = FALSE, Genus = "Genus", Specie = "Species", returnFullDataframe = FALSE)
+clearCircumference <- function(data, idTree = "idTree", Measure = "Circ", MeasureYear = "CensusYear", Status = FALSE, idTaxon = FALSE, Genus = "Genus", Specie = "Species", returnFullDataframe = TRUE)
 {
   stopifnot(is.data.frame(data),is.character(idTree), is.character(Measure), is.character(MeasureYear))
+
+  tempData <- data.table()
+
+  tempData$idTree <- data[[idTree]]
+  tempData$Measure <- data[[Measure]]
+  tempData$MeasureYear <- data[[MeasureYear]]
 
   if (is.character(idTaxon)) {
 
   } else if(identical(idTaxon,FALSE) && (is.character(Genus) && is.character(Specie))){ # If idTaxon doesn't exists generate it with the couple Genus and Species
-    data$idTaxon <- paste(data[[Genus]],data[[Specie]])
-    data$idTaxon <- as.numeric(as.factor(data$idTaxon))
+    tempData$idTaxon <- paste(data[[Genus]],data[[Specie]])
+    tempData$idTaxon <- as.numeric(as.factor(data$idTaxon))
   } else {
     stop("idTaxon or the couple Genus and Specie must be defined")
   }
@@ -36,15 +42,14 @@ clearCircumference <- function(data, idTree = "idTree", Measure = "Circ", Measur
   } else if(identical(Status,FALSE)) { # if Status column doesn't exists create it with the tree.status function of the corrections.R code
     data <- data %>%
       group_by_(idTree) %>%
-      mutate_(status = tree.status(idTree))
-
-    Status <- "status"
+      mutate(status = tree.status(idTree))
   }
 
   data[[Measure]] <- data[[Measure]]/(pi)
-  if (returnFullDataframe) {
-    data <- data %>% # Apply functions repl_missing and mega_correction from the corrections.R file to the dataframe
+  if (!returnFullDataframe) {
+    tempData <- data %>% # Apply functions repl_missing and mega_correction from the corrections.R file to the dataframe
       group_by_(idTree) %>%
+      arrange_(MeasureYear) %>%
       mutate_(.dots=setNames(
         mega_correction(Measure, MeasureYear, Status),
         Measure
@@ -54,6 +59,7 @@ clearCircumference <- function(data, idTree = "idTree", Measure = "Circ", Measur
   } else {
     data <- data %>% # Apply functions repl_missing and mega_correction from the corrections.R file to the dataframe
       group_by_(idTree) %>%
+      arrange_(MeasureYear) %>%
       mutate_(circumf_corr = mega_correction(Measure, MeasureYear, Status))
 
     data[["circumf_corr"]] <- data[["circumf_corr"]]*(pi)
@@ -64,7 +70,7 @@ clearCircumference <- function(data, idTree = "idTree", Measure = "Circ", Measur
   return(data)
 }
 
-clearDiameter <- function(data, idTree = "idTree", Measure = "Circ", MeasureYear = "CensusYear", Status = FALSE, idTaxon = FALSE, Genus = "Genus", Specie = "Species", returnFullDataframe = FALSE) # Same as clearCirconference but the function cut looks more logic for user
+clearDiameter <- function(data, idTree = "idTree", Measure = "Circ", MeasureYear = "CensusYear", Status = FALSE, idTaxon = FALSE, Genus = "Genus", Specie = "Species", returnFullDataframe = TRUE) # Same as clearCirconference but the function cut looks more logic for user
 {
   stopifnot(is.data.frame(data),is.character(idTree), is.character(Measure), is.character(MeasureYear))
 
@@ -82,14 +88,16 @@ clearDiameter <- function(data, idTree = "idTree", Measure = "Circ", MeasureYear
   } else { # if Status column doesn't exists create it with the tree.status function of the corrections.R code
     data <- data %>%
       group_by_(idTree) %>%
+      arrange_(MeasureYear) %>%
       mutate_(status = tree.status(idTree))
 
     Status <- "status"
   }
 
-  if (returnFullDataFrame) {
+  if (!returnFullDataframe) {
     data <- data %>% # Apply functions repl_missing and mega_correction from the corrections.R file to the Measure column specified by user
       group_by_(idTree) %>%
+      arrange_(MeasureYear) %>%
       mutate_(.dots=setNames(
         mega_correction(Measure, MeasureYear, Status),
         Measure
@@ -97,6 +105,7 @@ clearDiameter <- function(data, idTree = "idTree", Measure = "Circ", MeasureYear
   } else {
     data <- data %>% # Apply functions repl_missing and mega_correction from the corrections.R file to a new column
       group_by_(idTree) %>%
+      arrange_(MeasureYear) %>%
       mutate_(dbh_corr = mega_correction(Measure, MeasureYear, Status))
   }
 

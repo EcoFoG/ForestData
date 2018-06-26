@@ -29,9 +29,17 @@ repl_missing <- function(Y, time, status) {
   return(unlist(Y))
 }
 
+mega_correction_ <- function(data, X, tm, status, limit=20){
+  X <- data[[X]]
+  tm <- data[[tm]]
+  status <- data[[status]]
+  return(mega_correction(X, tm, status, limit))
+}
+
 
 ### 2) global corrections ###
 mega_correction <- function(X, tm, status, limit=20) {
+
   # Xsav if for browser() use: save initial value of X
   Xsav <- X
   #   X = data$dbh[data$idtree==id]
@@ -43,6 +51,7 @@ mega_correction <- function(X, tm, status, limit=20) {
   cresc_abs <- rep(0, length(X)-1)
   if (sum(!is.na(X))>1) {
     cresc[which(!is.na(X))[-1]-1] <- diff(X[!is.na(X)])/diff(tm[!is.na(X)])
+    cresc[is.nan(cresc)] <- 0
     cresc_abs[which(!is.na(X))[-1]-1] <- diff(X[!is.na(X)])
   }
   recr_temp <- which(is.na(status))
@@ -138,26 +147,15 @@ mega_correction <- function(X, tm, status, limit=20) {
     X <- repl_missing(X, tm, status)
 
     ### overgrown recruit
-    if ( length(recr)>0 & sum(!is.na(X))>0 ) {    ## recruited during measurement interval
+    if ( !is.na(recr) && length(recr)>0 && sum(!is.na(X))>0 ) {    ## recruited during measurement interval
       if( X[recr] > limit + diff(tm)[recr-1]*5) {  ### tolerated growth rate: 5cm/yr
         coef <- lm(X[!is.na(X)]~tm[!is.na(X)])$coefficients
         if (is.na(coef[2])) { X[is.na(status)] <- coef[1] } ### only 1 dbh value: replace all non-recruited dbh by this value
         else { X[is.na(status)] <- min(coef[1] + tm[is.na(status)]*coef[2], X[!is.na(X)][1]) }
       }
     }
+    return(X)
   }
-  return(X)
-}
-
-
-## 3) graph of corrected trees (blue: dbh before correction, red: dbh after correction)
-plot.corr <- function(id){
-  tree=which(data$idtree==id)
-  yrange=c(min(data$dbh[tree], data$dbh_c[tree], na.rm=T),
-           max(data$dbh[tree], data$dbh_c[tree], na.rm=T))
-  plot(data$dbh_c[tree] ~ data$t[tree], pch=16, col=2,
-       ylim=yrange, main=id, ylab="dbh", xlab="year")
-  points(data$dbh[tree] ~ data$t[tree], col=4, pch=16) # a$cohort: number of the recruitment year
 }
 
 ## 4) status: alive (1), not recruited (NA), dead (0)
@@ -170,19 +168,4 @@ tree.status <- function(X){
     status[(max(which(!is.na(X)))+1):length(X)]<-0
   }
   return(status)
-}
-
-vol_equations <- function(dbh, site){
-  if (site == "ita"){ vol <- 0.001602*dbh^1.9}
-  else {if (site %in% c("ira", "tab", "cum", "chi")){vol <- 0.000308*(dbh)^2.1988 }
-    else {if (site %in% c("eco", "pet") ) {vol <- 10^(-2.96 + 1.93 *log10(dbh))}
-      else {if (site =="tap"){vol <- exp(-7.62812 + 2.18090 * log(dbh))}
-        else {if (site =="jar"){vol <- (-0.367921 + 0.0013446*(dbh)^2)}
-          else {if (site=="par"){vol <- -0.274+0.001247*(dbh)^2 }
-          }
-        }
-      }
-    }
-  }
-  return(vol)
 }
