@@ -12,8 +12,16 @@ mega_correction <- function(X, tm, status, limit=20) {
   #   X = data$dbh[data$idtree==id]
   #   tm = data$year[data$idtree==id]
   #   status = data$status[data$idtree==id]
+  
+  ##### ERRATUM #####
   # cresc : relative annual diameter increment
+  #### This is false. cresc is the ABSOLUTE(in terms of centimeters)
+  #### ANNUAL diameter increment
   # cresc_abs: absolute annual diameter increment
+  #### This is false. cresc_abs is the absolute (cm) diameter 
+  #### differential between two censuses with non NA measure.
+  #### It is not annual at all since there is no use of the census
+  #### years to calculate it.
   cresc <- rep(0, length(X)-1)
   cresc_abs <- rep(0, length(X)-1)
   if (sum(!is.na(X))>1) {
