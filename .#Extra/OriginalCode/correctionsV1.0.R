@@ -12,16 +12,17 @@ mega_correction <- function(X, tm, status, limit=20) {
   #   X = data$dbh[data$idtree==id]
   #   tm = data$year[data$idtree==id]
   #   status = data$status[data$idtree==id]
-  
-  ##### ERRATUM #####
+
+  ##### Clarification #####
   # cresc : relative annual diameter increment
-  #### This is false. cresc is the ABSOLUTE(in terms of centimeters)
+  #### This is unexact. cresc is the ABSOLUTE(in terms of centimeters)
   #### ANNUAL diameter increment
   # cresc_abs: absolute annual diameter increment
-  #### This is false. cresc_abs is the absolute (cm) diameter 
-  #### differential between two censuses with non NA measure.
+  #### This is unexact. cresc_abs is the absolute (cm) diameter
+  #### DIFFERENTIAL between two censuses with non NA measure.
   #### It is not annual at all since there is no use of the census
   #### years to calculate it.
+
   cresc <- rep(0, length(X)-1)
   cresc_abs <- rep(0, length(X)-1)
   if (sum(!is.na(X))>1) {
@@ -111,13 +112,45 @@ mega_correction <- function(X, tm, status, limit=20) {
 }
 
 
-repl_missing <- function(Y, time, status) {
-  miss <- which(is.na(Y) & status == 1)
-  # miss: nb of the missing value(s)
+# repl_missing ------------------------------------------------------------
+
+
+## This function infers the size of alive trees with NA measurements for a given year
+## It corresponds mainly to the "outlyers" (abnormal size differential with return to normal values)
+## for which the measure is dropped (set to NA) in mega_correction. It can also correspond to cases
+## for which the tree is unseen during several years (e.g. after a big windthrow), then found again alive
+## and thus corrected for CodeAlive in the corresponding func.
+## It returns a set of values corresponding to the inferred missing vals.
+## would it be efficient to change it into a modifyer ?
+
+#' Title
+#'
+#' @param Y
+#' @param time
+#' @param status
+#'
+#' @return
+#' @export
+#'
+#' @examples
+repl_missing <- function(Y, time, status) { ## Passing the entire tree would perhaps be more explicit ? do we gain much computation time ?
+  miss <- which(is.na(Y) & status == 1) ## As I said, alive trees with no measurement
+  # miss: nb of the missing value(s) ## more exactly, the indices of missing vals.
+
+    ## the advantage of sapply over for is that a vector is directly affected
+    ## to the tree size, instead of updating the values within a for (which would be wrong)
+    ## or creating a temporary variable in which to store the values, generated only with
+    ## actual measurements.
+    ## The inconvenients are that sapply is slower than for(), probably generates intermediate vars
+    ##(thus is not as RAM efficient as it seems), and returns a list (so, the unlist step is also time-consuming)
+
+    ## !!!! Contrarily to what the "metedata.pdf" stipulates for Paracou, not all the points are used to realign
+    ## an outlyer or recalculate a NA. Only the two neighbour points are used.
+
   Y[miss] <- sapply(miss, function(i){
     # case 1: i is the first value of the series
     if (i < min(which(!is.na(Y))) ) {
-      ## choose 2 next values
+      ## choose 2 next non NA values
       yval <- Y[which(!is.na(Y))[1:min(2, sum(!is.na(Y)))]]
       tval <- time[which(!is.na(Y))[1:min(2, sum(!is.na(Y)))]]
     } #case 2: i is the last value of the series
@@ -133,7 +166,7 @@ repl_missing <- function(Y, time, status) {
     }
     reg <- lm(yval ~ tval)$coef
     yi <- reg[1] + reg[2]*time[i]
-    if (sum(!is.na(tval))==1) {yi <- yval}
+    if (sum(!is.na(tval))==1) {yi <- yval} # only one non NA: we recycle the existing value because no lm is feasible
     return(yi)
   })
   return(unlist(Y))

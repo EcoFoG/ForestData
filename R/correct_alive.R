@@ -29,7 +29,7 @@ correct_alive <- function(data,
   if(!time_col%in%names(data)){
     stop("The name you indicated (or let to default) for the census year column is apparently not in the colnames of the dataset. Please specify it")
   }
-  if(!time_col%in%names(data)){
+  if(!id_col%in%names(data)){
     stop("The name you indicated (or let to default) for the unique, individual tree IDs column is apparently not in the colnames of the dataset. Please specify it")
   }
 
