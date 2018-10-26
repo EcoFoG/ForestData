@@ -86,7 +86,7 @@ outlyers <- outlyers %>%
                                        value.name = "G") %>% 
               mutate(cor = grepl("corr",Gtype))) 
 # %>% head(40)
-i <- outlyers_ids[3]
+# i <- outlyers_ids[3]
 for(i in outlyers_ids){
   # cnt <- cnt+1
   # i <- outlyers_ids[cnt]
@@ -108,27 +108,26 @@ for(i in outlyers_ids){
      ggtitle(label = paste0("Corrected diameter vs time for individual ",i),
              subtitle = paste0(paste(unique(temp$species), collapse = " ")," code correction: ",paste(unique(temp$CodeCorr),collapse = " ")))+
      scale_x_continuous(breaks = 1984:2017)+
-     theme(axis.text.x = element_text(angle=45))
-   g1+
-     ggrepel::geom_text_repel(aes(label =  Ctype),
+     theme(axis.text.x = element_text(angle=45))+ggrepel::geom_text_repel(aes(label =  Ctype),
                               size = 3)
 
-   g2 <- temp %>%
-     ggplot(aes(x =CensusYear, y =growth_annual, color = is_outlyer_CircCorr))+
-     geom_point()+
-     ggtitle(label = paste0("Corrected diametr growth vs time for individual ",i),
-             subtitle = paste0(paste(unique(temp$species), collapse = " "),", code correction: ",paste(unique(temp$CodeCorr),collapse = " ")))+
-     scale_x_continuous(breaks = 1984:2017)+
-     theme(axis.text.x = element_text(angle=45))
+   # g2 <- temp %>%
+   #   ggplot(aes(x =CensusYear, y =growth_annual, color = is_outlyer_CircCorr))+
+   #   geom_point()+
+   #   ggtitle(label = paste0("Corrected diametr growth vs time for individual ",i),
+   #           subtitle = paste0(paste(unique(temp$species), collapse = " "),", code correction: ",paste(unique(temp$CodeCorr),collapse = " ")))+
+   #   scale_x_continuous(breaks = 1984:2017)+
+   #   theme(axis.text.x = element_text(angle=45))
+   # 
+   # g1 <- ggplotGrob(g1)
+   # g2 <- ggplotGrob(g2)
+   # g <- rbind(g2, g1, size = "first")
 
-   g1 <- ggplotGrob(g1)
-   g2 <- ggplotGrob(g2)
-   g <- rbind(g2, g1, size = "first")
-
-   ggsave(g, filename = paste0("./graphs/g_circcorr_outlyer_",i,".jpeg"),device = "jpeg")
+   ggsave(g1, filename = paste0("./graphs/compare_circ_circcorr/g_circcorr_outlyer_",i,".jpeg"),device = "jpeg")
    dev.off()
 
 }
+data %>% filter(CodeCorr != 0) %>% pull %>% length / data %>% filter(CodeCorr == 0) %>% pull %>% length()
 # 
 # 
 # g1 <- ggplotGrob(g1)
