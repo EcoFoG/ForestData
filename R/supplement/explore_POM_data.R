@@ -55,6 +55,12 @@ titi$time_lag_three <- lag(titi$time_lag_two)
 titi$time_lag_four <- lag(titi$time_lag_three)
 titi$time_lag_five <- lag(titi$time_lag_four)
 
+titi$id_lag <- lag(titi$id)
+titi$id_lag_two <- lag(titi$id_lag)
+titi$id_lag_three <- lag(titi$id_lag_two)
+titi$id_lag_four <- lag(titi$id_lag_three)
+titi$id_lag_five <- lag(titi$id_lag_four)
+
 
 # Unique POM shift
 titi$is_singlet <- titi$code %in% 1:3
@@ -63,7 +69,10 @@ titi$time_singlet <- ifelse(titi$is_singlet,
                             NA)
 
 # Repeated twice
-titi$is_duet <- titi$code == titi$code_lag & titi$code %in% 1:3
+titi$is_duet <- titi$code == titi$code_lag &
+  titi$code %in% 1:3 &
+  titi$id == titi$id_lag
+
 titi$time_duet <- ifelse(titi$is_duet & titi$time != 1,
                             paste(titi$time_lag,titi$time,sep = "_"),
                             NA)
@@ -71,7 +80,10 @@ titi$time_duet <- ifelse(titi$is_duet & titi$time != 1,
 #Repeated three times
 titi$is_triplet <- titi$code == titi$code_lag &
   titi$code == titi$code_lag_two &
-  titi$code %in% 1:3
+  titi$code %in% 1:3 &
+  titi$id == titi$id_lag &
+  titi$id == titi$id_lag_two
+
 titi$time_triplet <- ifelse(titi$is_duet & !titi$time%in%c(1,2),
                             paste(titi$time_lag_two,titi$time,sep = "_"),
                             NA)
@@ -97,10 +109,21 @@ titi$time_quintuplet <- ifelse(titi$is_duet & !titi$time%in%c(1,2),
                                paste(titi$time_lag_four,titi$time,sep = "_"),
                                NA)
 
-singlets
-duets
-triplets
-quadruplets
+titi %>%
+  filter_("is_duet") %>%
+  mutate(code = as.factor(code)) %>%
+  group_by_("time_duet", "code") %>%
+  summarise(N = n()) %>%
+  ggplot(aes(x = time_duet,y=N,fill = code))+ geom_bar(stat = "identity")+
+  theme(axis.text.x = element_text(angle = 45))
+
+titi %>%
+  filter_("is_triplet") %>%
+  mutate(code = as.factor(code)) %>%
+  group_by_("time_triplet", "code") %>%
+  summarise(N = n()) %>%
+  ggplot(aes(x = time_triplet,y=N,fill = code))+ geom_bar(stat = "identity")+
+  theme(axis.text.x = element_text(angle = 45))
 
 for(i in ids){
   temp <- titi[which(titi$id == i),c("time","POM","measure","code")]
