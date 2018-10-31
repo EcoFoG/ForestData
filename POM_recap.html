@@ -240,13 +240,54 @@ Leaning tree still alive
 </div>
 <div id="remarks" class="section level2">
 <h2>Remarks</h2>
-<p>First of all, it seems that the main weakness in this measurement code’s design is that several information of different nature, and that are non-mutually exclusive</p>
-<p>The meaning of the codes and the way they are used in the field is rather equivocal. One can first understand that every tree with code 1, 2 or 3 is measured at 1.3+code*0.5 m above the ground, and that once the POM changes, the code is repeated over years unless it is further raised. This is not the case, and we all agree that the descriptions in the database’s metada needs to be clarified to minimize the effort for persons that are not completely familiar with the detailed protocol. Indeed, as interpreted by the fieldworkers and the database’s referents, the codes from 1 to 3 are used when the POM has to be changed, and appears only for the corresponding years, the measurement code being subsequently reset to 0. Thus, the new code explanations would have to be like this:</p>
+<p>First of all, it seems that the main weakness in this measurement code’s design is that several information of different nature, and that are non-mutually exclusive: a tree could both be naturally damaged, or leaning, while having its POM raised over breast height, but the code does not allow to specify both and an information leak can occurr. It would perhaps be desirable to either seperate this code into two distinct fields, or explicitely register the POMs directly.</p>
+<p>Second, at first glance, there is quite an mystery around the code 10 (ladder used for measurement). It is apparently not used except for the Guyaflux plots, and it seems that it is replaced in the database by a boolean field indicating whether a ladder has been used to measure the tree, or not. In some cases, it seems that a big tree first measured with a ladder can be attributed a measure code of 0, but a ladder code of 1, which indicates that the POM has been raised by more than 1.5 meters. The height of the ladder is specified in Aurélie’ protocol, but not elsewhere (e.g. in the metadata file) whilst it would be desirable to know more about it. The ladder is allegedly 4 meters high, which is supposed to allow trees to be measured at heights reaching up to 5 meters. More precise details on these cases are not reported in the field, thus not available for us. Such implicit information can be misleading, and one has to know these little details before starting to properly analyze the data.</p>
+<p>The meaning of the codes and the way they are used in the field is rather equivocal. One can first understand that every tree with code 1, 2 or 3 is measured at 1.3+code*0.5 m above the ground, and that once the POM changes, the code is repeated over years unless it is further raised. This is not the case, and we all agree that the descriptions in the database’s metada needs to be clarified to minimize the effort for persons that are not completely familiar with the detailed protocol. Indeed, as interpreted by the fieldworkers and the database’s referents, the codes from 1 to 3 are used when the POM has to be changed, and appears only for the corresponding years, the measurement code being subsequently reset to 0. Thus, the new code explanations would have to be clearer, for instance:</p>
 <ul>
 <li><p><span class="math inline">\(Code\ 0:\)</span> Tree measured with <span class="math inline">\(the\ same\ POM\ as\ for\ the\ previous\ year\)</span>. If the tree has just been recruited, the default POM is 130cm, unless a ladder was used (see the code_ladder field).</p></li>
 <li><p><span class="math inline">\(Code\ 1\ to\ 3:\)</span> If the circumference <span class="math inline">\(cannot\ be\ obtained\ at\ the\ same\ POM\ as\ previously\)</span> (or at 130cm in case of first register), the POM is raised by 50, 100 or 150 cm for the codes 1, 2 and 3 respectively. The code appears <span class="math inline">\(for\ the\ census\ at\ which\ the\ POM\ changes\)</span> and is put back to 0 for the next censuses, unless (and/or untill) it will have to be raised again.</p></li>
 </ul>
-<p>The main problem of this code is that we might doubt that it has been use the right way, since it is equivocal. Prior to simply use the code</p>
+<p>The main problem of this code is that we might doubt that it has been use the right way, since it is equivocal. Prior to simply use the code, we have to hypothesize that either false and unreported POM changes occurred, and find a way to detect it in the database.</p>
+</div>
+</div>
+<div id="testing-the-reliability-of-measure-codes-to-reconstitute-poms-in-the-database" class="section level1">
+<h1>Testing the reliability of measure codes to reconstitute POMs in the database</h1>
+<div id="hypotheses" class="section level2">
+<h2>Hypotheses</h2>
+<p>Hereafter, I will refer to “announced but false POM changes” as “false positives” or “type I errors” and to “unreported POM changes” as “false negatives”, or “type II errors”.</p>
+<div id="basal-measurement-alea" class="section level3">
+<h3>Basal measurement alea</h3>
+<p>All else equal (POM, time, individual), a tree size can vary if several measurements are done by one or several fieldworkers. This is what I refer to, hereafter, as the basal measurement error in forest censuses, or . This can be due to inter-observer variability in terms of personal method and gesture, and to intra-observer irreductible imprecision due to multiple factors (e.g. measurement plan slightly not perpendicular to the trunk axis), and imprecision due to the conformation of the tree itself. In the absence of explicit data on the evaluation of this error, we have no clear idea of its magnitude, and distribution. In Paracou metadata and protocol files, the precision of the circumferences is of 0.5cm. We thus assume that the measurement error grossly follow a gaussian centered to 0 and with rather small standard error.</p>
+<p><span class="math display">\[\begin{equation}
+D_{obs}(i,t) = D_{real}(i,t) + \epsilon(i,t)
+\end{equation}\]</span></p>
+</div>
+<div id="expected-behavior-in-true-negative-cases" class="section level3">
+<h3>Expected behavior in true negative cases</h3>
+<p>Trees size, in tropical rainforests, is increasing slowly for those that are in the shade of biger ones. For the ones more or less exposed to sunlight, growth rates can be higher. The apparent growth between two censuses for a tree which POM is constant over these censuses can be expressed as:</p>
+<p><span class="math display">\[\begin{equation}
+\delta_{obs}D(i,t,t-1) = \delta_{real}D(i,t,t-1) + \delta\epsilon(i,t,t-1)
+\end{equation}\]</span></p>
+<p>Which develops into</p>
+<p><span class="math display">\[\begin{equation}
+\delta_{obs}D(i,t,t-1) = D_{real}(i,t) - D_{real}(i,t-1) + \epsilon(i,t) - \epsilon(i,t-1)
+\end{equation}\]</span></p>
+<p>Assuming the independance between <span class="math inline">\(\epsilon(i,t)\)</span> and <span class="math inline">\(\epsilon(i,t-1)\)</span> (which is only partly true since a part of the imprecision can be due to the tree itself), this yields</p>
+<p><span class="math display">\[\begin{equation}
+\delta_{obs}D(i,t,t-1) \sim \delta_{real}D(i,t,t-1) + \mathcal{N}(0,\sigma_{\epsilon}) - \mathcal{N}(0,\sigma_{\epsilon})
+\end{equation}\]</span></p>
+<p>Thus,</p>
+<p><span class="math display">\[\begin{equation}
+\delta_{obs}D(i,t,t-1) \sim \mathcal{N}(\delta_{real}D(i,t,t-1),\sigma_{\epsilon}\sqrt{2})
+\end{equation}\]</span></p>
+</div>
+<div id="expected-behavior-in-true-positive-cases" class="section level3">
+<h3>Expected behavior in true positive cases</h3>
+<p>In cases of POM changes, ###</p>
+</div>
+</div>
+<div id="section" class="section level2">
+<h2></h2>
 </div>
 </div>
 
