@@ -76,6 +76,16 @@ The main problem of this code is that we might doubt that it has been use the ri
 
 # Testing the reliability of measure codes to reconstitute POMs in the database
 
+
+## Empirical exploration
+
+### How many times are POM changes codes reapeated in the dataset, and which years ?
+
+### What is the distribution of diameter differentials according the code ?
+
+### How can we differenciate true POM changes and false code uses ?
+
+
 ## Hypotheses
 
 Hereafter, I will refer to "announced but false POM changes" as "false positives" or "type I errors" and to "unreported POM changes" as "false negatives", or "type II errors".

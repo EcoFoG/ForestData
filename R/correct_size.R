@@ -70,6 +70,9 @@ data$code_corr <- rep(0,nrow(data))
 # Internals ---------------------------------------------------------------
 .correct_tree_size <- function(tree){
 
+  # First step to correct explicitely with POM if they exist
+
+  # Then correct the other cases as in mega_correction
 }
 
 
