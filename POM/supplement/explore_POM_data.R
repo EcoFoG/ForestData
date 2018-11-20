@@ -199,7 +199,7 @@ titi$growth_abs[which(!titi$id == titi$id_lag)] <- NA
 
 data <- titi %>% select(id,time,measure,growth_abs,is_duet,real_duets,real_singlets,is_triplet,Genus,Species, code, code_copy)
 
-titi$CodeAlivesummary
+# titi$CodeAlivesummary
 
 
 statis <- data.frame("threshold"=rep(seq(10,-10, by=-0.5),4), "cases" = NA, "code"=NA,"growth" = NA) %>%

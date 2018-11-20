@@ -1,0 +1,341 @@
+---
+title: 'POM: résumé'
+author: "Nino PAGE"
+date: "20 novembre 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+invisible(library(tidyverse))
+invisible(library(kableExtra))
+invisible(library(gtable))
+load("Paracou_basic_POM.RData")
+```
+
+Ce document rassemble et synthétise l'exploration des données de Paracou réalisée afin de tenter une reconstitution de l'information relative aux POM sur l'ensemble des parcelles du dispositif.
+
+# Quelques mots sur le protocole et les données 
+
+## Codes mesures
+
+Lorsqu'un arbre est mesuré lors d'un inventaire, on attache à la données un code indiquant d'éventuelles particularités relatives à la manière dont l'arbre a été mesuré. Lorsqu'un changement de POM est jugé nécessaire pas le pointeur, il se matérialise sur le terrain par un nouveau trait de peinture indiquant la hauteur à laquelle l'arbre est mesuré, et dans la base de données par un code mesure 1,2, ou 3 indiquant la réhausse de 50, 100 et 150cm respectivement. Un code 0 indique un non changement de POM et l'absence de difficultés de mesure, donc l'utilisation du POM de l'année précédente, par défaut à 130cm, tandis qu'un code 4 indique une mauvaise conformation de l'arbre (périmètre du tronc non circulaire, nombreuses bosses ou défauts...) obligeant à estimer la circonférence, ou amenant à douter de la fiabilité de la mesure. Le changement de POM est a priori renseigné lorsqu'il est effectué, et suivi d'un retour au code 0 pour indiquer le maintien du nouveau POM par la suite. Quelques doutes plânaient autour de l'usage exact de ces codes sur le terrain, et une bonne partie des analyses effectuées ont eu pour but de vérifier la bonne interprétation du protocole sur le terrain, en essayant de déterminer quels cas suspect pouvaient être rencontrés, et s'ils sont structurés dans le temps et l'espace, ou non. Les autres codes sont relatifs à d'autres observations, et l'ensemble des états relevés au travers de ce code mesure sont non mutuellement exclusifs. Un changement de POM peut donc, en théorie, être masqué par un des autres codes correspondant à une information jugée plus importante à noter. 
+```{r codes, echo = F}
+
+table <- data.frame("Measure Code" = c(0,
+                                        1,
+                                        2,
+                                        3,
+                                        4,
+                                        7,
+                                        9,
+                                        10,
+                                        11,
+                                        12),
+                    "Description" = c("Normal\ tree measured\ at\ breast\ height\ (1.3\ m)\ or\ above\ buttresses",
+                                      "Measurement\ point\ raised\ by\ 0.5\ m",
+                                      "Measurement\ point\ raised\ by\ 1\ m",
+                                      "Measurement\ point\ raised\ by\ 1.5\ m",
+                                      "Tree\ for\ which\ size\ is\ estimated\ or\ uncertain\ (unusual\ shape)",
+                                      "Tree\ damaged\ during\ logging",
+                                      "Poisoned\ tree",
+                                      "Tree\ measured\ using\ a\ ladder",
+                                      "Naturally\ damaged\ tree",
+                                      "Leaning\ tree\ still\ alive")
+                    )
+
+knitr::kable(table) %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),full_width = T)
+
+```
+
+## Code "échelle"
+
+Lorsqu'un arbre est mesuré à un POM supérieur à 1m80 (c'est à dire, si un réhaussement de plus de 50cm est effectué), une échelle est en principe utilisée pour réaliser la mesure. Lorsque c'est le cas, cette information est renseignée dans les données, à l'aide d'une variable booléenne. Dans certains cas, les arbres mal conformés mesurée directement avec une échelle peuvent a priori avoir un code échelle "TRUE" mais un code mesure de 0, ce qui n'apporte que peu d'information sur le POM utilisé mais laisse penser que la réhausse surpasse 150cm.
+
+# Hypothèses et erreurs attendues
+
+Ayant des doutes sur la fiabilité des mesures indirectes de POM au travers des codes en indiquant les changements, il nous a fallu identifier les différents cas d'erreurs possibles pour évaluer leur prévalence, et décider de la manière idoine de les gérer. Pour simplifier les choses, appelons "faux négatifs" les cas où un changement de POM n'est pas indiqué mais a lieu, et "faux positifs" les cas où un code indique un changement de POM qui n'a en réalité pas lieu.
+
+## Faux négatifs
+
+Quatre cas possibles de faux négatifs ont été évoqués lors des discussions précédentes:
+
+* Le changement de POM est effectué, mais masqué par l'un des autres codes mesure (4 ou plus). Les codes 4, en particulier, peuvent poser problème cas il s'agit de cas où la circonférence est estimée car l'arbre est complètement retors à mesurer. On ignore si l'estimation s'accompagne d'un marquage à la peinture du point auquel la circonférence est estimée. Il est possible d'estimer le nombre maximum de mesures concernées par ces cas, et de cibler les arbres en question durant une vérification sur le terrain.
+
+* L'arbre est recruté avec un POM réhaussé d'office, mais le code mesure indiqué est 0, car un échelle est directement utilisée pour mesurer la circonférence à un POM relativement haut. Dans ce cas là, la variable "echelle" est sensée garder une trace du changement de POM, et bien que sa valeur réelle soit inconnue, elle peut être estimée par une moyenne ou prendre une valeur générale correspondant à ce genre de cas, en se basant sur les dires des forestiers.
+
+* De même, l'arbre est recruté avec un POM réhaussé d'office, mais avec un oubli sur le code échelle. Ce cas est supposé rare, et n'est traçable qu'en mesurant directement les POM pour les arbres encore vivants 
+
+* Un changement de POM a lieu à un certain moment, mais l'arbre conserve un code mesure de 0 l'année en question. Il est probable que ce genre d'erreurs soit très rare. le cas échéant, il se peut que l'information soit retraçable avec le code échelle. Il s'agit là aussi de cas jugés très rares, sur lesquels il n'est pas prioritaire de se concentrer.
+
+## Faux positifs
+
+Concernant les faux positifs, plusieurs possibilités ont été mises en évidence:
+
+* Le code mesure indique un changement de POM mais celui-ci n'a en fait pas lieu
+
+* Le code mesure renseigné n'est pas le bon
+
+* Le code mesure indiquant normalement le changement de POM est répété plusieurs années de suite, alors que seule une ou une partie de cette série fait l'objet d'un ou de vrai(s) changement(s) de POM. Il s'agit de cas de mauvaise interprétation de l'usage du code, et il semble plus que raisonnable de penser qu'en règle générale, la première année avec un code mesure entre 1 et 3 fait l'objet d'un changement de POM, mais pas les suivantes.
+
+* Des cas mixtes peuvent aussi exister, et sont plus difficiles à détecter et dénombrer.
+
+# Diagnostic
+
+```{r prepare, echo=F, eval=T}
+titi$code_copy <- titi$code
+titi[which(!titi$code %in% c(1,2,3)),"code"] <- 0
+
+titi$code_lag <- lag(titi$code)
+titi$code_lag_two <- lag(titi$code_lag)
+titi$code_lag_three <- lag(titi$code_lag_two)
+titi$code_lag_four <- lag(titi$code_lag_three)
+titi$code_lag_five <- lag(titi$code_lag_four)
+
+titi$time_lag <- lag(titi$time)
+titi$time_lag_two <- lag(titi$time_lag)
+titi$time_lag_three <- lag(titi$time_lag_two)
+titi$time_lag_four <- lag(titi$time_lag_three)
+titi$time_lag_five <- lag(titi$time_lag_four)
+
+titi$id_lag <- lag(titi$id)
+titi$id_lag_two <- lag(titi$id_lag)
+titi$id_lag_three <- lag(titi$id_lag_two)
+titi$id_lag_four <- lag(titi$id_lag_three)
+titi$id_lag_five <- lag(titi$id_lag_four)
+
+
+# All POM shifts
+titi$is_singlet <- titi$code %in% 1:3
+titi$time_singlet <- ifelse(titi$is_singlet,
+                            titi$time,
+                            NA)
+
+# Repeated twice
+titi$is_duet <- titi$code == titi$code_lag &
+  titi$code %in% 1:3 &
+  titi$id == titi$id_lag
+
+titi$time_duet <- ifelse(titi$is_duet & titi$time != 1,
+                            paste(titi$time_lag,titi$time,sep = "_"),
+                            NA)
+
+#Repeated three times
+titi$is_triplet <- titi$code == titi$code_lag &
+  titi$code == titi$code_lag_two &
+  titi$code %in% 1:3 &
+  titi$id == titi$id_lag &
+  titi$id == titi$id_lag_two
+
+titi$time_triplet <- ifelse(titi$is_duet & !titi$time%in%c(1,2),
+                            paste(titi$time_lag_two,titi$time,sep = "_"),
+                            NA)
+
+#Repeated four times
+titi$is_quadruplet <- titi$code == titi$code_lag &
+  titi$code == titi$code_lag_three &
+  titi$code == titi$code_lag_two &
+  titi$id == titi$id_lag &
+  titi$id == titi$id_lag_two &
+  titi$id == titi$id_lag_three &
+  titi$code %in% 1:3
+
+titi$time_quadruplet <- ifelse(titi$is_duet & !titi$time%in%c(1,2),
+                            paste(titi$time_lag_three,titi$time,sep = "_"),
+                            NA)
+
+#Repeated five times
+titi$is_quintuplet <- titi$code == titi$code_lag &
+  titi$code == titi$code_lag_three &
+  titi$code == titi$code_lag_four &
+  titi$code == titi$code_lag_two &
+  titi$id == titi$id_lag &
+  titi$id == titi$id_lag_two &
+  titi$id == titi$id_lag_three &
+  titi$id == titi$id_lag_four&
+  titi$code %in% 1:3
+
+titi$time_quintuplet <- ifelse(titi$is_duet & !titi$time%in%c(1,2),
+                               paste(titi$time_lag_four,titi$time,sep = "_"),
+                               NA)
+
+# Isolate true duets, i.e. which are not due to triplets
+
+titi$is_duet_lag <- lag(titi$is_duet)
+titi$is_duet_lead <- lead(titi$is_duet)
+
+titi$real_duets <- titi$is_duet
+# titi$real_duets[-1] <- titi$is_duet[-1] & titi$is_duet[-1]!=titi$is_duet_lag[-1]
+# any(titi$is_duet[-1]&titi$is_duet_lag[-1])
+
+
+titi$real_duets[which(titi$is_duet&titi$is_duet_lag)] <- F
+titi$real_duets[which(titi$is_duet&titi$is_duet_lead)] <- F
+identical(titi$real_duets,titi$is_duet)
+
+titi$time_real_duets = ifelse(titi$real_duets, titi$time_duet, NA)
+
+# Isolate real singlets 
+
+titi$is_singlet_lag <- lag(titi$is_singlet)
+titi$is_singlet_lead = lead(titi$is_singlet)
+
+titi$real_singlets <- titi$is_singlet
+titi$real_singlets[which(titi$is_singlet & titi$is_singlet_lag == titi$is_singlet)] <- FALSE
+titi$real_singlets[which(titi$is_singlet & titi$is_singlet_lead == titi$is_singlet)] <- FALSE
+
+titi$time_real_singlets = ifelse(titi$real_singlets, titi$time_singlet, NA)
+
+```
+
+
+## Dénombrement des différents cas
+
+### Occurrence des codes indiquant un changement de POM
+
+#### Proportion
+```{r prep all}
+# All POM shifts
+titi$is_singlet <- titi$code %in% 1:3
+titi$time_singlet <- ifelse(titi$is_singlet,
+                            titi$time,
+                            NA)
+sum(titi$is_singlet)/nrow(titi)
+sum(titi$is_singlet)
+
+matrix(c("Proportion totale",
+         "Nombre d'occurences",
+         "Nombre d'arbres",
+         sum(titi$is_singlet)/nrow(titi),
+       sum(titi$is_singlet),
+       titi %>% 
+         filter(is_singlet) %>% 
+         select(id) %>% 
+         unique %>% nrow),
+nrow = 3, byrow = F) %>% knitr::kable() %>% 
+  kable_styling()
+```
+
+La proportion d'individus concernés par un changement de POM signalé par un code est somme toute faible. Sous l'hypothèse selon laquelle les changements de POM sont indiqués par un code approprié bien plus souvent qu'ils sont masqués par d'autres codes mesures (4 ou plus), les corrections qui seront appliquées aux arbres mesurés au dessus de 130cm n'auront pas (ou très peu) de conséquences sur les grandes variables calculées à l'échelle du peuplement.
+
+#### Structuration dans le temps
+
+```{r all time}
+knitr::kable(table(titi$is_singlet, titi$time))%>% kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),full_width = T)
+
+titi %>% 
+  group_by(time) %>% 
+  summarise(count = length(which(is_singlet)),
+            proportion = length(which(is_singlet))/n(),
+            total = n())
+
+titi %>% 
+  filter(is_singlet) %>%
+  # group_by(time) %>% 
+  # summarise(count = n()) %>% 
+  ggplot(aes(x=time))+
+    geom_bar()
+
+
+```
+
+#### Structuration spatiale
+```{r all space}
+knitr::kable(table(titi$is_singlet,titi$Plot))%>% kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),full_width = T)
+
+titi %>% 
+  filter(is_singlet) %>%
+  rowwise %>%
+  mutate(Plot=as.character(Plot)) %>% 
+  mutate(Plot = ifelse(!Plot %in% as.character(1:16),
+                       BBmisc::explode(Plot, 
+                                       sep = "\\(")[1],
+                       Plot
+                       )) %>% 
+  ggplot(aes(x=Plot))+
+    geom_bar()
+
+titi %>% 
+  group_by(Plot) %>% 
+  summarise(count = length(which(is_singlet)),
+            proportion = length(which(is_singlet))/n(),
+            total = n())
+```
+
+## Fiabilité du code mesure
+
+Lors d'un changement de POM, sous l'hypothèse selon laquelle le tronc d'un arbre s'apparenterait à une section de cône, on s'attend à mesurer dans l'immédiat un diamètre moindre à celui mesuré à hauteur de poitrine, ou au POM précédent. Dans le cas d'inventaires annuels ou bisannuels, la croissance de l'arbre peut plus ou moins compenser cette diminution observée à cause du changement de hauteur de mesure, en particulier pour de faibles réhaussements (e.g. 50cm). Estimer la fiabilité générale de l'utilisation des codes mesure pour indiquer ces changements, à partir de taux de croissance, revient à comparer les distributions en fonction des codes renseignés. 
+
+### Codes 0
+
+
+
+### Changements uniques de POM indiqués par un code
+
+#### Nombre et structuration dans le temps
+
+#### Structuration spatiale
+
+#### Structuration taxonomique
+
+#### Changements de circonférences 
+
+### Deux occurrences consécutives d'un même code
+
+#### Nombre et structuration dans le temps
+
+#### Structuration spatiale
+
+#### Structuration taxonomique
+
+#### Changements de circonférences 
+
+#### Fiabilité apparente
+
+### Trois occurrences consécutives d'un même code
+
+#### Nombre et structuration dans le temps
+
+#### Structuration spatiale
+
+#### Structuration taxonomique
+
+#### Changements de circonférences
+
+#### Fiabilité apparente
+
+## Arbres mesurés avec une échelle
+
+### Recrutés avec une mesure à échelle et un code 0
+
+#### Nombre et structuration dans le temps
+
+#### Structuration spatiale
+
+#### Structuration taxonomique 
+
+### Mesurés au dessus de 180cm sans code échelle
+
+#### Nombre et structuration dans le temps
+
+#### Structuration spatiale
+
+#### Structuration taxonomique
+
+#### Recoupement avec les cas d'occurences multiples d'un même code
+
+# Sélection des arbres à vérifier en priorité
+
+## Hypothèses
+
+## Dénombrement
+
+## Localisation et parcelles à cibler
+
+# Conclusions sur la reconstitution automatique des POMs à Paracou
+
+## Hypothèses retenues
+
+## Méthode
+
+## Améliorations possibles
