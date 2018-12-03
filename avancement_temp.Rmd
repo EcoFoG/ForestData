@@ -1,0 +1,117 @@
+---
+title: "Avancement_temp"
+author: "Nino PAGE"
+date: "3 décembre 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Structure et philosophie du package
+
+## Idée générale
+
+### Philosophie
+
+On a retenu qu'il fallait rester simple dans les fonctionnalités proposées pour éviter de tomber dans l'abus d'assistance à l'user, et l'excès d'arguments pour filtrer à l'intérieur des fonctions, qui alordiraient la documentation. Les corrections ne doivent pas altérer les données d'entrée et sont réalisées en créant une nouvelle colonne. Les messages d'erreur sont informatifs et nombreux, les checks sont réalisés au début de chaque fonction, et chacun de ces cas devront être testés par des tests unitaires. Les seules dépendances appelées concernent le bloc "display", qui est très secondaire, et sont ggplot2 et dplyr (quoique, pas forcément nécessaire).
+
+### Arguments et nomenclature
+
+Pour les fonctions, le nom est du type "bloc_variable". 
+
+Les arguments sont explicites et simples:
+
+* time pour l'année d'inventaire, qui peut être absolue ou relative (nota, on considère seulement l'année ou bien la date pour le calcul de mortalités ? Faut il inclure les deux ?)
+
+* id pour les identifiants des arbres
+
+* measure pour le diamètre et la circonférence. Le type peut être spécifié avec un argument measure_type, ou détecté automatiquement parmi une liste de noms usuels (C,Circ,c,D,d,diam... etc) non équivoques.
+
+* status pour le statut vital. Peut être mieux que "alive" ?
+
+* Pour les noms de colonne, les noms sont du type "variable_col". Je n'ai pas trop trouvé d'autre moyen que de créer autant d'argument colonnes que de variables autres, et cela semble plus simple que de préciser l'ordre ou les noms que doivent avoir les variables quelque part dans la doc. Les noms par défaut sont les moins bêtes possibles.
+
+* D'autres variables logiques ou constantes peuvent occasionnellement figurer parmi la liste des arguments, mais leur nombre est en train d'être réduit. Par exemple, les "flag_correction" dans le bloc correct sont dépréciées, vu qu'on créée une nouvelle colonne sans toucher l'originale. L'idée est d'avoir le moins possible d'options "avancées" et de laisser l'user faire son prétraitement. Le cas échéant, le nom de ces variables est explicite (e.g. corrected, dans compute_mortality) et leur valeur par défaut est inactive.
+
+
+
+## Structure retenue
+
+Trois blocs, dont un "optionnel" : Correct (bloc coeur), Compute (appelé dans correct notamment), et Display (secondaire)
+
+### Correct
+
+Ce bloc se compose de deux fonctions qui corrigent le statut vital et les mesures de taille des arbres, et le stockent dans une nouvelle colonne appelée "nomspécifié_corrected":
+
+* correct_status, qui corrige le statut vital de l'arbre à partir de celui déjà existant si il y en a un, ou à partir des mesures de circonférences si ce n'est pas le cas. 
+
+* correct_size, qui corrige les circonférences à partir des données de POM et de circonférence brute.
+
+### Compute
+
+Ce bloc se compose de quatre fonctions, prenant en entrée des données que l'utilisateur aura pris soin de préfiltrer tout seul car rajouter des arguments et des filtres apporterait une densité d'arguments et d'options trop lourde, et nous ferait nous éloigner de l'idée de base d'un package simple et portatif utilisé pour corriger des données, voire calculer quelques statistiques générales. Une cinquième fonction, globale appelle les autres simultanément.
+
+Il se compose de:
+
+* compute_ba, qui calcule simplement la surface terrière, absolue ou par unité de surface, par année et éventuellement par parcelle si spécifié par l'user (encore que, on peut toujours rétrograder de ce côté là pour simplifier)
+
+* compute_mortality, qui se base sur une générification de la fonction de Géraldine passée en R-base, par année, et qui aussi se fait éventuellement par parcelle si spécifié. Si l'utilisateur renseigne un argument corrected = FALSE, la fonction appelle correct_status avant de réaliser le calcul. La différence avec la fonction déjà écrite en data.table est l'utilisation de colonnes décalées créées puis effacées au sein de la fonction, plutôt que le passage au format large en fonction de l'année d'inventaire.
+
+* compute_recruitement, dans la même idée que la fonction de mortalité.
+
+* compute_growth, qui est adaptée à la fois pour calculer la croissance d'une parcelle, par parcelles, et pour être appelée de manière simplifiée dans correct_size()
+
+* compute_all, qui crée une table appelant toutes les autres fonctions d'un coup. A noter que pour les mortalités, recrutements et croissances, une année de moins sera renseignée que pour la surface terrière, et sera matérialisée dans la table obtenue par des NA.
+
+### Display
+
+Ce bloc manque encore de définition. Je ne passerai que peu de temps dessus, sauf si il y a un vrai intérêt mais j'en doute. L'idée de base est de proposer une sortie graphique par variable calculée, en fonction du temps et des parcelles (sur le même graphe), et une fonction globale qui renvoie un grob des 4 variables en sortie de compute_all.
+
+On pourrait inclure rapidement et facilement le regroupement de certaines parcelles (e.g. par traitement) et tracer des ribbons avec moyenne et percentile, mais je ne sais pas si c'est hyper pertinent. 
+nota: Je suis ouvert à la discussion concernant l'adaptation des fonctions e display en R-base, a noter qu'il est plus complexe de coder ça ainsi pour obtenir des graphes aussi propres et complets qu'en ggplot. Plotly, pour le côté interactif, pourra être appelé mais son installation ne sera pas nécessaire à l'utilisation des fonctions.
+
+# Questions prioritaires et programme pour la suite
+
+J'ai des questions principalement sur les décisions relatives à la correction des tailles, qui est vraiment le coeur du package et qui est ce que je veux terminer en premier. Le reste doit surtout être testé, et il n'y a pas grand chose à réfléchir sur la manière de calculer les descripteurs du peuplement (sauf concernant la prise en compte de la date) ou la correction du statut vitale (sauf une)
+## correct_size
+
+### Questions 
+
+* Est-ce que le champ POM est une entrée obligatoire ? Sachant qu'à Paracou on a de grosses incertitudes autour, faut-il garder une version proche de celle de Camila qui prend juste les circonférences et corrige en manière empyrique, ou bien se décide-t-on à restreindre les corrections à des données pour lesquelles on a les changements de POM proprement renseignés, afin d'être certain de faire des corrections fiables ?
+
+* Dans le cas où on autorise le POM à ne pas être renseigné, dans quel ordre on effectue les corrections pour les trois cas de Camila (croissance ou décroissance aberrante avec retour, décroissance sans retour sous entendu changement de POM, croissance sans retour sous entendu estimation foireuse) ?
+
+* Concernant les corrections de changement de POM, si le champ est explicitement renseigné, est-ce qu'on corrige quand même "empiriqument" comme dans la méthode de Camila, par la suite ? Est-ce qu'on considère que le POM renseigné est 100% juste ou bien qu'il peut y avoir des erreurs dedans, du genre changement de POM pas reporté ?
+
+* Pour la correction des circonférences lors d'un changement de POM, Camila utilisait la méthode "translation selon l'écart entre les deux courbes + la croissance attendue, extrapolée depuis quelques années précédentes". On se cantonne à ça pour le moment ? Ou bien on utilise la formule trigonométrique de Bruno, qui nécessite soit un coefficient de conicité soit une hauteur.
+
+* Si on utilise la formule de Bruno, on prend un coefficient de conicité issu de la littérature et adapté soit aux néotropiques soit aux tropiques... Ou bien on cherche dans les allométries développées sur la Guyane voire sur Paracou (peut être que dans la thèse de Molto, j'ai vu quelque chose d'intéressant).
+
+### Actions
+
+* On a retenu que l'ordre de correction était le suivant: changements de POM renseignés, aberrations sans retour à la normal, aberrations ponctuelles. Dans les cas complexes, il faudrait être capable de les détecter pour décider que ce n'est pas corrigeable (avec un code correction indiquant que c'est probablement foireux)? Je pense que c'est important, mais ne sais pas encore comment faire ça, je propose donc de ne pas en faire une priorité et de l'inclure dans les développements futurs du package, par exemple à la mise à jour suivante.
+
+* Concernant la manière dont on corrige le changement de POM, si on ne trouve pas de méthode à la fois pointue, satisfaisante et peu exigeante en données d'entrée, on peut partir sur celle déjà utilisée par Camila et dans Paracou, et idem, inclure une solution plus intelligente et réfléchie dans la MAJ suivante, une fois qu'on aura fait les vérifs terrain qui pourraient apporter une information utile à cette décision: Mesures du diamètre avant et après changement de POM pour les arbres à vérifier ? Ou au moins, savoir quels changements de POM étaient effectivement vrais, pour avoir la vraie distribution des $delta(Circ)(t-1,t) = growth - loss(Circ)|delta(POM)(t-1,t)$... 
+
+* Je propose que le champ POM soit optionnel pour cette version, par souci de cohérence car on ne l'a pas encore reconstitué sur nos données, mais qu'un fort avertissement soit renvoyé si il n'est pas renseigné. Soit un simple warning, soit carrément un stop() obligeant l'utilisateur à lire le message, puis renseigner un argument pour ignorer le message en toute connaissance de cause.
+
+
+## Statut vital 
+
+* J'utilise soit le statut déjà existant soit la circonférence pour créer le champ status. Si les deux sont déjà dans le tableau d'entrée, est-ce que j'utilise les deux ou est-ce de l'overchecking ???
+
+
+## Display
+
+### Questions
+
+* Est-ce que je le fais aussi en R-base, ou bien on se donne le droit d'en faire un truc optionnel reservé aux ggploteurs ? Ceux qui n'utilisent pas ggplot font d'ores et déjà le choix de galérer à afficher leurs trucs avec base.
+
+* Une fonction générale display(data, what = "variable") où on change l'argument what selon ce qu'on veut ploter (voire, laisser la possibilité de mettre plusieurs vars ?), ou bien des fonctions séparées pour chaque variable et une display_all ?
+
+### Actions
+
+* Je vais déjà commencer par l'écrire en séparé, ça va aller vite car pour la plupart des vars j'ai déjà les codes ça et là. Et puis si il faut grouper et rendre ça souple, que ça allège l'index des fonctions du package ou la vignette, ça sera pas un souci non plus.
+
