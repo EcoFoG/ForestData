@@ -1,31 +1,67 @@
 #' Title
 #'
 #' @param data A data.frame containing a forest census, to correct for tree's status.
-#' @param measure_col character - The name of the column containing
 #' @param id_col
 #' @param time_col
 #' @param alive_col
-#' @param dead_confirmation_censuses
-#' @param flag_corrections
+#' @param dead_confirmation_censuses Integer - Number of censuses for which
+#' @param ignore_na_before
+#' @param use_circumference
 #'
 #' @return
 #' @export
 #'
 #' @examples
 correct_alive <- function(data,
-                          measure_col = "Circ",
                           id_col = "idTree",
                           time_col = "CensusYear",
                           alive_col = "CodeAlive",
                           ignore_na_before = FALSE,
                           dead_confirmation_censuses = 2,
-                          flag_corrections = T){
+                          use_circumference = FALSE
+                          ){
 
   # Safety checks -----------------------------------------------------------
 
-  if(!measure_col%in%names(data)){
-    stop("The name you indicated (or let to default) for tree sizes column (diameter or circumference) is apparently not in the colnames of the dataset. Please specify it")
+  # Trivial check of data arg
+  if(!is.data.frame(data)){
+    stop("data must be a dataframe")
   }
+  # Checks and adaptations relative to circumference and diameter columns
+  ##If no size column is specified, stop with explicit message
+  if(is.na(diameter_col) & is.na(circumference_col)){
+    stop("You must indicate the name of a column containing either circumference (argument circumference_col) or diameter (argument diameter col)")
+  }
+  else{
+    ##If both size columns are specified, stop with explicit message
+    if(!any(is.na(c(circumference_col,diameter_col)))){
+      stop("You specified both diameter and circumference column names, please choose only one.")
+    }
+    else{
+      ##Else, find which one is specified and check its validity, and stop with an explicit message if needed.
+      if(is.na(diameter_col)){
+        ## If diameter is NA then circumference is specified, then next step is to check if it is in data's column names
+        if(diameter_col%in%names(data)){
+          names(data[which(names(data) == circumference_col)]) <- "size" # tag size
+        }
+        else{
+          ## If not, then stop
+          stop("The name you indicated for trees' circumference column (argument circumference_col) is apparently not in the names of the dataset. Please specify the correct name for this column.")
+        }
+      }
+      else if(is.na(circumference_col)){
+        # Idem for circumference and diameter inverted.
+        if(diameter_col%in%names(data)){
+          names(data[which(names(data) == diameter_col)]) <- "size" # tag size
+        }
+        else{
+          stop("The name you indicated for trees' diameter column (argument diameter_col) is apparently not in the names of the dataset. Please specify the correct name for this column.")
+        }
+      } ## Let an escape message in case of unexpected type error or exception.
+      else stop("Unknown type exception relative to diameter_col and/or circumference_col argument(s). Please read the documentation.")
+    }
+  }
+
   if(!time_col%in%names(data)){
     stop("The name you indicated (or let to default) for the census year column is apparently not in the colnames of the dataset. Please specify it")
   }
@@ -47,7 +83,7 @@ correct_alive <- function(data,
     else stop("The name you indicated for the column containing tree status (0: dead, 1:alive) is not part in the colnames of the dataset. Please indicate it")
   }
   else{
-    return(.correct_alive_data(data, time_col,id_col,alive_col,flag_corrections))
+    return(.correct_alive_data(data, time_col,id_col,alive_col))
   }
 }
 

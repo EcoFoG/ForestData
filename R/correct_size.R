@@ -1,23 +1,58 @@
 correct_size <- function(data,
-                         measure_col,
+                         diameter_col = NA,
+                         circumference_col = NA,
+                         POM_col = NA,
                          time_col,
                          alive_col,
                          # limit = 20,  # unused argument in original code
                          method = "Thresholds", # Other arguments could be
-                         positive_tresh = 5,
-                         negative_thresh = -2
+                         positive_tresh_diameter = 5,
+                         negative_thresh_diameter = -2,
+                         ignore_POM = FALSE
                          ){
 
   # Checks ------------------------------------------------------------------
 
+  # Trivial check of data arg
   if(!is.data.frame(data)){
     stop("data must be a dataframe")
   }
 
-  if(!measure_col%in%names(data)){
-    stop("The name you indicated (or let to default) for tree sizes column (diameter or circumference) is apparently not in the colnames of the dataset. Please specify it")
+  # Checks and adaptations relative to circumference and diameter columns
+  ##If no size column is specified, stop with explicit message
+  if(is.na(diameter_col) & is.na(circumference_col)){
+    stop("You must indicate the name of a column containing either circumference (argument circumference_col) or diameter (argument diameter col)")
   }
-  else names(data[which(names(data) == measure_col)]) <- "size"
+  else{
+    ##If both size columns are specified, stop with explicit message
+    if(!any(is.na(c(circumference_col,diameter_col)))){
+      stop("You specified both diameter and circumference column names, please choose only one.")
+    }
+    else{
+      ##Else, find which one is specified and check its validity, and stop with an explicit message if needed.
+      if(is.na(diameter_col)){
+        ## If diameter is NA then circumference is specified, then next step is to check if it is in data's column names
+        if(diameter_col%in%names(data)){
+          names(data[which(names(data) == circumference_col)]) <- "size" # tag size
+        }
+        else{
+          ## If not, then stop
+          stop("The name you indicated for trees' circumference column (argument circumference_col) is apparently not in the names of the dataset. Please specify the correct name for this column.")
+        }
+      }
+      else if(is.na(circumference_col)){
+        # Idem for circumference and diameter inverted.
+        if(diameter_col%in%names(data)){
+          names(data[which(names(data) == diameter_col)]) <- "size" # tag size
+        }
+        else{
+          stop("The name you indicated for trees' diameter column (argument diameter_col) is apparently not in the names of the dataset. Please specify the correct name for this column.")
+        }
+      } ## Let an escape message in case of unexpected type error or exception.
+      else stop("Unknown type exception relative to diameter_col and/or circumference_col argument(s). Please read the documentation.")
+    }
+  }
+
 
   if(!time_col%in%names(data)){
     stop("The name you indicated (or let to default) for the census year column is apparently not in the colnames of the dataset. Please specify it")
@@ -28,6 +63,35 @@ correct_size <- function(data,
     stop("The name you indicated (or let to default) for the unique, individual tree IDs column is apparently not in the colnames of the dataset. Please specify it")
   }
   else names(data[which(names(data) == id_col)]) <- "id"
+
+  if(!is.numeric(positive_tresh_diameter)){
+    stop("The argument positive_thresh_diameter must be numeric, and contain the upper limit over which an annual growth rate is considered abnormally high")
+  }
+  else if(positive_tresh_diameter == 5){
+    warning("The argument positive_thresh_diameter, which represents the upper limit over which a growth rate is considered abnormally high, is set to its default value. If you work on other plots than Paracou, we advise you to consider this point carefully.")
+  }
+
+  if(!is.numeric(negative_tresh_diameter)){
+    stop("The argument negative_thresh_diameter must be numeric, and contain the lower limit under which an annual diameter growth rate is considered abnormally low (negative)")
+  }
+  else if(negative_tresh_diameter == -2){
+    warning("The argument negative_thresh_diameter, which represents the lower limit under which an annual diameter growth rate is considered abnormally low(negative), is set to its default value. If you work on other plots than Paracou, we advise you to consider this point carefully.")
+  }
+
+  if(is.na(POM_col)){
+    if(!ignore_POM){
+      stop("You did not indicate any name for the column containing POM measurements. If you wish to perform the correction without using this source of information, you can set the argument ignore_POM to TRUE (unadvised and at your own risks).")
+    }
+    else{
+      warning("Keep aware that you do not use POM measurements to perform the corrections, which lowers the reliability of the corrections performed by this function. Take it on your own responsibility.")
+    }
+  }
+  else if(!POM_col %in% names(data)){
+    stop("The name you indicated for the column containing POM values (argument POM_col) is not in data's column names. Please specify it correctly.")
+  }
+  else{
+    names(data[which(names(data) == POM_col)]) <- "POM"
+  }
 
 
 # Ordering by and extracting ID -------------------------------------------
