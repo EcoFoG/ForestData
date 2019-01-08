@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-correct_alive <- function(data,
+correct_alive_opti <- function(data,
                           id_col = "idTree",
                           time_col = "CensusYear",
                           alive_col = "CodeAlive",
@@ -45,7 +45,7 @@ correct_alive <- function(data,
   if(use_size != FALSE & !alive_col%in%names(data)){
     stop("The name you indicated (or let to default) for the tree vital status column is apparently not in the colnames of the dataset. You must specify it, or if it does not exist, use the argument use_size to create it from measurements under the hypothesis that only live trees were measured in your inventory")
   }
-  else names(data)[which(names(data)==alive_col)] <- "status"
+  else names(data)[which(names(data)==id_col)] <- "status"
   ## plots
   if(byplot & !plot_col%in%names(data)){
     stop("The name you indicated (or let to default) for the unique, individual tree IDs column is apparently not in the colnames of the dataset. Please specify it")
@@ -104,7 +104,13 @@ correct_alive <- function(data,
     # print(data_plot[which(data_plot$id != i),])
     # print("tree")
     # print(.correct_alive_tree(tree_temp, censuses, dead_confirmation_censuses,i))
-    data_plot <- rbind(data_plot[which(data_plot$id != i),], .correct_alive_tree(tree_temp, censuses, dead_confirmation_censuses,i))
+
+
+    data_plot <- rbind(data_plot[which(data_plot$id != i),],
+                       .correct_alive_tree(tree_temp,
+                                           censuses,
+                                           dead_confirmation_censuses,
+                                           i))
   }
   return(data_plot)
 }
@@ -123,25 +129,26 @@ correct_alive <- function(data,
   # Create lines for each census
   # Instead of re-looping, we can extract directly the censuses for which tree was not seen.
   absents <- which(!censuses %in% tree_temp$time)
+  nabs <- length(absents)
   # Create new rows, but without knowing how many column are in data and what they contain !
-  if(length(absents) > 0){
+  if(nabs > 0){
     if("plot" %in% names(tree_temp)){
       new.rows <- data.frame(id = i,
                              time = censuses[absents],
-                             status = rep(NA, length(absents)),
-                             status_corr = rep(NA, length(absents)),
-                             plot = rep(tree_temp$plot[1],length(absents)))
+                             status = rep(NA, nabs),
+                             status_corr = rep(NA, nabs),
+                             plot = rep(tree_temp$plot[1],nabs))
     }
     else{
       new.rows <- data.frame(id = i,
                              time = censuses[absents],
-                             status = rep(NA, length(absents)),
-                             status_corr = rep(NA, length(absents)))
+                             status = rep(NA, nabs),
+                             status_corr = rep(NA, nabs))
     }
 
     # Add other columns which names are unknown (to allow subsequent rbinding), and default-set it to NA
     new.rows[,names(tree_temp)[-which(names(new.rows)%in%names(tree_temp))]] <- NA
-    tree_temp[(nrow(tree_temp)+1):(nrow(tree_temp)+nrow(new.rows)),names(new.rows)] <- new.rows
+    tree_temp[(nrow(tree_temp)+1):(nrow(tree_temp)+nabs),names(new.rows)] <- new.rows
   }
 
   #Make sure that it is ordered by increasing census time
@@ -151,8 +158,10 @@ correct_alive <- function(data,
   if(!all(is.na(tree_temp$status))){
 
     #Isolate the first and last census when seen alive.
-    first_seen_alive <- min(which(tree_temp$status == 1))
+    first_seen_alive <- which(tree_temp$status == 1)[1]
     last_seen_alive <- max(which(tree_temp$status == 1))
+    # first_seen_alive <- min(which(tree_temp$status == 1))
+    # last_seen_alive <- max(which(tree_temp$status == 1))
 
     #Correct tree status between both
     tree_temp$status_corr[first_seen_alive:last_seen_alive] <- 1
@@ -162,7 +171,7 @@ correct_alive <- function(data,
     # how many consecutive censuses without seeing the tree are needed to state its death.
 
     #If the tree is declared dead just after having been seen alive for the last time, suppress the censuses after that
-    if(!last_seen_alive == length(tree_temp$status)){
+    if(!last_seen_alive == nrow(tree_temp)){
       # If the tree is seen dead right after the last census it has been seen alive
       # the next lines are useless, thus we suppress them
       if(!is.na(tree_temp$status[last_seen_alive+1]) &  tree_temp$status[last_seen_alive+1] == 0){
@@ -173,7 +182,7 @@ correct_alive <- function(data,
         # If the tree is unseen more than dead_confirmation_censuses times
         # it means that it is almost certainly dead
 
-        if(last_seen_alive < length(tree_temp$status_corr)-(dead_confirmation_censuses-1)){
+        if(last_seen_alive < nrow(tree_temp)-(dead_confirmation_censuses-1)){
 
           # So, we correct stating that the tree died right after first unsighting
           tree_temp$status_corr[last_seen_alive+1] <- 0
@@ -195,9 +204,9 @@ correct_alive <- function(data,
       }
     }
     if(first_seen_alive > 1){
-      if(all(is.na(tree_temp$status_corr[1:(first_seen_alive-1)]))){
+      # if(all(is.na(tree_temp$status_corr[1:(first_seen_alive-1)]))){
         tree_temp <- tree_temp[-(1:(first_seen_alive-1)),]
-      }
+      # }
     }
   }
   return(tree_temp)

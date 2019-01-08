@@ -1,40 +1,53 @@
+#' Title
+#'
+#' @param data
+#' @param id_col
+#' @param time_col
+#' @param size_col
+#' @param measure_type
+#'
+#' @return
+#' @export
+#'
+#' @examples
 compute_growth_diameter <- function(data,
-                                    id_col,
-                                    time_col,
-                                    size_col,
-                                    measure_type){
+                                    id_col = "idTree",
+                                    time_col = "CensusYear",
+                                    size_col = "CircCorr",
+                                    measure_type = "C"){
 
 # Checks ------------------------------------------------------------------
-  if(!is.data.frame(data)) stop("data must be a data.frame class object")
+  if(!is.data.frame(data)) stop("data must be a data.frame")
 
   if(!id_col%in%names(data)){
     stop("wrong name for the column containing unique tree IDs")
   }
   else{
-    names(data[which(names(data) == id_col)]) <- "id"
+    names(data)[which(names(data) == id_col)] <- "id"
   }
 
   if(!time_col%in%names(data)){
     stop("wrong name for the column containing census year")
   }
   else{
-    names(data[which(names(data) == time_col)]) <- "time"
+    names(data)[which(names(data) == time_col)] <- "time"
   }
 
   if(!size_col%in%names(data)){
     stop("wrong name for the column containing tree size measure")
   }
   else{
-    names(data[which(names(data) == size_col)]) <- "size"
+    names(data)[which(names(data) == size_col)] <- "size"
   }
 
   if(!is.character(measure_type))
     stop("measure type must be a character: C or D for circumference and diameter, respectively")
 
-  if(measure_type == "C") data[which(names(data)==size_col),] <- data[which(names(data)==size_col),]/pi
+  if(measure_type == "C") data[,which(names(data)==size_col)] <- data[,which(names(data)==size_col)]/pi
 # Compute -----------------------------------------------------------------
-
-  data <- .compute_growth(data[order(data$id, data$size),])
+print(head(data$id))
+  print(head(data$size))
+  data <- .compute_growth_complete_data(data[order(data$id, data$size),])
 
   names(data$size) <- size_col
   names(data$time) <- time_col
@@ -42,6 +55,8 @@ compute_growth_diameter <- function(data,
 
   return(data)
 }
+
+
 compute_growth_circumference <- function(data,
                                     id_col,
                                     time_col,
@@ -78,7 +93,7 @@ compute_growth_circumference <- function(data,
   if(measure_type == "D") data[which(names(data)==size_col),] <- data[which(names(data)==size_col),]*pi
   # Compute -----------------------------------------------------------------
 
-  data <- .compute_growth(data[order(data$id, data$size),])
+  data <- .compute_growth_complete_data(data[order(data$id, data$size),])
 
   names(data$size) <- size_col
   names(data$time) <- time_col
@@ -86,19 +101,22 @@ compute_growth_circumference <- function(data,
 
   return(data)
 }
+
+
 .compute_growth_complete_data <- function(data){
 
-  data <- data[order(data$id, data$size),]
+  data <- data[order(data$id, data$time),]
 
-  data$size_leaded <- c(data$size[-nrow(data)],NA)
-  data$time_leaded <- c(data$time[-nrow(data)],NA)
-  data$id_leaded <- c(data$id[-nrow(data)],NA)
+  data$size_lag <- c(NA,data$size[-nrow(data)])
+  data$time_lag <- c(NA,data$time[-nrow(data)])
+  data$id_lag <- c(NA,data$id[-nrow(data)])
 
   data$growth_absolute <- NA
   data$growth_annual <- NA
 
-  data$growth_absolute[which(data$id_leaded == data$id)] <- data$size_leaded - data$size
-  data$growth_annual[which(data$id_leaded == data$id)] <- (data$size_leaded-data$size)/(data$time_leaded - data$time)
+  indices <- which(data$id_lag == data$id)
+  data$growth_absolute[indices] <- data$size[indices] - data$size_lag[indices]
+  data$growth_annual[indices] <- (data$size[indices]-data$size_lag[indices])/(data$time[indices] - data$time_lag[indices])
 
   rm(list = c(data$size_leaded,data$id_leaded, data$time_leaded))
 
