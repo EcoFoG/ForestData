@@ -13,7 +13,6 @@
 #' @param replace When set to false it create a column circumf_corr, when set to true it replace measure named column with the corrected values
 #'
 #' @return a Dataframe cleared
-#' @export
 #'
 #' @examples
 #' clearCircumference(data, idTree = "idTree", Measure = "Circ", MeasureYear = "Year", Status = "Status", Genus = "Genus", Specie = "Specie", replace = FALSE)

@@ -12,7 +12,6 @@
 #' @param label_size Size of the label of each tree
 #'
 #' @return A ggplot2 plot
-#' @export
 #'
 #' @examples
 plotMap <- function(data, X = "X", Y = "Y", IdTree = "idTree", Measures = F, Status = F, title = "Map", label_size = 2){
