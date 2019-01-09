@@ -1,0 +1,94 @@
+---
+title: "Avancement"
+author: "Nino PAGE"
+date: "9 janvier 2019"
+output: html_document
+---
+
+# Général
+
+
+# Correct_
+
+## Alive
+
+* Ecriture finie. Peut être quelques détails à peaufiner
+    - quelques checks et messages d'erreurs
+    - documentation à remanier un peu
+    - commentaires à revoir une fois optimisé, pour compenser une éventuelle perte en lisibilité.
+    
+* Tests unitaires : 
+    - Ecriture des tests de résultats finis. Sur les trois niveaux: dataset, plot, individu ; en utilisant un dataset que j'ai fait et qui inclut la majorité des cas pathologiques que l'on s'attend à rencontrer. Reste à faire les tests d'erreurs avec des types d'arguments non gérés.
+    
+* Optimisation :
+    - Quelques points d'optimisation ont permis de diviser le temps de calcul par deux environ. 
+    - En passant à des matrices ou vecteurs plutôt que des data.frames, on perd beaucoup en lisibilité (d'où ma réécriture dans ce format) mais on gagne en temps de calcul. Je vais essayer d'optimiser les autres opérations qui prennent du temps, mais on ne pourra peut être pas y couper.
+    - A faire: code profiling pour identifier les lignes sur lesquelles se concentrer.
+    
+
+
+## Recruits
+
+* Gros de l'écriture finie. Sécurisation et messages d'erreurs à terminer.
+* Basé sur les morceaux de codes envoyés par Camila. Fait la même chose : remplace toutes les valeurs précédentes par la mesure dispo si il y en a une seule ; extrapole la trajectoire pré-recrutement si il y a au moins deux mesures.
+* Sécurisation et documentation à faire.
+* Tests unitaires à faire.
+* Optimisation a priori inutile.
+
+## Size
+
+* Gros de l'écriture finie. Sécurisation et messages d'erreurs à venir.
+* Ordre actuel à l'échelle de l'arbre: 
+    - Corrige, à partir du champ POM fourni, les changements explicitement indiqués
+        - Par translation comme fait par Camila. Une méthode trigo pourrait être adaptée, mais devoir utiliser des données d'allométries pour calculer un coefficient de conicité peut être limitant
+        - Difficile de tester si cette méthode est raisonnable ou non : pas encore de champ POM propre sur Paracou
+    - Corrige ensuite les croissances anormales, comme dans correct_dbh dans les codes originaux
+        - Se calque sur la version qui détecte les aberrations, et corrige le plus aberrant en premier.
+        - Un problème venait, pour certains arbres, du fait qu'on utilise les données déjà corrigées, au fur et à mesure que l'on corrige des outlyers. Ceci a l'inconvénient de donner de l'importance à l'ordre dans lequel sont effectuées les corrections (notamment chez certains Cecropia, corriger une première croissance aberrante rend les suivantes aberrantes aussi !). Je n'ai pas encore fait en sorte qu'o utilise seulement la circonférence brute pour générer la circonférence corrigée. Utilisez la circonférence brute seulement peut aussi amener des erreurs.
+        
+        - Un autre problème semblait venir de la définition de "croissance aberrante sans retour à la normale" : on regarde les deux points avant et les deux points après l'aberration, dans l'espoir de trouver une aberration inverse qui compense l'erreur de mesure (cas le plus répandu : mesure eronnée isolée). Parfois, on observe des changements aberrants, une stagnation pendant deux ou trois ans, puis ce qui semble être un retour à la normale. Dans ces cas là, il se peut que les mesures précédentes soient réalignées sur les quelques potentielles aberrations, ce qui semble problématique. J'ai essayé de faire tourner la première partie pour corriger en utilisant les POM, afin de voir si ce genre de cas subsiste dans mon "panel d'outlyers", les cas retors pour lesquels j'avais sorti un ensemble de graphes. Cela ne résoud pas le problème. Le plus embêtant, c'est que si l'on élargit trop le scope, on peut en arriver à l'erreur inverse, et considérer comme outlyer une série de mesures que l'on réaligne ainsi sur les précédentes, à tort.
+        - Pour le moment, je garde ce qu'a fait Camila en ajoutant la première correction explicite avec les POM. En y voyant plus clair, je pourrais avoir une idée de ce qu'il faut faire. Elargir le scope de manière arbitraire peut mener à un comportement de la correction qui marche bien pour Paracou, mais pas forcément très générique ? 
+    
+* Tests unitaires à écrire : données manipulées ou créées, ou bien vraies données sachant qu'il va falloir bien les choisir (à cause des problèmes de champ POM) ?
+
+* Optimisation : A faire en dernier.
+
+
+
+
+# Compute_
+
+## Mortaliy 
+
+* Ecriture finie
+    - Peaufiner les commentaires et les descriptions
+    - Vérifier les checks.
+    
+* Fonctionne sur les petits jeux de données, et prend peu de temps de calcul pour tout Paracou.
+* Tests unitaires:  A ecrire. Il faut que j'utilise la fonction qu'a fait Géraldineen data.table l'année dernière pour vérifier le bon fonctionnement de celle-ci.
+
+## Recruitement
+
+* Parallèle à Mortality.
+* Ecriture finie
+    - Peaufiner les commentaires et les descriptions
+    - Vérifier les checks.
+* Fonctionne sur les petits jeux de données, et prend peu de temps de calcul pour tout Paracou.
+* Tests unitaires:  A ecrire. Il faut que j'utilise la fonction qu'a fait Géraldineen data.table l'année dernière pour vérifier le bon fonctionnement de celle-ci.
+
+## Growth
+* Ecriture bien avancée, à remettre au propre. Version qui marche sur les données corrigées, complètes. Reste à voir comment je code ça pour des inventaires à trous ou pas encore corrigés : 
+    - Si un arbre a N circonférences NA entre deux circonférences non NA, est-ce que je fais en sorte que la croissance annuelle soit NA pour la période de temps concernée puis apparaisse pour la première valeur après les NA ? Ou bien est-ce que je mets dans le champ croissance la même croissance annuelle répétée N fois à l'endroit où sont les NA ?
+    
+* Deux possibilités: soit rajoute un champ croissance sur l'inventaire... soit retourne un autre data.frame avec plot, année, croissance (comme pour les fonctions mortality et recruitment) prêt à être ggploté. Lequel on favorise pour la version finale ?
+
+
+## BA
+
+* Ecriture en cours (remise au propre des premières versions, épurement), à calquer sur mortality et recruitment.
+* Peu de points à revoir.
+* tests à écrire.
+
+# Display_
+
+Pas encore de fonctions qui marchent pour ce bloc, pas une priorité donc à faire en dernier.

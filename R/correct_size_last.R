@@ -88,11 +88,16 @@ data <- .correct_size_plot(data,
   return(data_plot)
 }
 
-.correct_size_tree <- function(size,
+
+
+
+
+
+
+.correct_POM_changes <- function(size,
                                size_corr,
                                code_corr,
                                cresc,
-                               status,
                                time,
                                POM,
                                default_POM,
