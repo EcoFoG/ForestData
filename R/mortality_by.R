@@ -14,7 +14,7 @@ compute_ba <- function(data,
                        measure_col = "CircCorr",
                        measure_type = "C",
                        time_col = "CensusYear",
-                       by = c("Plot", "CensusYear"),
+                       by = c("Plot"),
                        surface = F){
 
 
@@ -36,12 +36,12 @@ compute_ba <- function(data,
     }
   }
 
-
-  data$ba <- pi*(data$size*data$size)/4
-
   if(!(is.na(time_col)|is.null(time_col))){
     by <- c(by, time_col)
   }
+
+  data$ba <- pi*(data$size*data$size)/4
+
   if(any(!by %in% names(data))){
     if(sum(!by %in% names(data)) == 1){
       stop(paste0("Argument 'by' contains an element that is not matching the dataset's fields: ",
@@ -67,7 +67,7 @@ compute_ba <- function(data,
       bys[[b]] <- unique(data[,which(names(data) == b)])
     }
     print(bys)
-    basal_area <- expand.grid(bys, stringsAsFactors = FALSE)
+    mortality <- expand.grid(bys, stringsAsFactors = FALSE)
 
 
     basal_area <- data.frame(basal_area,"absolute_basal_area" = NA, "surface_area" = NA, "basal_area_per_ha" = NA)
@@ -78,23 +78,23 @@ compute_ba <- function(data,
       }
       else if(is.data.frame(surface)){
         # if(!length(which(!names(surface) %in% by))> 1){
-          for(s in 1:nrow(surface)){
+        for(s in 1:nrow(surface)){
 
-            surftemp <- surface[s,"surface"]
+          surftemp <- surface[s,"surface"]
 
-            matchs <- names(surface)[which(names(surface) %in% by)]
-            corresp <- surface[s,matchs]
-print(matchs)
-            expsurf <- paste0(paste0("basal_area$",
-                                     matchs,
-                                     " == ",
-                                     corresp),
-                              collapse = " & ")
-            print("here")
-            print(expsurf)
-            print(which(eval(parse(text = expsurf))))
-            basal_area$surface_area[which(eval(parse(text = expsurf)))] <- surftemp
-          }
+          matchs <- names(surface)[which(names(surface) %in% by)]
+          corresp <- surface[s,matchs]
+          print(matchs)
+          expsurf <- paste0(paste0("basal_area$",
+                                   matchs,
+                                   " == ",
+                                   corresp),
+                            collapse = " & ")
+          print("here")
+          print(expsurf)
+          print(which(eval(parse(text = expsurf))))
+          basal_area$surface_area[which(eval(parse(text = expsurf)))] <- surftemp
+        }
         # }
       }
     }
@@ -106,7 +106,7 @@ print(matchs)
 
       rowval = basal_area[f,by]
       print("rowval")
-print(str(rowval))
+      print(str(rowval))
       exp <- paste0(paste0("data$",
                            by,
                            " == ",
