@@ -1,181 +1,116 @@
 #' Title
 #'
-#' @param data
-#' @param measure
-#' @param surface
-#' @param forest_col
-#' @param forest
-#' @param plot_col
-#' @param plot
-#' @param subplot_col
-#' @param subplot
-#' @param time_col
-#' @param time
-#' @param taxon_col
-#' @param taxon
-#' @param Dmin
-#' @param Dmax
-#' @param categories
+#' @param data A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.
+#' @param measure_col A single character containing the name of the column corresponding to tree size measurements -either circumference or diameter.
+#' @param measure_type A single character indicating whether tree sizes are given in circumferences -"C"- or diameter -"D"-.
+#' @param by A character vector containing the name of the columns containing the variables -other than census time- according to which the result will be aggregated. Be it plots, subplots or species name...
+#' @param surface Either a scalar containing the surface area of each plot -if they have the same dimensions- or a data.frame of the surface area according to some of the grouping variables -e.g. Plot and subplot...
 #'
-#' @return
+#' @return A dataframe containing, for each combination of grouping variables, the plot-level and per-ha basal area for a given census year.
 #' @export
 #'
 #' @examples
 compute_ba <- function(data,
-                       measure = "Diameter",
-                       surface = NA,
-                       forest_col = "Forest",
-                       forest = NA,
-                       plot_col = "Plot",
-                       plot = NA,
-                       subplot_col = "Subplot",
-                       subplot = NA,
-                       time_col = "CensusYear",
-                       time = NA,
-                       taxon_col = c("Genus","Species"),
-                       taxon = NA,
-                       Dmin = NA,
-                       Dmax = NA,
-                       categories = NA,
-                       aggregation = T
-){
+                       measure_col = "CircCorr",
+                       measure_type = "C",
+                       by = c("Plot", "CensusYear"),
+                       surface = F){
 
-  # General checks ----------------------------------------------------------
 
-  if(!measure%in%c("Circumference",
-                   "Diameter",
-                   "circumference",
-                   "diameter",
-                   "Circ",
-                   "Diam",
-                   "circ" ,
-                   "diam",
-                   "C",
-                   "D",
-                   "c",
-                   "d")){
-    stop("Please indicate the type of measurement used : \"Circonference\" or \"Diameter\"")
+  if(!measure_col %in% names(data)){
+    stop("Argument measure_col does not match any column name in the forest inventory you provided")
   }
-  if(!is.numeric(data) & !is.data.frame(data)){
-    stop("The input dataset must be either numeric or a data.frame")
-  }
-
-  # If the dataset is just an array of measurements -------------------------
-
-  if(is.numeric(data)){
-    if(!is.na(surface)){
-      print(paste0("The total basal area in the plot is ", ba, " squarred meters, correcponding to ", ba_perha, " squarred meters per ha."))
-      return(ba, ba_perha)
+  else{
+    names(data)[which(names(data)==measure_col)]<- "size"
+    if(!is.numeric(data$size)){
+      stop("Tree size measurements must be numeric, which is apparently not the case in your forest inventory")
     }
     else{
-      print(paste0("The total basal area in the plot is ", ba, " squarred meters."))
-      return(ba)
+      if(anyNA(data$size)){
+        warning("Tree size measurements contain NA values. Have you used the correction and completion functions that we provide beforehand ?")
+      }
+      if(measure_type == "C"){
+        data$size = data$size/pi
+      }
     }
   }
 
 
-  # If the dataset is a data.frame ------------------------------------------
-  else if(is.data.frame(data)){
+  data$ba <- pi*(data$size*data$size)/4
 
-    # Specific checks and beforehand treatments
-
-    ## Forest
-
-    if(!is.na(forest_col)){
-      if(!forest_col%in%names(data))
-        stop("The column name you indicated for forests (biological stations) is wrong. Please check it.")
-      names(data[,which(names(data) == forest_col)]) <- "forest"
-      if(!is.na(forest)){
-        data <- data[which(data$forest == forest),]
-        if(nrow(data) == 0)
-          stop(paste("There is no forest (biological station) corresponding to", forest))
+  if(any(!by %in% names(data))){
+    if(sum(!by %in% names(data)) == 1){
+      stop(paste0("Argument 'by' contains an element that is not matching the dataset's fields: ",
+                  "by[",which(!by %in% names(data)),"] = ",by[which(!by %in% names(data))],
+                  ". For more information, please see the documentation page of the function"))
+    }
+    else{
+      for(n in which(!by %in% names(data))){
+        print(paste0("Argument 'by' contains an element that is not matching the dataset's fields: ",
+                     "by[",n,"] = ",by[n],
+                     "."))
+        stop("For more information, please see the documentation page of the function")
       }
     }
-    ## Plots
-    if(!is.na(plot_col)){
-      if(!plot_col%in%names(data))
-        stop("The column name you indicated for plots is wrong. Please check it.")
-      names(data[,which(names(data) == plot_col)]) <- "plot"
-      if(!is.na(plot)){
-        data <- data[which(data$plot == plot),]
-        if(nrow(data) == 0)
-          stop(paste("There is no plot corresponding to", plot))
-      }
-    }
-    ## Subplots
-    if(!is.na(plot_col)){
-      if(!subplot_col%in%names(data))
-        stop("The column name you indicated for subplots is wrong. Please check it.")
-      names(data[,which(names(data) == subplot_col)]) <- "subplot"
-      if(!is.na(subplot)){
-        data <- data[which(data$subplot == subplot),]
-        if(nrow(data) == 0)
-          stop(paste("There is no subplot corresponding to", subplot))
-      }
-    }
-
-    ## Census campaigns
-    if(!is.na(time_col)){
-      if(!time_col%in%names(data))
-        stop("The column name you indicated for times is wrong. Please check it.")
-      names(data[,which(names(data) == time_col)]) <- "time"
-      if(!is.na(time)){
-        data <- data[which(data$time == time),]
-        if(nrow(data) == 0)
-          stop(paste("There is no time corresponding to", time))
-      }
-    }
-
-    ## Taxa
-    if(!is.na(taxon_col)){
-      if(length(taxon_col)> 1){ # In some inventories, genus and species name are separated so that the binomial name is a transformed field that users have to create.
-        # In this case, the user must have the choice between doing it beforehand or indicating the name of the fields to compose species (or even, subspecies, whatever) name.
-        data$taxon = taxon_col[1]
-        for(level in 2:length(taxon_col)){
-          data$taxon <- paste(data$taxon, data[,which(names(data) == taxon_col[level])], sep = "_")
-        }
-      }
-      else{
-        if(!taxon_col %in% names(data)) stop("The name you indicated for taxon column is apparently not in the dataset's names. Please indicate the right one, or unactivate this feature with taxon_col = NA")
-        names(data[which(names(data) == taxon_col)]) <- "taxon"
-      }
-    }
-    if(!is.na(taxon)){
-      data <- data[which(data$taxon) == taxon,]
-      if(nrow(data) == 0) stop("There is no measure available for the taxon you indicated. The taxon name must follow the format of this example : genusnames_speciesname ; althought it is possible to add levels - always separated by an underscore_")
-    }
-    if(measure%in%c("Circumference",
-                    "circumference",
-                    "Circ",
-                    "circ",
-                    "C",
-                    "c")){
-      data <- data/pi
-      print("Circumferences have been converted to diameter. If your measures are already diameters, please indicate it with the measure argument")
-    }
-
-    ## Min and max diameters
-    if(!is.na(Dmin)){
-      data <- data[which(data$measure >= Dmin),]
-      if(nrow(data == 0))
-        stop("there is no tree above the minimum diameter you indicated")
-    }
-    if(!is.na(Dmax)){
-      data <- data[which(data$measure >= Dmax),]
-      if(nrow(data == 0))
-        stop("there is no tree under the maximum diameter you indicated")
-    }
-
-    # Individual level BA calculus
-
-    # Aggregate to sum according to user specified filters
-    if(aggregation){
-      arglist <- ifelse(!is.na(taxon_col),data.frame(forest_col, plot_col, subplot_col, time_col, "taxon"),data.frame(forest_col, plot_col, subplot_col, time_col))
-      arglist <- arglist[which(!is.na(arglist))]
-      for(i in 1:ncol(arglist)){
-
-      }
-    }
-    else return(data)
   }
+
+  else{
+
+    print(by)
+    bys <- list()
+    for(b in by){
+      # print(data[,which(names(data) == by[b])])
+      bys[[b]] <- unique(data[,which(names(data) == b)])
+    }
+    print(bys)
+    basal_area <- expand.grid(bys, stringsAsFactors = FALSE)
+
+
+    basal_area <- data.frame(basal_area,"absolute_basal_area" = NA, "surface_area" = NA, "basal_area_per_ha" = NA)
+
+    if(!isFALSE(surface)){
+      if(is.numeric(surface) & length(surface == 1)){
+        basal_area$surface_area = rep(surface, nrow(basal_area))
+      }
+      else if(is.data.frame(surface)){
+        # if(!length(which(!names(surface) %in% by))> 1){
+          for(s in 1:nrow(surface)){
+
+            surftemp <- surface[s,"surface"]
+
+            matchs <- names(surface)[which(names(surface) %in% by)]
+            corresp <- surface[s,matchs]
+print(matchs)
+            expsurf <- paste0(paste0("basal_area$",
+                                     matchs,
+                                     " == ",
+                                     corresp),
+                              collapse = " & ")
+            print("here")
+            print(expsurf)
+            print(which(eval(parse(text = expsurf))))
+            basal_area$surface_area[which(eval(parse(text = expsurf)))] <- surftemp
+          }
+        # }
+      }
+    }
+
+    for(f in 1:nrow(basal_area)){
+
+      rowval = basal_area[f,by]
+      print("rowval")
+print(str(rowval))
+      exp <- paste0(paste0("data$",
+                           by,
+                           " == ",
+                           rowval),
+                    collapse = " & ")
+      print(exp)
+      print(length(which(eval(parse(text=exp)))))
+      basal_area[f,"absolute_basal_area"] <- sum(data[which(eval(parse(text=exp))),"ba"], na.rm = T)
+      basal_area[f,"basal_area_per_ha"] <- basal_area[f,"absolute_basal_area"]/basal_area[f,"surface_area"]
+    }
+  }
+  return(basal_area)
 }
+
