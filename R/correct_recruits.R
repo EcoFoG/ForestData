@@ -1,4 +1,6 @@
-#' Title
+#' Correct Overgrown Recruits in Forest Inventories
+#'
+#'Spot individuals that have first been unseen during previous censuses but were already over the minimum counting dbh, and provide a correction that is useful to compute biomass estimates.
 #'
 #' @param data A data.frame containing a forest inventory in which each line corresponds to an individual's measurement for one census
 #' @param dbh_min A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters. Defaults to 10 cm.
@@ -10,7 +12,7 @@
 #' @param status_col A character indicating the name of the column containing tree vital status - 0 for dead, 1 for alive, NA for unseen. No tree must appear with NA status before their first measurement.
 #' @param measure_type A character indicating the size measurement type : "C" for circumference, "D" for diameter. Defaults to "C".
 #' @param byplot A logical indicating whether there are several plots in the dataset. Defaults to TRUE
-#' @param corrected_mortality A logical indicating whether the dataset was corrected for tree vital status errors beforehand. If FALSE, the correct_mortality function is called first with default parameters - see the function info section.
+#' @param corrected_status A logical indicating whether the dataset was corrected for tree vital status errors beforehand. If FALSE, the correct_mortality function is called first with default parameters - see the function info section.
 #'
 #' @return
 #' @export
@@ -18,7 +20,7 @@
 #' @examples
 correct_recruits <- function(data,
                              dbh_min = 10,
-                             growth_limit = 5,
+                             diameter_growth_limit = 5,
                              time_col = "CensusYear",
                              id_col = "id",
                              plot_col = "Plot",
@@ -26,7 +28,7 @@ correct_recruits <- function(data,
                              status_col = "AliveCode",
                              measure_type = "circumference",
                              byplot = TRUE,
-                             corrected_mortality){
+                             corrected_status){
 
   if(!measure_type %in% c("circumference",
                           "circ","c",
@@ -47,6 +49,8 @@ correct_recruits <- function(data,
                           "Circ",
                           "C")){
     # data$diameter <- data$circumference/pi
+    diameter_growth_limit <- diameter_growth_limit*pi
+    dbh_min <- dbh_min*pi
   }
 
   if(byplot){

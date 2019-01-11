@@ -1,17 +1,34 @@
-## test
-dat = subset(data, idtree == "prg_1_0_21998")
-size = dat$dbh
-time = dat$year
-min_dbh = 10
-ladder = dat$ladder
+# ## test
+# dat = subset(data, idtree == "prg_1_0_21998")
+# size = dat$dbh
+# time = dat$year
+# min_dbh = 10
+# ladder = dat$ladder
 
 
 
+#' Title
+#'
+#' @param data
+#' @param size_col
+#' @param time_col
+#' @param status_col
+#' @param id_col
+#' @param POM_col
+#' @param positive_growth_threshold
+#' @param negative_growth_threshold
+#' @param default_POM
+#'
+#' @return
+#' @export
+#'
+#' @examples
 correct_size <- function(data,
                          size_col,
                          time_col,
                          status_col,
                          id_col,
+                         POM_col,
                          positive_growth_threshold,
                          negative_growth_threshold,
                          default_POM){
@@ -268,7 +285,9 @@ correct_size <- function(data,
   }
 
   if(! all(POM == POM[1])){
+    s
     POM_diff <- diff(POM)
+
     if(!ignore_negative_POM_changes &
        any(POM_diff < 0)){
       msg <- paste0("It seems that you have negative POM changes ",
@@ -304,3 +323,40 @@ correct_size <- function(data,
   print(cbind(res,size, POM))
   return(res)
 }
+
+.replace_missing <- function(tree){ #function(size, time,status)
+
+  tree <- tree[order(time),c("time","size","status")] # in case data is not ordered yet
+  missing <- which(is.na(tree$size) & status == 1) # indices of the missing values
+  present <- !is.na(tree$size) # to simplify the code written hereafter
+
+  corrected_values <- rep(NA, length(tree$size))
+
+  # correct each value - apply replaced by for: faster and also clearer.
+  for(i in missing){
+    if(i < min(which(present))){
+      size_val <- tree$size[which(present)[1:min(2, sum(present))]]
+      time_val <- tree$time[which(!is.na(tree$size))[1:min(2, sum(present))]]
+    }
+    else if(i > max(which(present))){
+      size_val <- tree$size[which(present)[(sum(present)-1):sum(present)]]
+      time_val <- tree$time[which(present)[(sum(present)-1):sum(present)]]
+
+      size_val <- size_val[!is.na(size_val)]
+      time_val <- time_val[!is.na(size_val)] ## Something weird here in C's original code
+    }
+    else{
+      size_val <- tree$size[c(max(which(!is.na(tree$size[1:(i-1)]))), i+min(which(!is.na(tree$size[(i+1):length(tree$size)]))))]
+      time_val <- tree$time[c(max(which(!is.na(tree$size[1:(i-1)]))), i+min(which(!is.na(tree$size[(i+1):length(tree$size)]))))]
+    }
+
+    reg <- lm(size_val ~ time_val)$coef
+    corrected_values[i] <- reg[1] + reg[2]*tree$time[i]
+
+    if (sum(!is.na(time_val))==1) {
+      corrected_values[i] <- size_val
+    }
+  }
+  return(corrected_values)
+}
+
