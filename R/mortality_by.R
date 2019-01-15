@@ -70,7 +70,7 @@ compute_ba <- function(data,
     mortality <- expand.grid(bys, stringsAsFactors = FALSE)
 
 
-    basal_area <- data.frame(basal_area,"absolute_basal_area" = NA, "surface_area" = NA, "basal_area_per_ha" = NA)
+    mortality <- data.frame(basal_area,"absolute_basal_area" = NA, "surface_area" = NA, "basal_area_per_ha" = NA)
 
     if(!isFALSE(surface)){
       if(is.numeric(surface) & length(surface == 1)){

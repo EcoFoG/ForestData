@@ -10,11 +10,11 @@
 #' @export
 #'
 #' @examples
-compute_ba <- function(data,
+compute_ba_ok <- function(data,
                        measure_col = "CircCorr",
                        measure_type = "C",
                        time_col = "CensusYear",
-                       by = c("Plot", "CensusYear"),
+                       by = c("Plot","Subplot"),
                        surface = F){
 
 
@@ -60,13 +60,14 @@ compute_ba <- function(data,
 
   else{
 
-    print(by)
+    # print(by)
     bys <- list()
     for(b in by){
       # print(data[,which(names(data) == by[b])])
       bys[[b]] <- unique(data[,which(names(data) == b)])
     }
-    print(bys)
+    # bys[[time_col]] <- unique(data[,which(names(data) == time_col)])
+    # print(bys)
     basal_area <- expand.grid(bys, stringsAsFactors = FALSE)
 
 
@@ -84,15 +85,15 @@ compute_ba <- function(data,
 
             matchs <- names(surface)[which(names(surface) %in% by)]
             corresp <- surface[s,matchs]
-print(matchs)
+# print(matchs)
             expsurf <- paste0(paste0("basal_area$",
                                      matchs,
                                      " == ",
                                      corresp),
                               collapse = " & ")
-            print("here")
-            print(expsurf)
-            print(which(eval(parse(text = expsurf))))
+            # print("here")
+            # print(expsurf)
+            # print(which(eval(parse(text = expsurf))))
             basal_area$surface_area[which(eval(parse(text = expsurf)))] <- surftemp
           }
         # }
@@ -105,15 +106,15 @@ print(matchs)
     for(f in 1:nrow(basal_area)){
 
       rowval = basal_area[f,by]
-      print("rowval")
-print(str(rowval))
+      # print("rowval")
+# print(str(rowval))
       exp <- paste0(paste0("data$",
                            by,
                            " == ",
                            rowval),
                     collapse = " & ")
-      print(exp)
-      print(length(which(eval(parse(text=exp)))))
+      # print(exp)
+      # print(length(which(eval(parse(text=exp)))))
       basal_area[f,"absolute_basal_area"] <- sum(data[which(eval(parse(text=exp))),"ba"], na.rm = T)
       basal_area[f,"basal_area_per_ha"] <- basal_area[f,"absolute_basal_area"]/basal_area[f,"surface_area"]
     }
