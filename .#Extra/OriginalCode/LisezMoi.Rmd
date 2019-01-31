@@ -1,0 +1,59 @@
+---
+title: "Calculs automatisés des Mesures Corrigées de Guyafor"
+author: "Gaëlle Jaouen"
+date: "8 novembre 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Principe de l’automatisation
+
+Les données brutes sont requêtées dans Guyafor (SQL Server) via une connexion R-ODBC dans R. Le script R calcule toutes les corrections puis les données corrigées sont expédiées dans la table taMesure_Corr de Guyafor qui comporte 3 colonnes : 
+
+-	idMesure, l’identifiant unique de chaque mesure dans Guyafor
+
+-	Circ_corr, la circonférence corrigée ou  non
+
+-	Code_Corr, qui donne le type de correction appliquée à la valeur. Le détail se trouve dans la table taCode_corr
+
+Le script R « cleaning_dataVx.R » fonctionne avec le script source « correctionsVx.R ». Ces script se trouvent sur le serveur de base de données et sont lancés automatiquement tous les dimanches à 1h A.M. via une tâche planifiée « MesuresCorrGuyafor ».
+
+# Règles de corrections
+
+## Sélection des données
+Seules les parcelles ayant été suivies durant un minimum de 3 campagnes sont prises en compte.
+
+##  Code 0
+La mesure n’a subi aucune correction.
+
+##  Si un arbre montre une croissance annuelle en diamètre supérieure à 5cm
+
+### Code 1
+Cette croissance ne concerne que quelques points suivis d’un retour à une croissance normale. Ces points sont réalignés par régression linéaire.
+
+### Code 2
+Cette croissance concerne plusieurs points sans retour à une croissance normale. La série de points la plus abondante (ou la plus récente si égalité) sert de base pour réaligner l’autre série par ajout/retrait de la différence de dbh, corrigée par la croissance attendue (calculée comme la croissance moyenne des points environnants).
+
+## Si  un arbre montre une décroissance annuelle supérieure à 2cm
+
+### Code 3
+
+Cette décroissance ne concerne que quelques points suivis d’un retour à une croissance normale. Ces points sont réalignés par régression linéaire.
+
+### Code 4
+Cette décroissance concerne plusieurs points sans retour à une croissance normale. La série de points la plus abondante (ou la plus récente si égalité) sert de base pour réaligner l’autre série par ajout/retrait de la différence de dbh, corrigée par la croissance attendue (calculée comme la croissance moyenne des points environnants).
+
+## Code 5
+Cette correction concerne les bois cathédrale (Bugu Bugu) pour lesquels Nogueira(2006) propose de multiplier le dbh par 0.53 pour évaluer le diamètre si l’arbre était rond. Cette correction est appliquée sur les dbh corrigés, le code_corr apparait donc, le cas échéant, comme « x +5 », x étant le code correspondant au type de correction éventuellement subie par la mesure concernée.
+
+## Code 6
+Cette correction concerne les très gros arbres mal conformés et donc non mesurés. Dans Guyafor, ils apparaissent avec une circonférence constante de 888cm. Ces circonférences sont remplacées par des circonférences maximales empiriques :
+
+-	80 dbh x pi pour les kimboto, maho cigare, diagidia, buguni, yayamadou marécage, supun udu
+
+-	50 dbh x pi pour les weti udu, lebi koko, yayamadou montagne, wapa rivière, weti koko
+
+-	55 circ pour les patawa

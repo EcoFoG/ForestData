@@ -6,11 +6,14 @@
 ####################### Allow NAs to exist in the initial dataset ##################
 ############### i.e. unseen trees are already "spotted" and with status NA #########
 # Individual tree level ---------------------------------------------------
+rm(list = ls())
+context("correct_alive")
+library(testthat)
 
 
 test_that("correct_status_tree works on paracou config", {
 
-  source("R/correct_alive.R")
+  # source("R/correct_alive_opti.R")
   data("example_alive")
   data("expected_2_unseen")
 
@@ -43,7 +46,7 @@ test_that("correct_status_tree works on paracou config", {
 
 test_that("correct_status_tree works on death_confirmation_censuses = 3", {
 
-  source("R/correct_alive.R")
+  # source("R/correct_alive_opti.R")
   data("example_alive")
   data("expected_3_unseen")
   names(expected_3_unseen)[which(names(expected_3_unseen) == "status_altern")] <- "status_corr"
@@ -83,7 +86,7 @@ test_that("correct_status_tree works on death_confirmation_censuses = 3", {
 
 test_that("correct_status_plotlevel works on paracou config", {
 
-  source("R/correct_alive.R")
+  # source("R/correct_alive_opti.R")
   data("example_alive")
   data("expected_2_unseen")
 
@@ -131,7 +134,7 @@ test_that("correct_status_plotlevel works on paracou config", {
 
 test_that("correct_status_plotlevel works changing dead_confirmation_census to 3", {
 
-  source("R/correct_alive.R")
+  # source("R/correct_alive_opti.R")
   data("example_alive")
   data("expected_3_unseen")
 
@@ -175,7 +178,7 @@ test_that("correct_status_plotlevel works changing dead_confirmation_census to 3
 
 test_that("correct_alive works", {
 
-  source("R/correct_alive.R")
+  # source("R/correct_alive_opti.R")
   data("example_alive")
   data("expected_2_unseen")
 
@@ -206,6 +209,7 @@ test_that("correct_alive works", {
 
   data("example_alive")
   data("expected_3_unseen")
+  # source("R/correct_alive_opti.R")
 
   example_alive <- example_alive[,which(names(example_alive) != "status_altern")]
   example_alive <- example_alive[,-which(names(example_alive) == "status_corr")]
@@ -240,7 +244,7 @@ test_that("correct_alive works", {
 
 test_that("correct_status_tree works on paracou config", {
 
-  source("R/correct_alive.R")
+  # source("R/correct_alive_opti.R")
   data("example_alive_mini")
   data("expected_2_unseen_mini")
 
@@ -278,7 +282,7 @@ test_that("correct_status_tree works on paracou config", {
 
 test_that("correct_status_tree works on death_confirmation_censuses = 3", {
 
-  source("R/correct_alive.R")
+  # source("R/correct_alive_opti.R")
   data("example_alive_mini")
   data("expected_3_unseen_mini")
   names(expected_3_unseen_mini)[which(names(expected_3_unseen_mini) == "status_altern")] <- "status_corr"
@@ -318,7 +322,7 @@ test_that("correct_status_tree works on death_confirmation_censuses = 3", {
 
 test_that("correct_status_plotlevel works on paracou config", {
 
-  source("R/correct_alive.R")
+  # source("R/correct_alive_opti.R")
   data("example_alive_mini")
   data("expected_2_unseen_mini")
 
@@ -366,7 +370,7 @@ test_that("correct_status_plotlevel works on paracou config", {
 
 test_that("correct_status_plotlevel works changing dead_confirmation_census to 3", {
 
-  source("R/correct_alive.R")
+  # source("R/correct_alive_opti.R")
   data("example_alive_mini")
   data("expected_3_unseen_mini")
 
@@ -410,7 +414,7 @@ test_that("correct_status_plotlevel works changing dead_confirmation_census to 3
 
 test_that("correct_alive works", {
 
-  source("R/correct_alive.R")
+  # source("R/correct_alive_opti.R")
   data("example_alive_mini")
   data("expected_2_unseen_mini")
 
@@ -437,6 +441,7 @@ test_that("correct_alive works", {
 
 test_that("correct_alive works", {
 
+  # source("R/correct_alive_opti.R")
   data("example_alive_mini")
   data("expected_3_unseen_mini")
 

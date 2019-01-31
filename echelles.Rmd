@@ -1,0 +1,169 @@
+---
+title: "Code échelle"
+author: "Nino PAGE"
+date: "22 novembre 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+load("trees_tocheck.RData")
+library(tidyverse)
+```
+
+# Préparation des données
+
+```{r}
+singlet_id <- titi %>% 
+  filter(is_singlet & CodeAlive == 1 ) %>% 
+  select(id) %>% 
+  unique %>% pull
+titi %>% 
+  filter(id%in% singlet_id) %>% 
+  select(Plot, time, id) %>%
+  filter((Plot == 16 & time == 2015)|
+           (time %in% c(2017,2018))) %>%
+  select(id) %>% 
+  unique %>% unique %>% nrow
+```
+
+## Données échelle
+
+Les données d'échelle (identifiants, échelle et années) sont issues de l'extraction d'Aurélie à partir de la base sur Access, n'ayant pas accès à celle-ci via les fonctions du package EcoFoG. Le fichier est disponible sur son dossier Public sur Roucou.
+
+```{r}
+data_ladder <- read.table("NINO2.txt", sep = ";",header=T)
+names(data_ladder) <- c("idForet","Plot","campagne","Echelle","idArbre")
+data_ladder <- data_ladder %>%
+  rename(idTree = idArbre) %>%
+  mutate(Echelle = ifelse(Echelle == 1, T, ifelse(Echelle == 0,F,NA)))
+```
+
+
+## Paracou 
+
+J'utilise la version de la BDD disponible via Paracou2df() du package EcoFoG, en laissant tous les arguments à leur valeur par défaut, que j'ai traité précédemment pour explorer la structuration spatiale et temporelle de l'occurrence des codes mesure indiquant un changement de POM. La table est disponible sur mon Public.
+
+```{r}
+load("Paracou_basic_POM.RData")
+paracou <- titi 
+rm(titi) 
+```
+
+# Exploration
+
+## Extraction des ID par catégorie
+
+### Arbres pour lesquels une échelle a été utilisée au moins une fois
+
+```{r laddered}
+laddered_trees <- data_ladder %>%
+  filter(Echelle) %>%
+  select(idTree) %>%
+  unique %>%
+  pull
+```
+
+### Arbres ayant eu au moins un réhaussement signalé du POM
+
+```{r uprisen}
+uprisen_trees <- paracou %>%
+  filter(code%in%1:3) %>%
+  select(id) %>%
+  unique %>%
+  pull
+```
+
+
+### Correspondances
+
+```{r}
+
+matrix(c("Changement de POM indiqué, mesurés avec échelle",
+         "Changement de POM indiqué, mesuré sans échelle",
+         "Total",
+         which(uprisen_trees %in% laddered_trees) %>% length,
+         which(!uprisen_trees %in% laddered_trees) %>% length,
+                  uprisen_trees %>% length
+         ), ncol=3,byrow=T) %>% knitr::kable() %>% kableExtra::kable_styling()
+```
+
+Environ un quart des arbres pour lesquels un changement de POM a été noté ont nécessité l'utilisation d'une échelle pour la mesure. 
+
+```{r graph, warning=FALSE}
+load("Paracou_basic_POM.RData")
+
+laddered_uprisen <- titi[which(titi$id %in% laddered_trees & titi$id %in% uprisen_trees & titi$CodeAlive),c("POM","id","time","Plot")] %>%
+arrange(id,desc(time))
+
+lad_up_ids <- laddered_uprisen %>% select(id) %>% unique %>% pull
+
+for(i in lad_up_ids){
+  laddered_uprisen <- laddered_uprisen[-which(laddered_uprisen$id == i)[-1],]
+}
+laddered_uprisen <- laddered_uprisen[which(ifelse(laddered_uprisen$Plot == 16,
+                                                  ifelse(laddered_uprisen$time == 2015,
+                                                         TRUE, 
+                                                         FALSE),
+                                                  ifelse(laddered_uprisen$time %in% c(2017,2018),
+                                                         TRUE,
+                                                         FALSE))),]
+laddered_uprisen %>% select(POM) %>% table
+laddered_uprisen %>% 
+  group_by(POM) %>% 
+  summarise(N = n()) %>% 
+  ungroup %>% 
+  ggplot(aes(x=POM,y=N))+
+  geom_bar(stat = "identity")+
+  geom_text(aes(label = N), position = position_dodge(0.9), vjust = -0.25)+
+  scale_x_continuous(breaks=seq(1.8,7.3,by=0.5))
+  
+```
+L'utilisation de l'échelle concerne y compris les arbres
+```{r}
+matrix(c("Mesurés avec échelle, changement de POM indiqué",
+         "Mesurés avec échelle, aucun changement de POM noté",
+         "Total",
+         which(laddered_trees%in%uprisen_trees  ) %>% length,
+         which(!laddered_trees%in%uprisen_trees  ) %>% length,
+                  laddered_trees %>% length
+         ), ncol=3,byrow=T) %>% knitr::kable() %>% kableExtra::kable_styling()
+```
+
+
+```{r}
+laddered_tocheck <- laddered_trees[which(laddered_trees%in% trees_tocheck$id)]
+
+testpom <- data_ladder %>%
+    rename(id=idTree,time=campagne) %>% 
+  filter(id %in% laddered_tocheck) 
+testid <- testpom$id %>% unique
+for(i in testid){
+  discard <- which(testpom$id == i & (testpom$time != ifelse(length(testpom$time[which(testpom$id == i)])>1 &
+                                                                 max(testpom$time[which(testpom$id == i)])>2016,
+                                                               max(testpom$time[which(testpom$id == i)]),
+                                                               0)))
+  testpom <- testpom[-discard,]
+}
+testpom %>% 
+  rename(time_ech = time) %>% 
+  left_join(trees_tocheck %>% mutate(Plot=as.integer(Plot)) %>% rename(time_meas = time)) %>% 
+  View
+    select(POM, type) %>% table
+
+trees_tocheck %>%
+  select(POM, time) %>% table
+
+
+  testpom$id%in%trees_tocheck$id %>% all
+
+```
+
+```{r}
+trees_tocheck[which(!trees_tocheck$id[which(trees_tocheck$POM > 1.8)] %in% laddered_uprisen$id ),]
+
+laddered_uprisen %>% select(time, Plot) %>% table
+
+laddered_uprisen %>% filter(ifelse(Plot == 16, ifelse(time == 2015, TRUE, FALSE),ifelse(time %in% c(2017,2018), TRUE, FALSE))) %>% select(time, Plot) %>% table %>% sum
+```
+

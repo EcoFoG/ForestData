@@ -1,5 +1,5 @@
 # Unit tests for correct_alive function -----------------------------------
-
+context("Mortality")
 compute_mortality(res,
                   alive_col="status_corr",
                   time_col="time",
