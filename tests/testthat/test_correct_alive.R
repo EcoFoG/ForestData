@@ -3,427 +3,259 @@
 
 #The tests are run from the internalmost function to the whole function level
 
-####################### Allow NAs to exist in the initial dataset ##################
-############### i.e. unseen trees are already "spotted" and with status NA #########
+################## Test correction outputs with hand-crafted sets ##################
+######## i.e. control and pathological cases, to check the func's behavior #########
+
 # Individual tree level ---------------------------------------------------
 rm(list = ls())
 context("correct_alive")
 library(testthat)
 
+# Test error messages -----------------------------------------------------
 
-test_that("correct_status_tree works on paracou config", {
 
-  # source("R/correct_alive_opti.R")
+
+
+test_that("correct_status_tree gives accurate results for control datasets", {
+
+  ## We are going to test two datasets, for 2 modalities of death_confirmation_censuses, which
+  ## represents the number of censuses needed to declare dead a tree if unsighted for such a duration.
+  # Load dataset 1: When trees are unsighted, a corresponding line appears in the table with status NA
   data("example_alive")
+  # Load dataset 2, where unsighted trees have no corresponding line in the table (realistic case)
+  data("example_alive_mini")
+  # Corresponding hand-corrected datasets for death_confirmation_censuses = 3
   data("expected_2_unseen")
+  data("expected_2_unseen_mini")
+  # Corresponding hand-corrected datasets for death_confirmation_censuses = 3
+  data("expected_3_unseen")
+  data("expected_3_unseen_mini")
 
+
+  # Remove one of the columns of the initial dataset. Unimportant step.
   example_alive <- example_alive[,which(names(example_alive) != "status_altern")]
+  example_alive_mini <- example_alive_mini[,which(names(example_alive_mini) != "status_altern")]
 
-  ids <- unique(example_alive$id)
+  # Change one column name of the initial dataset. Unimportant step.
+  names(expected_3_unseen)[which(names(expected_3_unseen) == "status_altern")] <- "status_corr"
+  # names(expected_3_unseen_mini)[which(names(expected_3_unseen_mini) == "status_altern")] <- "status_corr"
+
+  # Extract ids and loop on them - since we are testing individual tree level function
+  ids <- unique(example_alive_mini$id)
   for(i in ids){
-
+    #Prepare required arguments
+    ## Tree's censuses
     tree <- example_alive[which(example_alive$id == i),]
+    tree_mini <- example_alive_mini[which(example_alive_mini$id == i),]
+    ## A vector containing all the census years for the plot where the tree is located
     pl <- unique(tree$plot)
+    pl_mini <- unique(tree$plot)
+    cens_mini <- unique(example_alive_mini[which(example_alive_mini$plot == pl_mini),"time"])
     cens <- unique(example_alive[which(example_alive$plot == pl),"time"])
-    corrected_tree <-  expected_2_unseen[which(expected_2_unseen$id == i),]
 
+    ## Extract the expected corrected lines in the result dataset
+    corrected_tree <-  expected_2_unseen[which(expected_2_unseen$id == i),]
+    corrected_tree_mini <-  expected_2_unseen_mini[which(expected_2_unseen_mini$id == i),]
+    corrected_tree_3 <-  expected_3_unseen[which(expected_3_unseen$id == i),]
+    corrected_tree_mini_3 <-  expected_3_unseen_mini[which(expected_3_unseen_mini$id == i),]
+
+    # Correct using the function
     res_tree <- .correct_alive_tree(tree_temp = tree,
                                     censuses = cens,
                                     dead_confirmation_censuses =2,
                                     i = i)
+    res_tree_mini <- .correct_alive_tree(tree_temp = tree_mini,
+                                          censuses = cens_mini,
+                                          dead_confirmation_censuses =2,
+                                          i = i)
+    res_tree_3 <- .correct_alive_tree(tree_temp = tree,
+                                      censuses = cens,
+                                      dead_confirmation_censuses =3,
+                                      i)
+    res_tree_mini_3 <- .correct_alive_tree(tree_temp = tree_mini,
+                                           censuses = cens_mini,
+                                           dead_confirmation_censuses =3,
+                                           i)
 
 
-
+    # Rearrange row.names because .correct_alive_tree adds missing and erases useless lines.
     row.names(res_tree) <- 1:nrow(res_tree)
+    row.names(res_tree_mini) <- 1:nrow(res_tree_mini)
+    row.names(res_tree_3) <- 1:nrow(res_tree_3)
+    row.names(res_tree_mini_3) <- 1:nrow(res_tree_mini_3)
+
     row.names(corrected_tree) <- 1:nrow(corrected_tree)
-    # print(res_tree)
-    # # print(tree)
-    # print(corrected_tree)
-    expect_equal(res_tree,corrected_tree)
-    # print(i)
-  }
-})
+    row.names(corrected_tree_mini) <- 1:nrow(corrected_tree_mini)
+    row.names(corrected_tree_3) <- 1:nrow(corrected_tree_3)
+    row.names(corrected_tree_mini_3) <- 1:nrow(corrected_tree_mini_3)
 
-test_that("correct_status_tree works on death_confirmation_censuses = 3", {
 
-  # source("R/correct_alive_opti.R")
-  data("example_alive")
-  data("expected_3_unseen")
-  names(expected_3_unseen)[which(names(expected_3_unseen) == "status_altern")] <- "status_corr"
-
-  example_alive <- example_alive[,which(names(example_alive) != "status_corr")]
-  names(example_alive)[which(names(example_alive)== "status_altern")] <- "status_corr"
-  # names(example_alive[,which(names(example_alive)== "status_altern")]) <- "status_corr"
-  names(example_alive)
-  ids <- unique(example_alive$id)
-  for(i in ids){
-    tree <- example_alive[which(example_alive$id == i),]
-    pl <- unique(tree$plot)
-    cens <- unique(example_alive[which(example_alive$plot == pl),"time"])
-    corrected_tree <-  expected_3_unseen[which(expected_3_unseen$id == i),]
-    # print(i)
-    # i <- "b"
-    tree
-    res_tree <- .correct_alive_tree(tree_temp = tree,
-                                    censuses = cens,
-                                    dead_confirmation_censuses =3,
-                                    i)
-
-    # print(i)
-    row.names(res_tree) <- 1:nrow(res_tree)
-    row.names(corrected_tree) <- 1:nrow(corrected_tree)
+    #Reorder columns
     res_tree <- res_tree[,names(corrected_tree)]
-    # print(res_tree)
-    # # print(tree)C
-    # print(corrected_tree)
+    res_tree_mini <- res_tree_mini[,names(corrected_tree_mini)]
+    res_tree_3 <- res_tree_3[,names(corrected_tree_3)]
+    res_tree_mini_3 <- res_tree_mini_3[,names(corrected_tree_mini_3)]
 
+    # Expect results to be similar to hand-corrected datasets
     expect_equal(res_tree,corrected_tree)
+    expect_equal(res_tree_mini,corrected_tree_mini)
+    expect_equal(res_tree_3,corrected_tree_3)
+    expect_equal(res_tree_mini_3,corrected_tree_mini_3)
   }
 })
+
+
 
 
 # Plot level --------------------------------------------------------------
 
-test_that("correct_status_plotlevel works on paracou config", {
+test_that("correct_status_plotlevel gives accurate results for control datasets", {
 
-  # source("R/correct_alive_opti.R")
+  # Load dataset 1: When trees are unsighted, a corresponding line appears in the table with status NA
   data("example_alive")
+  # Load dataset 2, where unsighted trees have no corresponding line in the table (realistic case)
+  data("example_alive_mini")
+  # Corresponding hand-corrected datasets
   data("expected_2_unseen")
+  data("expected_2_unseen_mini")
+  data("expected_3_unseen")
+  data("expected_3_unseen_mini")
+
+
+  names(expected_3_unseen)[which(names(expected_3_unseen)== "status_altern")] <- "status_corr"
+  names(expected_3_unseen_mini)[which(names(expected_3_unseen_mini)== "status_altern")] <- "status_corr"
 
   example_alive <- example_alive[,which(names(example_alive) != "status_altern")]
+  example_alive_mini <- example_alive_mini[,which(names(example_alive_mini) != "status_altern")]
 
 
   plot1 <- example_alive[which(example_alive$plot == 1),]
   plot2 <- example_alive[which(example_alive$plot == 2),]
+  plot1_mini <- example_alive_mini[which(example_alive_mini$plot == 1),]
+  plot2_mini <- example_alive_mini[which(example_alive_mini$plot == 2),]
 
   corrected1 <- expected_2_unseen[which(expected_2_unseen$plot == 1),]
   corrected2 <- expected_2_unseen[which(expected_2_unseen$plot == 2),]
+  corrected1_mini <- expected_2_unseen_mini[which(expected_2_unseen_mini$plot == 1),]
+  corrected2_mini <- expected_2_unseen_mini[which(expected_2_unseen_mini$plot == 2),]
+
+  corrected1_3 <- expected_3_unseen[which(expected_3_unseen$plot == 1),]
+  corrected2_3 <- expected_3_unseen[which(expected_3_unseen$plot == 2),]
+  corrected1_mini_3 <- expected_3_unseen_mini[which(expected_3_unseen_mini$plot == 1),]
+  corrected2_mini_3 <- expected_3_unseen_mini[which(expected_3_unseen_mini$plot == 2),]
 
   plot1 <- plot1[,-which(names(example_alive) == "status_corr")]
   plot2 <- plot2[,-which(names(example_alive) == "status_corr")]
+  plot1_mini <- plot1_mini[,-which(names(example_alive_mini) == "status_corr")]
+  plot2_mini <- plot2_mini[,-which(names(example_alive_mini) == "status_corr")]
+
+
 
   plot1$status_corr <- plot1$status
   plot2$status_corr <- plot2$status
+  plot1_mini$status_corr <- plot1_mini$status
+  plot2_mini$status_corr <- plot2_mini$status
+
 
 
   res1 <- .correct_status_plotlevel(data_plot = plot1,
                                     dead_confirmation_censuses = 2,
                                     use_size = FALSE)
+  res1_3 <- .correct_status_plotlevel(data_plot = plot1,
+                                    dead_confirmation_censuses = 3,
+                                    use_size = FALSE)
 
-  # print("res1")
-  # print(res1)
-  # print("corrected1")
-  # print(corrected1)
+  res1_mini <- .correct_status_plotlevel(data_plot = plot1_mini,
+                                         dead_confirmation_censuses = 2,
+                                         use_size = FALSE)
 
+  res1_mini_3 <- .correct_status_plotlevel(data_plot = plot1_mini,
+                                           dead_confirmation_censuses = 3,
+                                           use_size = FALSE)
 
   row.names(res1) <- 1:nrow(res1)
-  row.names(corrected1) <- 1:nrow(corrected1)
-  res1 <- res1[,names(corrected1)]
-  expect_equal(res1,corrected1)
+  row.names(res1_mini) <- 1:nrow(res1_mini)
+  row.names(res1_3) <- 1:nrow(res1_3)
+  row.names(res1_mini_3) <- 1:nrow(res1_mini_3)
 
+
+  row.names(corrected1) <- 1:nrow(corrected1)
+  row.names(corrected1_mini) <- 1:nrow(corrected1_mini)
+  row.names(corrected1_3) <- 1:nrow(corrected1_3)
+  row.names(corrected1_mini_3) <- 1:nrow(corrected1_mini_3)
+
+  res1 <- res1[,names(corrected1)]
+  res1_mini <- res1_mini[,names(corrected1_mini)]
+  res1_3 <- res1_3[,names(corrected1_3)]
+  res1_mini_3 <- res1_mini_3[,names(corrected1_mini_3)]
+
+  expect_equal(res1,corrected1)
+  expect_equal(res1_mini,corrected1_mini)
+  expect_equal(res1_3,corrected1_3)
+  expect_equal(res1_mini_3,corrected1_mini_3)
 
   res2 <- .correct_status_plotlevel(data_plot = plot2,
                                     dead_confirmation_censuses = 2,
                                     use_size = FALSE)
+  res2_mini <- .correct_status_plotlevel(data_plot = plot2_mini,
+                                         dead_confirmation_censuses = 2,
+                                         use_size = FALSE)
+  res2_3 <- .correct_status_plotlevel(data_plot = plot2,
+                                      dead_confirmation_censuses = 3,
+                                      use_size = FALSE)
+  res2_mini_3 <- .correct_status_plotlevel(data_plot = plot2_mini,
+                                           dead_confirmation_censuses = 3,
+                                           use_size = FALSE)
 
   row.names(res2) <- 1:nrow(res2)
+  row.names(res2_mini) <- 1:nrow(res2_mini)
+  row.names(res2_3) <- 1:nrow(res2_3)
+  row.names(res2_mini_3) <- 1:nrow(res2_mini_3)
+
   row.names(corrected2) <- 1:nrow(corrected2)
+  row.names(corrected2_mini) <- 1:nrow(corrected2_mini)
+  row.names(corrected2_3) <- 1:nrow(corrected2_3)
+  row.names(corrected2_mini_3) <- 1:nrow(corrected2_mini_3)
+
   res2 <- res2[,names(corrected2)]
+  res2_mini <- res2_mini[,names(corrected2_mini)]
+  res2_3 <- res2_3[,names(corrected2_3)]
+  res2_mini_3 <- res2_mini_3[,names(corrected2_mini_3)]
+
   expect_equal(res2,corrected2)
-})
-
-test_that("correct_status_plotlevel works changing dead_confirmation_census to 3", {
-
-  # source("R/correct_alive_opti.R")
-  data("example_alive")
-  data("expected_3_unseen")
-
-  example_alive <- example_alive[,which(names(example_alive) != "status_altern")]
-  names(expected_3_unseen)[which(names(expected_3_unseen)== "status_altern")] <- "status_corr"
-
-  plot1 <- example_alive[which(example_alive$plot == 1),]
-  plot2 <- example_alive[which(example_alive$plot == 2),]
-
-  corrected1 <- expected_3_unseen[which(expected_3_unseen$plot == 1),]
-  corrected2 <- expected_3_unseen[which(expected_3_unseen$plot == 2),]
-
-  plot1 <- plot1[,-which(names(example_alive) == "status_corr")]
-  plot2 <- plot2[,-which(names(example_alive) == "status_corr")]
-
-  plot1$status_corr <- plot1$status
-  plot2$status_corr <- plot2$status
-
-  res1 <- .correct_status_plotlevel(data_plot = plot1,
-                                    dead_confirmation_censuses = 3,
-                                    use_size = FALSE)
-  row.names(res1) <- 1:nrow(res1)
-  row.names(corrected1) <- 1:nrow(corrected1)
-  res1 <- res1[,names(corrected1)]
-
-  # print(res1)
-  # print(corrected1)
-  expect_equal(res1,corrected1)
-
-  res2 <- .correct_status_plotlevel(data_plot = plot2,
-                                    dead_confirmation_censuses = 3,
-                                    use_size = FALSE)
-  row.names(res2) <- 1:nrow(res2)
-  row.names(corrected2) <- 1:nrow(corrected2)
-  res2 <- res2[,names(corrected2)]
-  expect_equal(res2,corrected2)
+  expect_equal(res2_mini,corrected2_mini)
+  expect_equal(res2_3,corrected2_3)
+  expect_equal(res2_mini_3,corrected2_mini_3)
 })
 
 
 # Overall function --------------------------------------------------------
 
-test_that("correct_alive works", {
+test_that("correct_alive gives accurate results for control datasets", {
 
-  # source("R/correct_alive_opti.R")
+  # Load dataset 1: When trees are unsighted, a corresponding line appears in the table with status NA
   data("example_alive")
+  # Load dataset 2, where unsighted trees have no corresponding line in the table (realistic case)
+  data("example_alive_mini")
+  # Corresponding hand-corrected datasets
   data("expected_2_unseen")
+  data("expected_2_unseen_mini")
+  data("expected_3_unseen")
+  data("expected_3_unseen_mini")
+
 
   example_alive <- example_alive[,which(names(example_alive) != "status_altern")]
   example_alive <- example_alive[,which(names(example_alive) != "status_corr")]
+  example_alive_mini <- example_alive_mini[,which(names(example_alive_mini) != "status_altern")]
+  example_alive_mini <- example_alive_mini[,which(names(example_alive_mini) != "status_corr")]
 
   names(expected_2_unseen)[which(names(expected_2_unseen)== "status_altern")] <- "status_corr"
-
-  res <- correct_alive(data = example_alive,
-                       id_col = "id",
-                       time_col = "time",
-                       alive_col = "status",
-                       plot_col = "plot",
-                       byplot = TRUE,
-                       dead_confirmation_censuses = 2,
-                       use_size = FALSE)
-
-  row.names(res) <- 1:nrow(res)
-  row.names(expected_2_unseen) <- 1:nrow(expected_2_unseen)
-  res <- res[,names(expected_2_unseen)]
-  # print(res)
-  # print(example_alive)
-  expect_equal(res,expected_2_unseen)
-
-})
-
-test_that("correct_alive works", {
-
-  data("example_alive")
-  data("expected_3_unseen")
-  # source("R/correct_alive_opti.R")
-
-  example_alive <- example_alive[,which(names(example_alive) != "status_altern")]
-  example_alive <- example_alive[,-which(names(example_alive) == "status_corr")]
+  names(expected_2_unseen_mini)[which(names(expected_2_unseen_mini)== "status_altern")] <- "status_corr"
+  # Change one column name of the initial dataset. Unimportant step.
   names(expected_3_unseen)[which(names(expected_3_unseen)== "status_altern")] <- "status_corr"
 
 
-
   res <- correct_alive(data = example_alive,
-                       id_col = "id",
-                       time_col = "time",
-                       alive_col = "status",
-                       plot_col = "plot",
-                       byplot = TRUE,
-                       dead_confirmation_censuses = 3,
-                       use_size = FALSE)
-
-  row.names(res) <- 1:nrow(res)
-  row.names(expected_3_unseen) <- 1:nrow(expected_3_unseen)
-  res <- res[,names(expected_3_unseen)]
-  # print(res)
-  # print(example_alive)
-  expect_equal(res,expected_3_unseen)
-
-
-})
-
-####################### Suppress NA lines as in real inventories #################
-
-
-# Individual tree level ---------------------------------------------------
-
-
-test_that("correct_status_tree works on paracou config", {
-
-  # source("R/correct_alive_opti.R")
-  data("example_alive_mini")
-  data("expected_2_unseen_mini")
-
-
-  example_alive_mini <- example_alive_mini[,which(names(example_alive_mini) != "status_altern")]
-
-
-  ids <- unique(example_alive_mini$id)
-  for(i in ids){
-    # print(i)
-    # i = "f"
-    # tree <- example_alive_mini[which(example_alive_mini$id == i),which(names(example_alive_mini) != "status_corr")]
-    tree <- example_alive_mini[which(example_alive_mini$id == i),]
-    pl <- unique(tree$plot)
-    cens <- unique(example_alive_mini[which(example_alive_mini$plot == pl),"time"])
-    corrected_tree <-  expected_2_unseen_mini[which(expected_2_unseen_mini$id == i),]
-
-    res_tree <- .correct_alive_tree(tree_temp = tree,
-                                    censuses = cens,
-                                    dead_confirmation_censuses =2,
-                                    i = i)
-
-
-
-    row.names(res_tree) <- 1:nrow(res_tree)
-    row.names(corrected_tree) <- 1:nrow(corrected_tree)
-    res_tree <- res_tree[,names(corrected_tree)]
-    # print(res_tree)
-    # # print(tree)
-    # print(corrected_tree)
-    expect_equal(res_tree,corrected_tree)
-    # print(i)
-  }
-})
-
-test_that("correct_status_tree works on death_confirmation_censuses = 3", {
-
-  # source("R/correct_alive_opti.R")
-  data("example_alive_mini")
-  data("expected_3_unseen_mini")
-  names(expected_3_unseen_mini)[which(names(expected_3_unseen_mini) == "status_altern")] <- "status_corr"
-
-  example_alive_mini <- example_alive_mini[,which(names(example_alive_mini) != "status_corr")]
-  names(example_alive_mini)[which(names(example_alive_mini)== "status_altern")] <- "status_corr"
-  # names(example_alive_mini[,which(names(example_alive_mini)== "status_altern")]) <- "status_corr"
-  names(example_alive_mini)
-  ids <- unique(example_alive_mini$id)
-  for(i in ids){
-    # i = "f"
-    tree <- example_alive_mini[which(example_alive_mini$id == i),]
-    pl <- unique(tree$plot)
-    cens <- unique(example_alive_mini[which(example_alive_mini$plot == pl),"time"])
-    corrected_tree <-  expected_3_unseen_mini[which(expected_3_unseen_mini$id == i),]
-    # print(i)
-    tree
-    res_tree <- .correct_alive_tree(tree_temp = tree,
-                                    censuses = cens,
-                                    dead_confirmation_censuses =3,
-                                    i)
-
-    # print(i)
-    row.names(res_tree) <- 1:nrow(res_tree)
-    row.names(corrected_tree) <- 1:nrow(corrected_tree)
-    res_tree <- res_tree[,names(corrected_tree)]
-    # print(res_tree)
-    # # print(tree)C
-    # print(corrected_tree)
-
-    expect_equal(res_tree,corrected_tree)
-  }
-})
-
-
-# Plot level --------------------------------------------------------------
-
-test_that("correct_status_plotlevel works on paracou config", {
-
-  # source("R/correct_alive_opti.R")
-  data("example_alive_mini")
-  data("expected_2_unseen_mini")
-
-  example_alive_mini <- example_alive_mini[,which(names(example_alive_mini) != "status_altern")]
-
-
-  plot1 <- example_alive_mini[which(example_alive_mini$plot == 1),]
-  plot2 <- example_alive_mini[which(example_alive_mini$plot == 2),]
-
-  corrected1 <- expected_2_unseen_mini[which(expected_2_unseen_mini$plot == 1),]
-  corrected2 <- expected_2_unseen_mini[which(expected_2_unseen_mini$plot == 2),]
-
-  plot1 <- plot1[,-which(names(example_alive_mini) == "status_corr")]
-  plot2 <- plot2[,-which(names(example_alive_mini) == "status_corr")]
-
-  plot1$status_corr <- plot1$status
-  plot2$status_corr <- plot2$status
-
-
-  res1 <- .correct_status_plotlevel(data_plot = plot1,
-                                    dead_confirmation_censuses = 2,
-                                    use_size = FALSE)
-
-  # print("res1")
-  # print(res1)
-  # print("corrected1")
-  # print(corrected1)
-
-
-  row.names(res1) <- 1:nrow(res1)
-  row.names(corrected1) <- 1:nrow(corrected1)
-  res1 <- res1[,names(corrected1)]
-  expect_equal(res1,corrected1)
-
-
-  res2 <- .correct_status_plotlevel(data_plot = plot2,
-                                    dead_confirmation_censuses = 2,
-                                    use_size = FALSE)
-
-  row.names(res2) <- 1:nrow(res2)
-  row.names(corrected2) <- 1:nrow(corrected2)
-  res2 <- res2[,names(corrected2)]
-  expect_equal(res2,corrected2)
-})
-
-test_that("correct_status_plotlevel works changing dead_confirmation_census to 3", {
-
-  # source("R/correct_alive_opti.R")
-  data("example_alive_mini")
-  data("expected_3_unseen_mini")
-
-  example_alive_mini <- example_alive_mini[,which(names(example_alive_mini) != "status_altern")]
-  names(expected_3_unseen_mini)[which(names(expected_3_unseen_mini)== "status_altern")] <- "status_corr"
-
-  plot1 <- example_alive_mini[which(example_alive_mini$plot == 1),]
-  plot2 <- example_alive_mini[which(example_alive_mini$plot == 2),]
-
-  corrected1 <- expected_3_unseen_mini[which(expected_3_unseen_mini$plot == 1),]
-  corrected2 <- expected_3_unseen_mini[which(expected_3_unseen_mini$plot == 2),]
-
-  plot1 <- plot1[,-which(names(example_alive_mini) == "status_corr")]
-  plot2 <- plot2[,-which(names(example_alive_mini) == "status_corr")]
-
-  plot1$status_corr <- plot1$status
-  plot2$status_corr <- plot2$status
-
-  res1 <- .correct_status_plotlevel(data_plot = plot1,
-                                    dead_confirmation_censuses = 3,
-                                    use_size = FALSE)
-  row.names(res1) <- 1:nrow(res1)
-  row.names(corrected1) <- 1:nrow(corrected1)
-  res1 <- res1[,names(corrected1)]
-
-  # print(res1)
-  # print(corrected1)
-  expect_equal(res1,corrected1)
-
-  res2 <- .correct_status_plotlevel(data_plot = plot2,
-                                    dead_confirmation_censuses = 3,
-                                    use_size = FALSE)
-  row.names(res2) <- 1:nrow(res2)
-  row.names(corrected2) <- 1:nrow(corrected2)
-  res2 <- res2[,names(corrected2)]
-  expect_equal(res2,corrected2)
-})
-
-
-# Overall function --------------------------------------------------------
-
-test_that("correct_alive works", {
-
-  # source("R/correct_alive_opti.R")
-  data("example_alive_mini")
-  data("expected_2_unseen_mini")
-
-  example_alive_mini <- example_alive_mini[,which(names(example_alive_mini) != "status_altern")]
-  example_alive_mini <- example_alive_mini[,which(names(example_alive_mini) != "status_corr")]
-
-  names(expected_2_unseen_mini)[which(names(expected_2_unseen_mini)== "status_altern")] <- "status_corr"
-
-  res <- correct_alive(data = example_alive_mini,
                        id_col = "id",
                        time_col = "time",
                        alive_col = "status",
@@ -431,46 +263,54 @@ test_that("correct_alive works", {
                        byplot = TRUE,
                        dead_confirmation_censuses = 2,
                        use_size = FALSE)
+  res_mini <- correct_alive(data = example_alive_mini,
+                            id_col = "id",
+                            time_col = "time",
+                            alive_col = "status",
+                            plot_col = "plot",
+                            byplot = TRUE,
+                            dead_confirmation_censuses = 2,
+                            use_size = FALSE)
+  res_3 <- correct_alive(data = example_alive,
+                         id_col = "id",
+                         time_col = "time",
+                         alive_col = "status",
+                         plot_col = "plot",
+                         byplot = TRUE,
+                         dead_confirmation_censuses = 3,
+                         use_size = FALSE)
+  res_mini_3 <- correct_alive(data = example_alive_mini,
+                              id_col = "id",
+                              time_col = "time",
+                              alive_col = "status",
+                              plot_col = "plot",
+                              byplot = TRUE,
+                              dead_confirmation_censuses = 3,
+                              use_size = FALSE)
+
+
 
   row.names(res) <- 1:nrow(res)
+  row.names(res_mini) <- 1:nrow(res_mini)
+  row.names(res_3) <- 1:nrow(res_3)
+  row.names(res_mini_3) <- 1:nrow(res_mini_3)
+
+  row.names(expected_2_unseen) <- 1:nrow(expected_2_unseen)
   row.names(expected_2_unseen_mini) <- 1:nrow(expected_2_unseen_mini)
-  res <- res[,names(expected_2_unseen_mini)]
-  expect_equal(res,expected_2_unseen_mini)
-
-})
-
-test_that("correct_alive works", {
-
-  # source("R/correct_alive_opti.R")
-  data("example_alive_mini")
-  data("expected_3_unseen_mini")
-
-  example_alive_mini <- example_alive_mini[,which(names(example_alive_mini) != "status_altern")]
-  example_alive_mini <- example_alive_mini[,-which(names(example_alive_mini) == "status_corr")]
-  names(expected_3_unseen_mini)[which(names(expected_3_unseen_mini)== "status_altern")] <- "status_corr"
-
-
-
-  res <- correct_alive(data = example_alive_mini,
-                       id_col = "id",
-                       time_col = "time",
-                       alive_col = "status",
-                       plot_col = "plot",
-                       byplot = TRUE,
-                       dead_confirmation_censuses = 3,
-                       use_size = FALSE)
-
-  row.names(res) <- 1:nrow(res)
+  row.names(expected_3_unseen) <- 1:nrow(expected_3_unseen)
   row.names(expected_3_unseen_mini) <- 1:nrow(expected_3_unseen_mini)
-  res <- res[,names(expected_3_unseen_mini)]
 
-  #Finally, compare result and expected
-  expect_equal(res,expected_3_unseen_mini)
+  res <- res[,names(expected_2_unseen)]
+  res_mini <- res_mini[,names(expected_2_unseen_mini)]
+  res_3 <- res_3[,names(expected_3_unseen)]
+  res_mini_3 <- res_mini_3[,names(expected_3_unseen_mini)]
+
+  expect_equal(res,expected_2_unseen)
+  expect_equal(res_mini,expected_2_unseen_mini)
+  expect_equal(res_mini_3,expected_3_unseen_mini)
+  expect_equal(res_3,expected_3_unseen)
+
 })
-
-
-
-# Test error messages -----------------------------------------------------
 
 
 # Operations I did to modify or create test datasets ----------------------
@@ -494,3 +334,15 @@ test_that("correct_alive works", {
 # expected_3_unseen[which(is.na(expected_3_unseen$status)),c("col1","col2")] <- NA
 # expected_3_unseen_mini <- expected_3_unseen
 # save(expected_3_unseen_mini, file = "data/expected_3_unseen_mini.rda")
+
+
+# identical(expected_2_unseen,expected_2_unseen_mini)
+# View(expected_2_unseen_mini)
+# View(expected_2_unseen)
+# nrow(expected_2_unseen_mini)
+# for(i in 1:142){
+#   line = paste0(expected_2_unseen[i,], collapse = "_")
+#   if(line != paste0(expected_2_unseen_mini[i,], collapse="_")){
+#     print(i)
+#   }
+# }

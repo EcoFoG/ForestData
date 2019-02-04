@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-correct_alive_opti <- function(data,
+correct_alive <- function(data,
                                id_col = "idTree",
                                time_col = "CensusYear",
                                alive_col = "CodeAlive",
@@ -54,7 +54,7 @@ correct_alive_opti <- function(data,
     )
   }
   else
-    names(data)[which(names(data) == id_col)] <- "status"
+    names(data)[which(names(data) == alive_col)] <- "status"
   ## plots
   if (byplot & !plot_col %in% names(data)) {
     stop(
@@ -104,44 +104,25 @@ correct_alive_opti <- function(data,
 #'
 #' @return a data.frame containing the inputted plot-level data with trees' corrected life statuses. 1 = alive, 0 = dead. NAs indicate that the tree was unseen and cannot be considered yet. The output does not necessarily have the same number of lines as the input. Lines are added when the tree is unseen then seen alive again, with all columns being NA except trees' id, plot, census year and corrected status. Useless lines -with NA status before first sight alive, or after death- are suppressed.
 
-.correct_status_plotlevel <-
-  function(data_plot,
-           dead_confirmation_censuses,
-           use_size) {
-    if (use_size != FALSE) {
-      if (!use_size %in% names(data_plot)) {
-        stop(
-          "use_size defaults to FALSE, but to activate this option, it must contain the name of the column containing circumference or diameter measurements"
-        )
-      }
-      else{
-        data <- .use_size_status(data_plot, use_size)
-      }
+.correct_status_plotlevel <- function(data_plot, dead_confirmation_censuses, use_size){
+  if(use_size != FALSE){
+    if(!use_size %in% names(data_plot)){
+      stop("use_size defaults to FALSE, but to activate this option, it must contain the name of the column containing circumference or diameter measurements")
     }
-
-    #Dataset preparation
-    # data_plot$status_corr <- data_plot$status
-    censuses <- unique(data_plot$time)
-    ids <- unique(data_plot$id)
-
-    for (i in ids) {
-      tree_temp <- data_plot[which(data_plot$id == i), ]
-      # print("data plot")
-      # print(data_plot[which(data_plot$id != i),])
-      # print("tree")
-      # print(.correct_alive_tree(tree_temp, censuses, dead_confirmation_censuses,i))
-
-
-      data_plot <- rbind(
-        data_plot[which(data_plot$id != i), ],
-        .correct_alive_tree(tree_temp,
-                            censuses,
-                            dead_confirmation_censuses,
-                            i)
-      )
+    else{
+      data_plot <- .use_size_status(data_plot, use_size)
     }
-    return(data_plot)
   }
+
+  censuses <- unique(data_plot$time)
+  ids <- unique(data_plot$id)
+  data_plot <- data_plot[order(data_plot$id, data_plot$time),]
+  data_plot <- do.call(rbind,lapply(ids,function(i) .correct_alive_tree(data_plot[which(data_plot$id == i),],
+                                                                        censuses,
+                                                                        dead_confirmation_censuses,
+                                                                        i)))
+  return(data_plot)
+}
 
 #' Internal tree-level life status correction
 #'
@@ -152,89 +133,102 @@ correct_alive_opti <- function(data,
 #'
 #' @return a data.frame containing the inputted individual-tree-level data with corrected life status. 1 = alive, 0 = dead. NAs indicate that the tree was unseen and cannot be considered yet. The output does not necessarily have the same number of lines as the input. Lines are added when the tree is unseen then seen alive again, with all columns being NA except trees' id, plot, census year and corrected status. Useless lines -with NA status before first sight alive, or after death- are suppressed.
 
-.correct_alive_tree <-
-  function(tree_temp,
-           censuses,
-           dead_confirmation_censuses,
-           i) {
-    vars <- names(tree_temp)
-    first_record <- tree_temp$time[which(tree_temp$status == 1)[1]]
-    if (is.na(first_record)) {
-      if (all(is.na(tree_temp$status))) {
-        message <-
-          paste0(
-            "tree ",
-            i,
-            " has only NA life status. If it is a isolated outlyer, please manually check it. If there is no life status column in your dataset, you can create it from size measurement (see the vignette)"
-          )
-      } else if (all(isFALSE(tree_temp$status))) {
-        message <-
-          paste0(
-            "tree ",
-            i,
-            " has only been recorded dead. It might be that it has been recruited and died on the same between-censuses interval. Please verify it"
-          )
-      }
-      warning(message)
-    } else{
-      absents <- (censuses > first_record & !censuses %in% tree_temp$time)
-      nabs <- sum(absents)
+.correct_alive_tree <- function(tree_temp, censuses, dead_confirmation_censuses, i){
+  vars <- names(tree_temp)
+  first_record <- tree_temp$time[which(tree_temp$status == 1)[1]]
+  if(is.na(first_record)){
+    if(all(is.na(tree_temp$status))){
+      message <- paste0("tree ",i," has only NA life status. If it is a isolated outlyer, please manually check it. If there is no life status column in your dataset, you can create it from size measurement (see the vignette)")
+    }else if(all(isFALSE(tree_temp$status))){
+      message <- paste0("tree ",i," has only been recorded dead. It might be that it has been recruited and died on the same between-censuses interval. Please verify it")
+    }
+    warning(message)
+  }else{
+    absents <- (censuses > first_record & !censuses %in% tree_temp$time)
 
-      if (nabs > 0) {
-        if ("plot" %in% vars) {
-          new.rows <- data.frame(
-            id = i,
-            time = censuses[absents],
-            status = NA,
-            status_corr = NA,
-            plot = tree_temp$plot[1]
-          )
-          newnames <- c("id", "time", "status", "status_corr", "plot")
+    # last_seen_alive <- max(which(tree_temp$status == 1))
+
+    # first_seen_alive <- which(tree_temp$status == 1)[1]
+    # last_seen_alive <- max(which(tree_temp$status == 1))
+    # tree_temp$status_corr[first_seen_alive:last_seen_alive] <- 1
+    # if(!last_seen_alive == nrow(tree_temp)){
+    #   if(!is.na(tree_temp$status[last_seen_alive+1]) &  tree_temp$status[last_seen_alive+1] == 0){
+    #     tree_temp <- tree_temp[-(last_seen_alive+2:nrow(tree_temp)),]
+    #   }
+    #   else{
+    #     if(last_seen_alive < nrow(tree_temp)-(dead_confirmation_censuses-1)){
+    #       tree_temp$status_corr[last_seen_alive+1] <- 0
+    #       tree_temp <- tree_temp[-(last_seen_alive+2:nrow(tree_temp)),]
+    #     }
+    #     else{
+    #       tree_temp[(last_seen_alive+1):nrow(tree_temp),"status_corr"] <- NA
+    #     }
+    #   }
+    # }
+    # if(first_seen_alive > 1){
+    #   tree_temp <- tree_temp[-(1:(first_seen_alive-1)),]
+    # }
+
+
+    # absents <- which(!censuses %in% tree_temp$time)
+    # nabs <- length(absents)
+    nabs <- sum(absents)
+    # print(nabs)
+    # print(absents)
+    # print(censuses)
+    # print(first_record)
+    # print(censuses > first_record)
+    # print(which(tree_temp$status == 1)[1])
+    # print(tree_temp)
+    if(nabs > 0){
+      if("plot" %in% vars){
+        new.rows <- data.frame(id = i,
+                               time = censuses[absents],
+                               status = NA,
+                               status_corr = NA,
+                               plot = tree_temp$plot[1])
+        newnames <- c("id","time","status","status_corr","plot")
+      }
+      else{
+        new.rows <- data.frame(id = i,
+                               time = censuses[absents],
+                               NA,
+                               NA)
+        newnames <- c("id","time","status","status_corr")
+      }
+
+      # new.rows[,vars[-which(vars%in%newnames)]] <- NA
+      # print(new.rows)
+      tree_temp[(nrow(tree_temp)+1):(nrow(tree_temp)+nabs),newnames] <- new.rows
+      # if(rnorm(1,0,1) > 0.7) print(tree_temp[,vars[-which(vars%in%newnames)]])
+      tree_temp <- tree_temp[order(tree_temp$time),]
+    }
+    if(!all(is.na(tree_temp$status))){
+      first_seen_alive <- which(tree_temp$status == 1)[1]
+      last_seen_alive <- max(which(tree_temp$status == 1))
+      tree_temp$status_corr[first_seen_alive:last_seen_alive] <- 1
+      if(!last_seen_alive == nrow(tree_temp)){
+        if(!is.na(tree_temp$status[last_seen_alive+1]) &  tree_temp$status[last_seen_alive+1] == 0){
+          tree_temp <- tree_temp[-(last_seen_alive+2:nrow(tree_temp)),]
         }
         else{
-          new.rows <- data.frame(id = i,
-                                 time = censuses[absents],
-                                 NA,
-                                 NA)
-          newnames <- c("id", "time", "status", "status_corr")
-        }
-
-        # new.rows[,vars[-which(vars%in%newnames)]] <- NA
-        # print(new.rows)
-        tree_temp[(nrow(tree_temp) + 1):(nrow(tree_temp) + nabs), newnames] <-
-          new.rows
-        # if(rnorm(1,0,1) > 0.7) print(tree_temp[,vars[-which(vars%in%newnames)]])
-        tree_temp <- tree_temp[order(tree_temp$time), ]
-      }
-      if (!all(is.na(tree_temp$status))) {
-        first_seen_alive <- which(tree_temp$status == 1)[1]
-        last_seen_alive <- max(which(tree_temp$status == 1))
-        tree_temp$status_corr[first_seen_alive:last_seen_alive] <- 1
-        if (!last_seen_alive == nrow(tree_temp)) {
-          if (!is.na(tree_temp$status[last_seen_alive + 1]) &
-              tree_temp$status[last_seen_alive + 1] == 0) {
-            tree_temp <- tree_temp[-(last_seen_alive + 2:nrow(tree_temp)), ]
+          if(last_seen_alive < nrow(tree_temp)-(dead_confirmation_censuses-1)){
+            tree_temp$status_corr[last_seen_alive+1] <- 0
+            tree_temp <- tree_temp[-(last_seen_alive+2:nrow(tree_temp)),]
           }
           else{
-            if (last_seen_alive < nrow(tree_temp) - (dead_confirmation_censuses - 1)) {
-              tree_temp$status_corr[last_seen_alive + 1] <- 0
-              tree_temp <-
-                tree_temp[-(last_seen_alive + 2:nrow(tree_temp)), ]
-            }
-            else{
-              tree_temp[(last_seen_alive + 1):nrow(tree_temp), "status_corr"] <-
-                NA
-            }
+            tree_temp[(last_seen_alive+1):nrow(tree_temp),"status_corr"] <- NA
           }
         }
-        if (first_seen_alive > 1) {
-          tree_temp <- tree_temp[-(1:(first_seen_alive - 1)), ]
-        }
+      }
+      if(first_seen_alive > 1){
+        tree_temp <- tree_temp[-(1:(first_seen_alive-1)),]
       }
     }
-
-    return(tree_temp)
   }
+
+  return(tree_temp)
+}
 
 #' Create vital status field from size measurements under the hypothesis that only live trees were measured.
 #'

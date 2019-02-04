@@ -2,19 +2,17 @@
 % Please edit documentation in R/correct_recruits.R
 \name{correct_recruits}
 \alias{correct_recruits}
-\title{Title}
+\title{Correct Overgrown Recruits in Forest Inventories}
 \usage{
-correct_recruits(data, dbh_min = 10, growth_limit = 5,
+correct_recruits(data, dbh_min = 10, diameter_growth_limit = 5,
   time_col = "CensusYear", id_col = "id", plot_col = "Plot",
   size_col = "Circ", status_col = "AliveCode",
-  measure_type = "circumference", byplot = TRUE, corrected_mortality)
+  measure_type = "circumference", byplot = TRUE, corrected_status)
 }
 \arguments{
 \item{data}{A data.frame containing a forest inventory in which each line corresponds to an individual's measurement for one census}
 
 \item{dbh_min}{A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters. Defaults to 10 cm.}
-
-\item{growth_limit}{A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal. Defaults to 5 cm, as set for Paracou inventories.}
 
 \item{time_col}{A character indicating the name of the column containing census year information.}
 
@@ -30,8 +28,10 @@ correct_recruits(data, dbh_min = 10, growth_limit = 5,
 
 \item{byplot}{A logical indicating whether there are several plots in the dataset. Defaults to TRUE}
 
-\item{corrected_mortality}{A logical indicating whether the dataset was corrected for tree vital status errors beforehand. If FALSE, the correct_mortality function is called first with default parameters - see the function info section.}
+\item{corrected_status}{A logical indicating whether the dataset was corrected for tree vital status errors beforehand. If FALSE, the correct_mortality function is called first with default parameters - see the function info section.}
+
+\item{growth_limit}{A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal. Defaults to 5 cm, as set for Paracou inventories.}
 }
 \description{
-Title
+Spot individuals that have first been unseen during previous censuses but were already over the minimum counting dbh, and provide a correction that is useful to compute biomass estimates.
 }
