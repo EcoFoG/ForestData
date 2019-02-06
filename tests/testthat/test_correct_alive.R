@@ -13,7 +13,92 @@ library(testthat)
 
 # Test error messages -----------------------------------------------------
 
+data("example_alive")
 
+expect_error(correct_alive(data = example_alive,
+                           id_col = "id",
+                           time_col = "time",
+                           alive_col = "status",
+                           plot_col = "plot",
+                           byplot = TRUE,
+                           dead_confirmation_censuses = 3,
+                           use_size = FALSE))
+
+expect_error(correct_alive(data = example_alive,
+                           id_col = "TOTO",
+                           time_col = "time",
+                           alive_col = "status",
+                           plot_col = "plot",
+                           byplot = TRUE,
+                           dead_confirmation_censuses = 3,
+                           use_size = FALSE))
+
+expect_error(correct_alive(data = example_alive,
+                           id_col = "id",
+                           time_col = "TOTO",
+                           alive_col = "status",
+                           plot_col = "plot",
+                           byplot = TRUE,
+                           dead_confirmation_censuses = 3,
+                           use_size = FALSE))
+
+expect_error(correct_alive(data = example_alive,
+                           id_col = "id",
+                           time_col = "time",
+                           alive_col = "TOTO",
+                           plot_col = "plot",
+                           byplot = TRUE,
+                           dead_confirmation_censuses = 3,
+                           use_size = FALSE))
+
+expect_error(correct_alive(data = example_alive,
+                           id_col = "id",
+                           time_col = "time",
+                           alive_col = "status",
+                           plot_col = "TOTO",
+                           byplot = TRUE,
+                           dead_confirmation_censuses = 3,
+                           use_size = FALSE))
+
+expect_error(correct_alive(data = example_alive,
+                           id_col = "id",
+                           time_col = "time",
+                           alive_col = "status",
+                           plot_col = "plot",
+                           byplot = list(),
+                           dead_confirmation_censuses = 3,
+                           use_size = FALSE))
+
+expect_error(correct_alive(data = example_alive,
+                           id_col = "id",
+                           time_col = "time",
+                           alive_col = "status",
+                           plot_col = "plot",
+                           byplot = TRUE,
+                           dead_confirmation_censuses = c(1,2),
+                           use_size = FALSE))
+
+expect_error(correct_alive(data = example_alive,
+                           id_col = "id",
+                           time_col = "time",
+                           alive_col = "status",
+                           plot_col = "plot",
+                           byplot = TRUE,
+                           dead_confirmation_censuses = "2",
+                           use_size = FALSE))
+
+expect_error(correct_alive(data = example_alive,
+                           id_col = "id",
+                           time_col = "time",
+                           alive_col = "status",
+                           plot_col = "plot",
+                           byplot = TRUE,
+                           dead_confirmation_censuses = 2,
+                           use_size = list()))
+
+
+
+# Test outputs ------------------------------------------------------------
 
 
 test_that("correct_status_tree gives accurate results for control datasets", {
