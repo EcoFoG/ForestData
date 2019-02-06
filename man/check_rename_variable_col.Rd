@@ -2,16 +2,25 @@
 % Please edit documentation in R/check_rename_variable_col.R
 \name{check_rename_variable_col}
 \alias{check_rename_variable_col}
-\title{Title}
+\title{Check that a Column Name is in a Dataset and Replace it by a Temp Name}
 \usage{
-check_rename_variable_col(arg, argname, data)
+check_rename_variable_col(arg, name, data)
 }
 \arguments{
-\item{data}{}
+\item{arg}{A character argument corresponding to a column name, that must be checked}
+
+\item{name}{A name which replaces the original column name inside the function where the check/replace is called}
+
+\item{data}{A data.frame}
 }
 \value{
-
+A data.frame in which the target colname has been replaced by one that will be used internally
 }
 \description{
-Title
+Internal and unexported function of ForestData
+}
+\examples{
+\dontrun{
+data <- check_rename_variable_col(status_col, "status",data)
+}
 }

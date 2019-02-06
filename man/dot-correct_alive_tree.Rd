@@ -9,6 +9,10 @@
 \arguments{
 \item{tree_temp}{a data.frame corresponding to a single tree's measurements, arranged by time}
 
+\item{censuses}{numeric, censuses for the plot in which the tree is.}
+
+\item{dead_confirmation_censuses}{see correct_alive}
+
 \item{i}{character or numeric, but single value. the id of the tree that is being corrected in the function}
 }
 \value{

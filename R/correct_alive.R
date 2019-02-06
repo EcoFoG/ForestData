@@ -5,7 +5,7 @@
 #' @param data Data.frame, no default. Forest inventory in the form of a long-format time series - one line is a measure for one individual during one census time.
 #' @param id_col Character. The name of the column containing trees unique ids
 #' @param time_col Character. The name of the column containing census year
-#' @param alive_col Character. The name of the column containing tree vital status - 0=dead; 1=alive.
+#' @param status_col Character. The name of the column containing tree vital status - 0=dead; 1=alive.
 #' @param plot_col Character. The name of the column containing the plots indices.
 #' @param byplot Logical. If there are several plots in your dataset, the correction is performed by plot, in case these would not be censuses the same years or with the same frequencies one another.
 #' @param dead_confirmation_censuses Integer, defaults to 2. This is the number of censuses needed to state that a tree is considered dead, if unseen. In Paracou, we use the rule-of-thumb that if a tree is unseen twice, its probability to be actually dead is close to 1. The choice of this value involves that trees unseen during the X-1 last inventories can not be corrected for death, and thus mortality rates should not be calculated for these censuses.
@@ -15,6 +15,17 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' data("Paracou6")
+#' correct_alive(Paracou6,
+#' id_col = "idTree",
+#' time_col = "CensusYear",
+#' status_col = "CodeAlive",
+#' plot_col = "SubPlot",
+#' byplot = TRUE,
+#' dead_confirmation_censuses = 2,
+#' use_size = FALSE)}
+
 correct_alive <- function(data,
                           id_col = "idTree",
                           time_col = "CensusYear",
@@ -47,7 +58,7 @@ correct_alive <- function(data,
   #Checks if columns are well specified and temporarily replace their names
 
   ## Census years
-  data <- check_rename_variable_col(time_col, "time_col",data)
+  data <- check_rename_variable_col(time_col, "time",data)
   # if (!time_col %in% names(data)) {
   #   stop(
   #     "The name you indicated (or let to default) for the census year column is apparently not in the colnames of the dataset. Please specify it"
@@ -57,7 +68,7 @@ correct_alive <- function(data,
   #   names(data)[which(names(data) == time_col)] <- "time"
 
   ## ids
-  data <- check_rename_variable_col(id_col, "id_col",data)
+  data <- check_rename_variable_col(id_col, "id",data)
   # if (!id_col %in% names(data)) {
   #   stop(
   #     "The name you indicated (or let to default) for the unique, individual tree IDs column is apparently not in the colnames of the dataset. Please specify it"
@@ -68,7 +79,7 @@ correct_alive <- function(data,
 
   ## alive code
   if(!use_size){
-    data <- check_rename_variable_col(status_col, "status_col",data)
+    data <- check_rename_variable_col(status_col, "status",data)
   }else data$status <- NA
 
   data$status_corr <- data$status
@@ -81,7 +92,7 @@ correct_alive <- function(data,
   #   names(data)[which(names(data) == alive_col)] <- "status"
 
   ## plots
-  if(byplot) data <- check_rename_variable_col(plot_col, "plot_col",data)
+  if(byplot) data <- check_rename_variable_col(plot_col, "plot",data)
   # if (byplot & !plot_col %in% names(data)) {
   #   stop(
   #     "The name you indicated (or let to default) for the unique, individual tree IDs column is apparently not in the colnames of the dataset. Please specify it"
@@ -121,10 +132,11 @@ correct_alive <- function(data,
   else
     data <- .correct_status_plotlevel(data, dead_confirmation_censuses, use_size)
 
-  names(data)[which(names(data == "id"))] <- id_col
-  names(data)[which(names(data == "time"))] <- time_col
-  names(data)[which(names(data == "status"))] <- status_col
-  if(byplot) names(data)[which(names(data == "plot"))] <- plot_col
+print(names(data))
+  names(data)[which(names(data) == "id")] <- id_col
+  names(data)[which(names(data) == "time")] <- time_col
+  names(data)[which(names(data) == "status")] <- status_col
+  if(byplot) names(data)[which(names(data) == "plot")] <- plot_col
   return(data)
 }
 
@@ -162,8 +174,8 @@ correct_alive <- function(data,
 #' Internal tree-level life status correction
 #'
 #' @param tree_temp a data.frame corresponding to a single tree's measurements, arranged by time
-#' @param censuses
-#' @param dead_confirmation_censuses
+#' @param censuses numeric, censuses for the plot in which the tree is.
+#' @param dead_confirmation_censuses see correct_alive
 #' @param i character or numeric, but single value. the id of the tree that is being corrected in the function
 #'
 #' @return a data.frame containing the inputted individual-tree-level data with corrected life status. 1 = alive, 0 = dead. NAs indicate that the tree was unseen and cannot be considered yet. The output does not necessarily have the same number of lines as the input. Lines are added when the tree is unseen then seen alive again, with all columns being NA except trees' id, plot, census year and corrected status. Useless lines -with NA status before first sight alive, or after death- are suppressed.

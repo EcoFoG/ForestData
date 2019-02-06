@@ -2,7 +2,7 @@
 % Please edit documentation in R/correct_recruits.R
 \name{.correct_recruits_tree}
 \alias{.correct_recruits_tree}
-\title{Internal function. plot-level correction for overgrown recruits.}
+\title{Internal function. tree-level correction for overgrown recruits.}
 \usage{
 .correct_recruits_tree(tree, dbh_min, growth_limit, censuses)
 }
@@ -16,8 +16,16 @@
 \item{censuses}{A numeric vector containing all the years for which the plot to which the tree belongs were censused.}
 }
 \value{
-
+A data.frame containing the corrected indiv
 }
 \description{
-Internal function. plot-level correction for overgrown recruits.
+Internal function. tree-level correction for overgrown recruits.
+}
+\examples{
+#' \dontrun{
+data("Paracou6")
+cens <- unique(Paracou6$CensusYear)
+ids <- unique(Paracou6$idTree)
+for(i in ids) correct_recruits_tree(Paracou[Paracou$idTree == i,], 10, 5,cens)
+}
 }

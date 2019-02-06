@@ -1,4 +1,6 @@
-#' Title
+#' Compute Basal Area in Forest Inventories
+#'
+#' Compute Basal Area according to user-specified grouping variables, and time.
 #'
 #' @param data A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.
 #' @param measure_col A single character containing the name of the column corresponding to tree size measurements -either circumference or diameter.
@@ -10,6 +12,15 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' data("Paracou6")
+#' function(Paracou6,
+#' measure_col = "CircCorr",
+#' measure_type = "C",
+#' time_col = "CensusYear",
+#' by = c("Species"),
+#' surface = 6.25)
+#' }
 compute_ba <- function(data,
                        measure_col = "CircCorr",
                        measure_type = "C",

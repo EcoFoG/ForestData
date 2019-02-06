@@ -5,7 +5,7 @@
 \title{Correct Trees Life Status in a Forest Inventory}
 \usage{
 correct_alive(data, id_col = "idTree", time_col = "CensusYear",
-  alive_col = "CodeAlive", plot_col = "Plot", byplot = TRUE,
+  status_col = "CodeAlive", plot_col = "Plot", byplot = TRUE,
   dead_confirmation_censuses = 2, use_size = FALSE)
 }
 \arguments{
@@ -15,7 +15,7 @@ correct_alive(data, id_col = "idTree", time_col = "CensusYear",
 
 \item{time_col}{Character. The name of the column containing census year}
 
-\item{alive_col}{Character. The name of the column containing tree vital status - 0=dead; 1=alive.}
+\item{status_col}{Character. The name of the column containing tree vital status - 0=dead; 1=alive.}
 
 \item{plot_col}{Character. The name of the column containing the plots indices.}
 
@@ -30,4 +30,16 @@ a data.frame containing the corrected data - with trees' corrected life statuses
 }
 \description{
 Spotting unseen trees and correcting their status.
+}
+\examples{
+\dontrun{
+data("Paracou6")
+correct_alive(Paracou6,
+id_col = "idTree",
+time_col = "CensusYear",
+status_col = "CodeAlive",
+plot_col = "SubPlot",
+byplot = TRUE,
+dead_confirmation_censuses = 2,
+use_size = FALSE)}
 }

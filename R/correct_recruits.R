@@ -14,10 +14,24 @@
 #' @param correct_status A logical indicating whether the dataset was corrected for tree vital status errors beforehand. If FALSE, the correct_mortality function is called first with default parameters - see the function info section.
 #' @param diameter_growth_limit A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal. Defaults to 5 cm, as set for Paracou inventories.
 #'
-#' @return
+#' @return A corrected data.frame
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' data("Paracou6")
+#' correct_recruits(Paracou6,
+#' dbh_min = 10,
+#' diameter_growth_limit = 5,
+#' time_col = "CensusYear",
+#' id_col = "id",
+#' plot_col = "Plot",
+#' size_col = "Circ",
+#' status_col = "AliveCode",
+#' measure_type = "circumference",
+#' byplot = TRUE,
+#' correct_status = FALSE)
+#' }
 correct_recruits <- function(data,
                              dbh_min = 10,
                              diameter_growth_limit = 5,
@@ -52,6 +66,16 @@ correct_recruits <- function(data,
   res <- try(check_rename_variable_col("status_corr", "status_corr_col",data))
   if(inherits(res,'try-error') & correct_status == T){
     data <- check_rename_variable_col(status_col, "status_col",data)
+  }
+  else if (inherits(res,'try-error') & !correct_status){
+    data <- check_rename_variable_col(status_col,"status_corr_col",data)
+  }
+
+  data <- check_rename_variable_col(id_col, "id_col",data)
+  data <- check_rename_variable_col(size_col, "size_col",data)
+  if(byplot) data <- check_rename_variable_col(plot_col, "plot_col",data)
+
+  if(correct_status){
     data <- correct_alive(data,
                           id_col = "id",
                           time_col = "time",
@@ -64,17 +88,7 @@ correct_recruits <- function(data,
                                             FALSE)
     )
   }
-  else if (inherits(res,'try-error') & !correct_status){
-    data <- check_rename_variable_col(status_col,"status_corr_col",data)
-  }
 
-  data <- check_rename_variable_col(id_col, "id_col",data)
-  data <- check_rename_variable_col(size_col, "size_col",data)
-  if(byplot) data <- check_rename_variable_col(plot_col, "plot_col",data)
-
-  if(correct_status){
-
-  }
   if(!measure_type %in% c("circumference",
                           "circ","c",
                           "Circumference",
@@ -88,6 +102,7 @@ correct_recruits <- function(data,
                           "D")){
     stop("Please indicate if the tree size measurements (argument measure_type) are circumferences (C) or diameters (D)")
   }
+
   if(!measure_type %in% c("circumference",
                           "circ","c",
                           "Circumference",
@@ -138,10 +153,15 @@ correct_recruits <- function(data,
 #' @param dbh_min A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters.
 #' @param growth_limit A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal.
 #'
-#' @return
+#' @return A data.frame containing the corrected plot
 #'
 #' @examples
-.corect_recruits_plot <- function(data_plot,
+#' \dontrun{
+#' data("Paracou6")
+#' plots <- unique(Paracou6$Plot)
+#' for(p in plots) correct_recruits_plot(Paracou[Paracou$Plot == p,], 10, 5)
+#' }
+.correct_recruits_plot <- function(data_plot,
                                   dbh_min,
                                   growth_limit){
 
@@ -162,16 +182,22 @@ correct_recruits <- function(data,
   }
 }
 
-#' Internal function. plot-level correction for overgrown recruits.
+#' Internal function. tree-level correction for overgrown recruits.
 #'
 #' @param dbh_min A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters.
 #' @param growth_limit A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal.
 #' @param tree A data.frame containing one single tree's time series of measurements.
 #' @param censuses A numeric vector containing all the years for which the plot to which the tree belongs were censused.
 #'
-#' @return
+#' @return A data.frame containing the corrected indiv
 #'
 #' @examples
+#' #' \dontrun{
+#' data("Paracou6")
+#' cens <- unique(Paracou6$CensusYear)
+#' ids <- unique(Paracou6$idTree)
+#' for(i in ids) correct_recruits_tree(Paracou[Paracou$idTree == i,], 10, 5,cens)
+#' }
 .correct_recruits_tree <- function(tree,
                                    dbh_min,
                                    growth_limit,

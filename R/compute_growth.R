@@ -1,15 +1,26 @@
-#' Title
+#' Compute Tree Annual Diameter Growth
 #'
-#' @param data
-#' @param id_col
-#' @param time_col
-#' @param size_col
-#' @param measure_type
+#' This function computes annual diameter increment for every tree per census interval
 #'
-#' @return
+#' @param data A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.
+#' @param id_col Character. The name of the column containing trees unique ids
+#' @param time_col Character. The name of the column containing census year
+#' @param size_col A single character containing the name of the column corresponding to tree size measurements -either circumference or diameter.
+#' @param measure_type A single character indicating whether tree sizes are given in circumferences -"C"- or diameter -"D"-.
+#'
+#' @return a data.frame with annual and absolute inter-census diameter increments. It has N-n rows, where N is the input dataset's nrow, and n the number of individual trees measurement in the dataset.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' data("Paracou6")
+#' compute_growth_diameter(Paracou6,
+#' id_col = "idTree",
+#' time_col = "CensusYear",
+#' size_col = "CircCorr",
+#' measure_type = "C")
+#' }
+
 compute_growth_diameter <- function(data,
                                     id_col = "idTree",
                                     time_col = "CensusYear",

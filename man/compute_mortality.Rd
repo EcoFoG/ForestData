@@ -2,15 +2,45 @@
 % Please edit documentation in R/compute_mortality.R
 \name{compute_mortality}
 \alias{compute_mortality}
-\title{Title}
+\title{Compute Annual Mortality Rates in Forest Inventories}
 \usage{
-compute_mortality(data, alive_col = "status_corr", time_col, id_col,
-  dead_confirmation_censuses = 2, byplot = TRUE, plot_col = "plot",
+compute_mortality(data, status_col = "status_corr",
+  time_col = "CensusYear", id_col = "idTree",
+  dead_confirmation_censuses = 2, byplot = TRUE, plot_col = "Plot",
   corrected = TRUE)
 }
 \arguments{
-\item{corrected}{}
+\item{data}{A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.}
+
+\item{status_col}{Character. The name of the column containing tree vital status - 0=dead; 1=alive.}
+
+\item{time_col}{Character. The name of the column containing census year}
+
+\item{id_col}{Character. The name of the column containing trees unique ids}
+
+\item{dead_confirmation_censuses}{Integer, defaults to 2. This is the number of censuses needed to state that a tree is considered dead, if unseen. In Paracou, we use the rule-of-thumb that if a tree is unseen twice, its probability to be actually dead is close to 1. The choice of this value involves that trees unseen during the X-1 last inventories can not be corrected for death, and thus mortality rates should not be calculated for these censuses.}
+
+\item{byplot}{Logical. If there are several plots in your dataset, the correction is performed by plot, in case these would not be censuses the same years or with the same frequencies one another.}
+
+\item{plot_col}{Character. The name of the column containing the plots indices.}
+
+\item{corrected}{Logical. Indicates whether the dataset has been corrected for errors in tree life status; if not it will be corrected beforehand using correct_alive function}
+}
+\value{
+A data.frame with absolute and annual mortality rates by plot and census interval.
 }
 \description{
-Title
+This function computes mortality in forest inventories according to plot
+}
+\examples{
+#' \dontrun{
+data("Paracou6")
+compute_mortality(Paracou6,
+status_col="status_corr",
+time_col="CensusYear",
+id_col="idTree",
+dead_confirmation_censuses=2,
+byplot = TRUE,
+plot_col = "Plot",
+corrected = TRUE)}
 }

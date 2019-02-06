@@ -12,8 +12,57 @@ correct_all(data, id_col = "idTree", time_col = "CensusYear",
   use_size = FALSE)
 }
 \arguments{
-\item{use_size}{}
+\item{data}{Data.frame, no default. Forest inventory in the form of a long-format time series - one line is a measure for one individual during one census time.}
+
+\item{id_col}{Character. The name of the column containing trees unique ids}
+
+\item{time_col}{Character. The name of the column containing census year}
+
+\item{status_col}{Character. The name of the column containing tree vital status - 0=dead; 1=alive.}
+
+\item{POM_col}{Character. The name of the column containing trees POM}
+
+\item{size_col}{Character. The name of the column containing tree size measurements - diameter or circumference at breast height}
+
+\item{measure_type}{A single character indicating whether tree sizes are given in circumferences -"C"- or diameter -"D"-.}
+
+\item{plot_col}{Character. The name of the column containing the plots indices.}
+
+\item{byplot}{Logical. If there are several plots in your dataset, the correction is performed by plot, in case these would not be censuses the same years or with the same frequencies one another.}
+
+\item{dead_confirmation_censuses}{Integer, defaults to 2. This is the number of censuses needed to state that a tree is considered dead, if unseen. In Paracou, we use the rule-of-thumb that if a tree is unseen twice, its probability to be actually dead is close to 1. The choice of this value involves that trees unseen during the X-1 last inventories can not be corrected for death, and thus mortality rates should not be calculated for these censuses.}
+
+\item{positive_growth_threshold}{Numeric. Upper threshold over which an annual DIAMETER growth is considered abnormal. Defaults to 5 cm.}
+
+\item{negative_growth_threshold}{Numeric. Lower threshold under which a negative annual DIAMETER growth is considered abnormal. Defaults to -2 cm.}
+
+\item{default_POM}{Numeric. POM normally used in the forest inventory- defaults to the internationa convention of breast height, 1.3}
+
+\item{dbh_min}{A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters.}
+
+\item{use_size}{Character, but defaults to FALSE. Optional argument specifying that circumference or diameter must be used to create the vital status field. If your data already contains a field indicating whether the tree is dead -0 or FALSE- or alive -1 or TRUE-, let it to its default value. If you use this option, make sure beforehand that only live trees are measured - non-NA size - in your dataset's protocol.}
+}
+\value{
+A data.frame with additional columns: status_corr and size_corr for corrected tree vital status and size, code_corr for correction tag and types.
 }
 \description{
 Performs corrections for tree life status, overgrown recruits cases, size measurement errors and POM changes.
+}
+\examples{
+\dontrun{
+correct_all <- function(data,
+id_col = "idTree",
+time_col = "CensusYear",
+status_col = "CodeAlive",
+POM_col,
+size_col = "Circ",
+measure_type = "circumference",
+plot_col = "Plot",
+byplot = TRUE,
+dead_confirmation_censuses = 2,
+positive_growth_threshold,
+negative_growth_threshold,
+default_POM,
+dbh_min = 10,
+use_size = FALSE)}
 }

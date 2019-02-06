@@ -1,25 +1,37 @@
-#' Title
+#' Compute Annual Mortality Rates in Forest Inventories
 #'
-#' @param data
-#' @param alive_col
-#' @param time_col
-#' @param id_col
-#' @param dead_confirmation_censuses
-#' @param byplot
-#' @param plot_col
-#' @param corrected
+#' This function computes mortality in forest inventories according to plot
 #'
-#' @return
+#' @param data A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.
+#' @param status_col Character. The name of the column containing tree vital status - 0=dead; 1=alive.
+#' @param time_col Character. The name of the column containing census year
+#' @param id_col Character. The name of the column containing trees unique ids
+#' @param dead_confirmation_censuses Integer, defaults to 2. This is the number of censuses needed to state that a tree is considered dead, if unseen. In Paracou, we use the rule-of-thumb that if a tree is unseen twice, its probability to be actually dead is close to 1. The choice of this value involves that trees unseen during the X-1 last inventories can not be corrected for death, and thus mortality rates should not be calculated for these censuses.
+#' @param plot_col Character. The name of the column containing the plots indices.
+#' @param byplot Logical. If there are several plots in your dataset, the correction is performed by plot, in case these would not be censuses the same years or with the same frequencies one another.
+#' @param corrected Logical. Indicates whether the dataset has been corrected for errors in tree life status; if not it will be corrected beforehand using correct_alive function
+#'
+#' @return A data.frame with absolute and annual mortality rates by plot and census interval.
 #' @export
 #'
 #' @examples
+#' #' \dontrun{
+#' data("Paracou6")
+#' compute_mortality(Paracou6,
+#' status_col="status_corr",
+#' time_col="CensusYear",
+#' id_col="idTree",
+#' dead_confirmation_censuses=2,
+#' byplot = TRUE,
+#' plot_col = "Plot",
+#' corrected = TRUE)}
 compute_mortality <- function(data,
-                              alive_col="status_corr",
-                              time_col,
-                              id_col,
+                              status_col="status_corr",
+                              time_col="CensusYear",
+                              id_col="idTree",
                               dead_confirmation_censuses=2,
                               byplot = TRUE,
-                              plot_col = "plot",
+                              plot_col = "Plot",
                               corrected = TRUE){
 
   # Checks ------------------------------------------------------------------
@@ -33,13 +45,13 @@ compute_mortality <- function(data,
   }
 
   data <- check_rename_variable_col(time_col, "time_col",data)
-  data <- check_rename_variable_col(alive_col, "status_corr_col",data)
+  data <- check_rename_variable_col(status_col, "status_corr_col",data)
   data <- check_rename_variable_col(id_col, "id_col",data)
   if(byplot) data <- check_rename_variable_col(plot_col, "plot_col",data)
 
 
   if(!corrected){
-    data <- correct_alive(data,alive_col=alive_col,time_col=time_col)
+    data <- correct_alive(data,status_col=status_col,time_col=time_col)
     warning("You specified that your dataset was not corrected beforehand. It has been automatically corrected prior to mortality rate computation.")
   }
   # prepare dataset ---------------------------------------------------------
@@ -87,7 +99,6 @@ compute_mortality <- function(data,
     mortality <- data.frame(time = paste(times[-((length(times)-dead_confirmation_censuses):length(times))],times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))], sep = "_" ),
                             annual_deathrate = NA)
   }
-
 
   if(byplot){
     plots <- unique(data$plot)

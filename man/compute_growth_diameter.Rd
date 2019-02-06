@@ -2,14 +2,35 @@
 % Please edit documentation in R/compute_growth.R
 \name{compute_growth_diameter}
 \alias{compute_growth_diameter}
-\title{Title}
+\title{Compute Tree Annual Diameter Growth}
 \usage{
 compute_growth_diameter(data, id_col = "idTree",
   time_col = "CensusYear", size_col = "CircCorr", measure_type = "C")
 }
 \arguments{
-\item{measure_type}{}
+\item{data}{A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.}
+
+\item{id_col}{Character. The name of the column containing trees unique ids}
+
+\item{time_col}{Character. The name of the column containing census year}
+
+\item{size_col}{A single character containing the name of the column corresponding to tree size measurements -either circumference or diameter.}
+
+\item{measure_type}{A single character indicating whether tree sizes are given in circumferences -"C"- or diameter -"D"-.}
+}
+\value{
+a data.frame with annual and absolute inter-census diameter increments. It has N-n rows, where N is the input dataset's nrow, and n the number of individual trees measurement in the dataset.
 }
 \description{
-Title
+This function computes annual diameter increment for every tree per census interval
+}
+\examples{
+\dontrun{
+data("Paracou6")
+compute_growth_diameter(Paracou6,
+id_col = "idTree",
+time_col = "CensusYear",
+size_col = "CircCorr",
+measure_type = "C")
+}
 }

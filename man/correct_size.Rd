@@ -2,14 +2,47 @@
 % Please edit documentation in R/correct_size_main.R
 \name{correct_size}
 \alias{correct_size}
-\title{Title}
+\title{Correct Tree Size Measurements}
 \usage{
 correct_size(data, size_col, time_col, status_col, id_col, POM_col,
   positive_growth_threshold, negative_growth_threshold, default_POM)
 }
 \arguments{
-\item{default_POM}{}
+\item{data}{Data.frame, no default. Forest inventory in the form of a long-format time series - one line is a measure for one individual during one census time.}
+
+\item{size_col}{Character. The name of the column containing tree size measurements - diameter or circumference at breast height}
+
+\item{time_col}{Character. The name of the column containing census year}
+
+\item{status_col}{Character. The name of the column containing tree vital status - 0=dead; 1=alive.}
+
+\item{id_col}{Character. The name of the column containing trees unique ids}
+
+\item{POM_col}{Character. The name of the column containing trees POM}
+
+\item{positive_growth_threshold}{Numeric. Upper threshold over which an annual DIAMETER growth is considered abnormal. Defaults to 5 cm.}
+
+\item{negative_growth_threshold}{Numeric. Lower threshold under which a negative annual DIAMETER growth is considered abnormal. Defaults to -2 cm.}
+
+\item{default_POM}{Numeric. POM normally used in the forest inventory- defaults to the internationa convention of breast height, 1.3}
+}
+\value{
+The same data.frame with two additional columns: size_cor, containing corrected tree size measurements, and code_corr, containing codes that tag both corrections locations and type.
 }
 \description{
-Title
+This function provides corrections for tree size measurements in Forest Inventories.
+POM are to be given as an input, and POM shifts are accounted for by adjusting the after-shifts value
+translating the points to offest the observed size loss by: after_shift_size_corrected = after_shift_size_original + difference_before_after + expected_growth.
+}
+\examples{
+\dontrun{
+correct_size <- function(data,
+size_col,
+time_col,
+status_col,
+id_col,
+POM_col,
+positive_growth_threshold,
+negative_growth_threshold,
+default_POM)}
 }

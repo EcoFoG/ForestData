@@ -1,28 +1,33 @@
-# ## test
-# dat = subset(data, idtree == "prg_1_0_21998")
-# size = dat$dbh
-# time = dat$year
-# min_dbh = 10
-# ladder = dat$ladder
-
-
-
-#' Title
+#' Correct Tree Size Measurements
 #'
-#' @param data
-#' @param size_col
-#' @param time_col
-#' @param status_col
-#' @param id_col
-#' @param POM_col
-#' @param positive_growth_threshold
-#' @param negative_growth_threshold
-#' @param default_POM
+#' This function provides corrections for tree size measurements in Forest Inventories.
+#' POM are to be given as an input, and POM shifts are accounted for by adjusting the after-shifts value
+#' translating the points to offest the observed size loss by: after_shift_size_corrected = after_shift_size_original + difference_before_after + expected_growth.
 #'
-#' @return
+#' @param data Data.frame, no default. Forest inventory in the form of a long-format time series - one line is a measure for one individual during one census time.
+#' @param size_col Character. The name of the column containing tree size measurements - diameter or circumference at breast height
+#' @param time_col Character. The name of the column containing census year
+#' @param status_col Character. The name of the column containing tree vital status - 0=dead; 1=alive.
+#' @param id_col Character. The name of the column containing trees unique ids
+#' @param POM_col Character. The name of the column containing trees POM
+#' @param positive_growth_threshold Numeric. Upper threshold over which an annual DIAMETER growth is considered abnormal. Defaults to 5 cm.
+#' @param negative_growth_threshold Numeric. Lower threshold under which a negative annual DIAMETER growth is considered abnormal. Defaults to -2 cm.
+#' @param default_POM Numeric. POM normally used in the forest inventory- defaults to the internationa convention of breast height, 1.3
+#'
+#' @return The same data.frame with two additional columns: size_cor, containing corrected tree size measurements, and code_corr, containing codes that tag both corrections locations and type.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' correct_size <- function(data,
+#' size_col,
+#' time_col,
+#' status_col,
+#' id_col,
+#' POM_col,
+#' positive_growth_threshold,
+#' negative_growth_threshold,
+#' default_POM)}
 correct_size <- function(data,
                          size_col,
                          time_col,
@@ -265,6 +270,8 @@ correct_size <- function(data,
                                  time,
                                  POM,
                                  default_POM,
+                                 positive_growth_threshold,
+                                 negative_growth_threshold,
                                  i){
   ignore_negative_POM_changes = F
   code_corr <- rep(0, length(size))
@@ -359,4 +366,22 @@ correct_size <- function(data,
   }
   return(corrected_values)
 }
+.fill_na_POM <- function(POM){ # TO CHECK
+  if(any(is.na(POM))){
+    if(all(is.na(POM))){
+      POM <- rep(1.3, length(POM))
+    }
+    else{
+      while(any(is.na(POM))){
+        index <- which.max(is.na(POM))
+        if(index == 1){
+          POM[1:(which.max(!is.na(POM))[-1])] <- POM[(which.max(!is.na(POM)))]
+        }
+        else if(index == length(POM)){
+          POM[which(is.na(POM))[length(which(is.na(POM)))]:(which.max(!is.na(POM))[-1])] <- POM[(which.max(!is.na(POM)))]
+        }
+      }
+    }
 
+  }
+}
