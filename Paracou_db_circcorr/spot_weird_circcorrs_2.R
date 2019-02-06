@@ -92,9 +92,8 @@ truc <- dbh_corrige %>%
              CodeMeas,
              VernName)
   ) %>%
-# %>% save(file = "compare_bdd_megacor.rda")
   reshape2::melt(id.vars = c("idTree","species","CodeCorr","CodeCorr2","CensusYear","CodeMeas","Plot","VernName"),
-                 measure.vars = c("Circ","CircCorr"),
+                 measure.vars = c("Circ","CircCorr","MegaCorr"),
                  variable.name = "Ctype",
                  value.name = "C") %>%
   as.tibble
@@ -109,7 +108,7 @@ codcor <- truc %>%
 codcor %>% pull %>% table
 truc$CodeCorr2 %>% table
 (truc$CodeCorr2 == codcor) %>% sum()
-
+truc
 ids <- truc %>% select(idTree) %>% unique %>% pull
 for(i in ids){
   # cnt <- cnt+1
@@ -135,7 +134,7 @@ for(i in ids){
     ylab("Diameter (cm)")+
     theme(axis.text.x = element_text(angle=45))+ggrepel::geom_text_repel(aes(label =  Ctype),
                                                                          size = 3)
-  g1
-  ggsave(g1, filename = paste0("./corrected_size_trees/g_corrected_size_",i,".jpeg"),device = "jpeg")
+  # g1
+  ggsave(g1, filename = paste0("./corrected_size_trees/compare3/g_corrected_size_",i,".jpeg"),device = "jpeg")
 
 }

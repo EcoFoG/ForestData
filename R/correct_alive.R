@@ -16,13 +16,13 @@
 #'
 #' @examples
 correct_alive <- function(data,
-                               id_col = "idTree",
-                               time_col = "CensusYear",
-                               alive_col = "CodeAlive",
-                               plot_col = "Plot",
-                               byplot = TRUE,
-                               dead_confirmation_censuses = 2,
-                               use_size = FALSE) {
+                          id_col = "idTree",
+                          time_col = "CensusYear",
+                          status_col = "CodeAlive",
+                          plot_col = "Plot",
+                          byplot = TRUE,
+                          dead_confirmation_censuses = 2,
+                          use_size = FALSE) {
   # Checks and preparation --------------------------------------------------
 
   # Trivial check of data arg
@@ -30,67 +30,102 @@ correct_alive <- function(data,
     stop("data must be a dataframe")
   }
 
+  if (!is.logical(use_size))
+    stop("use_size must be a single logical value(TRUE or FALSE)")
+  if (!is.logical(byplot))
+    stop("byplot must be a single logical value(TRUE or FALSE)")
+
+  # if (!is.character(id_col))
+  #   stop("id_col must be a single character")
+  # if (!is.logical(time_col))
+  #   stop("time_col must be a single character")
+  # if (!is.character(status_col))
+  #   stop("status_col must be a single character")
+  # if (byplot & !is.character(plot_col))
+  #   stop("plot_col must be a single character")
+
   #Checks if columns are well specified and temporarily replace their names
+
   ## Census years
-  if (!time_col %in% names(data)) {
-    stop(
-      "The name you indicated (or let to default) for the census year column is apparently not in the colnames of the dataset. Please specify it"
-    )
-  }
-  else
-    names(data)[which(names(data) == time_col)] <- "time"
+  data <- check_rename_variable_col(time_col, "time_col",data)
+  # if (!time_col %in% names(data)) {
+  #   stop(
+  #     "The name you indicated (or let to default) for the census year column is apparently not in the colnames of the dataset. Please specify it"
+  #   )
+  # }
+  # else
+  #   names(data)[which(names(data) == time_col)] <- "time"
+
   ## ids
-  if (!id_col %in% names(data)) {
-    stop(
-      "The name you indicated (or let to default) for the unique, individual tree IDs column is apparently not in the colnames of the dataset. Please specify it"
-    )
-  }
-  else
-    names(data)[which(names(data) == id_col)] <- "id"
+  data <- check_rename_variable_col(id_col, "id_col",data)
+  # if (!id_col %in% names(data)) {
+  #   stop(
+  #     "The name you indicated (or let to default) for the unique, individual tree IDs column is apparently not in the colnames of the dataset. Please specify it"
+  #   )
+  # }
+  # else
+  #   names(data)[which(names(data) == id_col)] <- "id"
+
   ## alive code
-  if (use_size != FALSE & !alive_col %in% names(data)) {
-    stop(
-      "The name you indicated (or let to default) for the tree vital status column is apparently not in the colnames of the dataset. You must specify it, or if it does not exist, use the argument use_size to create it from measurements under the hypothesis that only live trees were measured in your inventory"
-    )
-  }
-  else
-    names(data)[which(names(data) == alive_col)] <- "status"
+  if(!use_size){
+    data <- check_rename_variable_col(status_col, "status_col",data)
+  }else data$status <- NA
+
+  data$status_corr <- data$status
+  # if (use_size != FALSE & !alive_col %in% names(data)) {
+  #   stop(
+  #     "The name you indicated (or let to default) for the tree vital status column is apparently not in the colnames of the dataset. You must specify it, or if it does not exist, use the argument use_size to create it from measurements under the hypothesis that only live trees were measured in your inventory"
+  #   )
+  # }
+  # else
+  #   names(data)[which(names(data) == alive_col)] <- "status"
+
   ## plots
-  if (byplot & !plot_col %in% names(data)) {
-    stop(
-      "The name you indicated (or let to default) for the unique, individual tree IDs column is apparently not in the colnames of the dataset. Please specify it"
-    )
-  }
-  else if (byplot)
-    names(data)[which(names(data) == plot_col)] <- "plot"
+  if(byplot) data <- check_rename_variable_col(plot_col, "plot_col",data)
+  # if (byplot & !plot_col %in% names(data)) {
+  #   stop(
+  #     "The name you indicated (or let to default) for the unique, individual tree IDs column is apparently not in the colnames of the dataset. Please specify it"
+  #   )
+  # }
+  # else if (byplot)
+  #   names(data)[which(names(data) == plot_col)] <- "plot"
+
 
   ##Other
   if (!(is.numeric(dead_confirmation_censuses) &
         length(dead_confirmation_censuses) == 1))
     stop("argument dead_confirmation censuses must be an integer scalar")
 
-  if (!is.logical(byplot))
-    stop("byplot must be a single logical value(TRUE or FALSE)")
 
-  if (!"status" %in% names(data))
-    data$status <- NA
-  data$status_corr <- data$status
+
+  # if (!"status" %in% names(data))
+  #   data$status <- NA
+  # data$status_corr <- data$status
 
   # Call internals by plot or not --------------------------------------------
 
   if (byplot) {
     plots <- unique(data$plot)
-    for (p in plots) {
-      data <-
-        rbind(
-          data[which(data$plot != p), ],
-          .correct_status_plotlevel(data[which(data$plot == p), ], dead_confirmation_censuses, use_size)
-        )
-    }
-    return(data)
+    data <- do.call(rbind, lapply(plots,
+                                  function(p){
+                                    .correct_status_plotlevel(data[which(data$plot == p), ], dead_confirmation_censuses, use_size)
+                                  }))
+    # for (p in plots) {
+    #   data <-
+    #     rbind(
+    #       data[which(data$plot != p), ],
+    #       .correct_status_plotlevel(data[which(data$plot == p), ], dead_confirmation_censuses, use_size)
+    #     )
+    # }
   }
   else
-    return(.correct_status_plotlevel(data, dead_confirmation_censuses, use_size))
+    data <- .correct_status_plotlevel(data, dead_confirmation_censuses, use_size)
+
+  names(data)[which(names(data == "id"))] <- id_col
+  names(data)[which(names(data == "time"))] <- time_col
+  names(data)[which(names(data == "status"))] <- status_col
+  if(byplot) names(data)[which(names(data == "plot"))] <- plot_col
+  return(data)
 }
 
 

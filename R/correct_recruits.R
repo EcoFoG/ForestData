@@ -4,7 +4,6 @@
 #'
 #' @param data A data.frame containing a forest inventory in which each line corresponds to an individual's measurement for one census
 #' @param dbh_min A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters. Defaults to 10 cm.
-#' @param growth_limit A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal. Defaults to 5 cm, as set for Paracou inventories.
 #' @param time_col A character indicating the name of the column containing census year information.
 #' @param id_col A character indicating the name of the column containing individual tree's IDs
 #' @param plot_col A character indicating the name of the column containing plot indices or names.
@@ -12,7 +11,8 @@
 #' @param status_col A character indicating the name of the column containing tree vital status - 0 for dead, 1 for alive, NA for unseen. No tree must appear with NA status before their first measurement.
 #' @param measure_type A character indicating the size measurement type : "C" for circumference, "D" for diameter. Defaults to "C".
 #' @param byplot A logical indicating whether there are several plots in the dataset. Defaults to TRUE
-#' @param corrected_status A logical indicating whether the dataset was corrected for tree vital status errors beforehand. If FALSE, the correct_mortality function is called first with default parameters - see the function info section.
+#' @param correct_status A logical indicating whether the dataset was corrected for tree vital status errors beforehand. If FALSE, the correct_mortality function is called first with default parameters - see the function info section.
+#' @param diameter_growth_limit A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal. Defaults to 5 cm, as set for Paracou inventories.
 #'
 #' @return
 #' @export
@@ -28,8 +28,53 @@ correct_recruits <- function(data,
                              status_col = "AliveCode",
                              measure_type = "circumference",
                              byplot = TRUE,
-                             corrected_status){
+                             correct_status = FALSE){
 
+
+# Argument checks ---------------------------------------------------------
+
+
+  if(!is.data.frame(data)){
+    stop("data must be a data.frame object")
+  }
+
+  if(!is.logical(byplot)){
+    stop("byplot must be logical")
+  }
+
+  if(!is.logical(correct_status)){
+    stop("byplot must be logical")
+  }
+
+  if(!(is.character(measure_type) & length(measure_type) == 1))
+    stop("measure_type must be a character of length 1")
+  data <- check_rename_variable_col(time_col, "time_col",data)
+  res <- try(check_rename_variable_col("status_corr", "status_corr_col",data))
+  if(inherits(res,'try-error') & correct_status == T){
+    data <- check_rename_variable_col(status_col, "status_col",data)
+    data <- correct_alive(data,
+                          id_col = "id",
+                          time_col = "time",
+                          status_col = "status",
+                          plot_col,
+                          byplot,
+                          dead_confirmation_censuses = 2,
+                          use_size = ifelse(is.na(status_col),
+                                            size_col,
+                                            FALSE)
+    )
+  }
+  else if (inherits(res,'try-error') & !correct_status){
+    data <- check_rename_variable_col(status_col,"status_corr_col",data)
+  }
+
+  data <- check_rename_variable_col(id_col, "id_col",data)
+  data <- check_rename_variable_col(size_col, "size_col",data)
+  if(byplot) data <- check_rename_variable_col(plot_col, "plot_col",data)
+
+  if(correct_status){
+
+  }
   if(!measure_type %in% c("circumference",
                           "circ","c",
                           "Circumference",
@@ -53,25 +98,38 @@ correct_recruits <- function(data,
     dbh_min <- dbh_min*pi
   }
 
+
+# Call internals by plot or not -------------------------------------------
+
+
+
   if(byplot){
     plots <- unique(data$plot)
 
-    for(p in plots){
-      data <- rbind(data[which(data$plot != p),], .correct_recruits_plot(data_plot=data[which(data$plot == p),],
-                                                                         dbh_min = dbh_min,
-                                                                         growth_limit = growth_limit))
-    }
-    return(data)
+    # for(p in plots){
+    #   data <- rbind(data[which(data$plot != p),], .correct_recruits_plot(data_plot=data[which(data$plot == p),],
+    #                                                                      dbh_min = dbh_min,
+    #                                                                      growth_limit = growth_limit))
+    # }
+    data <- do.call(rbind,lapply(plots, function(p){.correct_recruits_plot(data_plot=data[which(data$plot == p),],
+                                                                           dbh_min = dbh_min,
+                                                                           growth_limit = growth_limit)}))
   }
   else{
     data <- .correct_recruits_plot(data_plot=data,
                                    dbh_min = dbh_min,
                                    growth_limit = growth_limit)
-    return(data)
   }
 
 
+# Put back colnames and return --------------------------------------------
 
+  names(data)[which(names(data == "id"))] <- id_col
+  names(data)[which(names(data == "time"))] <- time_col
+  names(data)[which(names(data == "status"))] <- status_col
+  names(data)[which(names(data == "size"))] <- size_col
+  if(byplot) names(data)[which(names(data == "plot"))] <- plot_col
+  return(data)
 }
 
 #' Internal function. plot-level correction for overgrown recruits.

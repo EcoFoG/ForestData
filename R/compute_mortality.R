@@ -91,18 +91,28 @@ compute_mortality <- function(data,
 
   if(byplot){
     plots <- unique(data$plot)
-    for(p in plots){
-      print(mortality[which(mortality$plot == p),])
-      mortality <- rbind(mortality[which(mortality$plot != p),],
-                         .compute_mortality_plotlevel(data[which(data$plot == p),],
-                                                      mortality[which(mortality$plot == p),],
-                                                      dead_confirmation_censuses
-                                                      )
-                         )
-    }
-    return(mortality)
+    mortality <- do.call(rbind,
+                         lapply(plots,
+                                function(p){
+                                  .compute_mortality_plotlevel(data[which(data$plot == p),],
+                                                               mortality[which(mortality$plot == p),],
+                                                               dead_confirmation_censuses
+                                  )
+                                }))
+    # for(p in plots){
+    #   print(mortality[which(mortality$plot == p),])
+    #   mortality <- rbind(mortality[which(mortality$plot != p),],
+    #                      .compute_mortality_plotlevel(data[which(data$plot == p),],
+    #                                                   mortality[which(mortality$plot == p),],
+    #                                                   dead_confirmation_censuses
+    #                                                   )
+    #                      )
+    # }
+
   }
-  else return(.compute_mortality_plotlevel(data, mortality, dead_confirmation_censuses))
+  else mortality <- .compute_mortality_plotlevel(data, mortality, dead_confirmation_censuses)
+
+  return(mortality)
 }
 
 

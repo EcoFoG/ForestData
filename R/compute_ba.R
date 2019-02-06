@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-compute_ba_ok <- function(data,
+compute_ba <- function(data,
                        measure_col = "CircCorr",
                        measure_type = "C",
                        time_col = "CensusYear",
