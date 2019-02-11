@@ -14,14 +14,26 @@
 #' }
 check_rename_variable_col <- function(arg, name, data){
   if(!inherits(name,"character")){
-    stop('Internal error in check_variable_col(): argname must be a character')
+    stop('Internal error in check_variable_col(): name must be a character')
+  }
+  if(length(name) != 1){
+    stop('Internal error in check_variable_col(): name must be a character of length 1')
+  }
+  if(is.na(name)){
+    stop('Internal error in check_variable_col(): name must be non-NA')
   }
   if(!inherits(data, "data.frame")){
     stop('Internal error in check_variable_col(): data must be a data.frame')
   }
 
-  if(!is.character(arg)){
-    stop(paste0(name, ' must be a character corresponding to a column name. For more informations on what this argument corresponds to, see the help section.'))
+  if(!inherits(arg,"character")){
+    stop(paste0(arg, ' must be a non NA, length 1 character corresponding to a column name. For more informations on what this argument corresponds to, see the help section.'))
+  }
+  if(length(arg) != 1){
+    stop((paste0(arg,' must be a character of length 1')))
+  }
+  if(is.na(arg)){
+    stop((paste0(arg,' must be non-NA')))
   }
   else if(!arg %in% names(data)){
     stop(paste0('The specified name for ', name,' (',arg,') does not match with the names of your dataset. For more informations on what this argument corresponds to, see the help section.'))
