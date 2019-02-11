@@ -33,7 +33,7 @@ A data.frame with absolute and annual mortality rates by plot and census interva
 This function computes mortality in forest inventories according to plot
 }
 \examples{
-#' \dontrun{
+\dontrun{
 data("Paracou6")
 compute_mortality(Paracou6,
 status_col="status_corr",
@@ -42,5 +42,6 @@ id_col="idTree",
 dead_confirmation_censuses=2,
 byplot = TRUE,
 plot_col = "Plot",
-corrected = TRUE)}
+corrected = TRUE)
+}
 }

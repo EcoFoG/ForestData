@@ -41,5 +41,6 @@ status_col = "CodeAlive",
 plot_col = "SubPlot",
 byplot = TRUE,
 dead_confirmation_censuses = 2,
-use_size = FALSE)}
+use_size = FALSE)
+}
 }

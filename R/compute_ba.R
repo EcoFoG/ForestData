@@ -7,6 +7,7 @@
 #' @param measure_type A single character indicating whether tree sizes are given in circumferences -"C"- or diameter -"D"-.
 #' @param by A character vector containing the name of the columns containing the variables -other than census time- according to which the result will be aggregated. Be it plots, subplots or species name...
 #' @param surface Either a scalar containing the surface area of each plot -if they have the same dimensions- or a data.frame of the surface area according to some of the grouping variables -e.g. Plot and subplot. However, defaults to FALSE and in this case, only absolute BA is returned.
+#' @param time_col A single character containing the name of the column corresponding to census years
 #'
 #' @return A dataframe containing, for each combination of grouping variables, the plot-level and per-ha basal area for a given census year.
 #' @export

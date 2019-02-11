@@ -357,7 +357,7 @@ correct_size <- function(data,
       time_val <- tree$time[c(max(which(!is.na(tree$size[1:(i-1)]))), i+min(which(!is.na(tree$size[(i+1):length(tree$size)]))))]
     }
 
-    reg <- lm(size_val ~ time_val)$coef
+    reg <- stats::lm(size_val ~ time_val)$coef
     corrected_values[i] <- reg[1] + reg[2]*tree$time[i]
 
     if (sum(!is.na(time_val))==1) {

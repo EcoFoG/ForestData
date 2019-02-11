@@ -15,7 +15,7 @@ library(testthat)
 
 data("example_alive")
 
-expect_error(correct_alive(data = example_alive,
+expect_error(correct_alive(data = as.list(example_alive),
                            id_col = "id",
                            time_col = "time",
                            status_col = "status",

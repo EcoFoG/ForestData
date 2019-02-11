@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-#' #' \dontrun{
+#' \dontrun{
 #' data("Paracou6")
 #' compute_mortality(Paracou6,
 #' status_col="status_corr",
@@ -24,7 +24,8 @@
 #' dead_confirmation_censuses=2,
 #' byplot = TRUE,
 #' plot_col = "Plot",
-#' corrected = TRUE)}
+#' corrected = TRUE)
+#' }
 compute_mortality <- function(data,
                               status_col="status_corr",
                               time_col="CensusYear",
