@@ -10,7 +10,7 @@ Authors@R: c(
     person("Gaëlle", "Jaouen", email="gaelle.jaouen@ecofog.gf", role="aut"),
     person("Camille", "Piponiot", email="camille.piponiot@ecofog.gf", role="aut")
     )
-Description: TODO
+Description: TODO.
 License: GNU General Public License
 Imports: dplyr, ggplot2, ggrepel
 Encoding: UTF-8

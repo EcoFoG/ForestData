@@ -192,7 +192,7 @@ correct_recruits <- function(data,
 #' @return A data.frame containing the corrected indiv
 #'
 #' @examples
-#' #' \dontrun{
+#' \dontrun{
 #' data("Paracou6")
 #' cens <- unique(Paracou6$CensusYear)
 #' ids <- unique(Paracou6$idTree)

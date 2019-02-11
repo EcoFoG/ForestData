@@ -32,7 +32,7 @@ A data.frame with absolute and annual recruitment rates by plot and census inter
 This function computes recruitment in forest inventories according to plot
 }
 \examples{
-#' \dontrun{
+\dontrun{
 data("Paracou6")
 compute_recruitment(Paracou6,
 alive_col="status_corr",

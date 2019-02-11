@@ -22,7 +22,7 @@ A data.frame containing the corrected indiv
 Internal function. tree-level correction for overgrown recruits.
 }
 \examples{
-#' \dontrun{
+\dontrun{
 data("Paracou6")
 cens <- unique(Paracou6$CensusYear)
 ids <- unique(Paracou6$idTree)

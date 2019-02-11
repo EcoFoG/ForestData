@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-#' #' \dontrun{
+#' \dontrun{
 #' data("Paracou6")
 #' compute_recruitment(Paracou6,
 #' alive_col="status_corr",
