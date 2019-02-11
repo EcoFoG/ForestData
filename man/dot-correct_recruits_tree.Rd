@@ -4,16 +4,18 @@
 \alias{.correct_recruits_tree}
 \title{Internal function. tree-level correction for overgrown recruits.}
 \usage{
-.correct_recruits_tree(tree, dbh_min, growth_limit, censuses)
+.correct_recruits_tree(tree, dbh_min, diameter_growth_limit, censuses, i)
 }
 \arguments{
 \item{tree}{A data.frame containing one single tree's time series of measurements.}
 
 \item{dbh_min}{A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters.}
 
-\item{growth_limit}{A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal.}
+\item{diameter_growth_limit}{A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal.}
 
 \item{censuses}{A numeric vector containing all the years for which the plot to which the tree belongs were censused.}
+
+\item{i}{i}
 }
 \value{
 A data.frame containing the corrected indiv

@@ -124,16 +124,16 @@ correct_recruits <- function(data,
     # for(p in plots){
     #   data <- rbind(data[which(data$plot != p),], .correct_recruits_plot(data_plot=data[which(data$plot == p),],
     #                                                                      dbh_min = dbh_min,
-    #                                                                      growth_limit = growth_limit))
+    #                                                                      diameter_growth_limit = diameter_growth_limit))
     # }
     data <- do.call(rbind,lapply(plots, function(p){.correct_recruits_plot(data_plot=data[which(data$plot == p),],
                                                                            dbh_min = dbh_min,
-                                                                           growth_limit = growth_limit)}))
+                                                                           diameter_growth_limit = diameter_growth_limit)}))
   }
   else{
     data <- .correct_recruits_plot(data_plot=data,
                                    dbh_min = dbh_min,
-                                   growth_limit = growth_limit)
+                                   diameter_growth_limit = diameter_growth_limit)
   }
 
 
@@ -151,7 +151,7 @@ correct_recruits <- function(data,
 #'
 #' @param data_plot A data.frame containing a subset of forest inventory corresponding to one plot, formatted as in "correct_recruits".
 #' @param dbh_min A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters.
-#' @param growth_limit A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal.
+#' @param diameter_growth_limit A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal.
 #'
 #' @return A data.frame containing the corrected plot
 #'
@@ -159,11 +159,10 @@ correct_recruits <- function(data,
 #' \dontrun{
 #' data("Paracou6")
 #' plots <- unique(Paracou6$Plot)
-#' for(p in plots) correct_recruits_plot(Paracou[Paracou$Plot == p,], 10, 5)
-#' }
+#' for(p in plots) correct_recruits_plot(Paracou[Paracou$Plot == p,], 10, 5)}
 .correct_recruits_plot <- function(data_plot,
                                   dbh_min,
-                                  growth_limit){
+                                  diameter_growth_limit){
 
   ids <- unique(data_plot$id)
   censuses <- unique(data_plot$time)
@@ -172,8 +171,9 @@ correct_recruits <- function(data,
   for(i in ids){
     tree_corrected <- .correct_recruits_tree(data_plot[which(data_plot$id == i),],
                                              dbh_min = dbh_min,
-                                             growth_limit = growth_limit,
-                                             censuses = censuses)
+                                             diameter_growth_limit = diameter_growth_limit,
+                                             censuses = censuses,
+                                             i=i)
 
     if(!identical(data_plot[which(data_plot$id == i),], tree_corrected)){
       data_plot <- rbind(data_plot[which(data_plot$id != i),],tree_corrected)
@@ -185,9 +185,10 @@ correct_recruits <- function(data,
 #' Internal function. tree-level correction for overgrown recruits.
 #'
 #' @param dbh_min A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters.
-#' @param growth_limit A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal.
+#' @param diameter_growth_limit A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal.
 #' @param tree A data.frame containing one single tree's time series of measurements.
 #' @param censuses A numeric vector containing all the years for which the plot to which the tree belongs were censused.
+#' @param i i
 #'
 #' @return A data.frame containing the corrected indiv
 #'
@@ -200,16 +201,17 @@ correct_recruits <- function(data,
 #' }
 .correct_recruits_tree <- function(tree,
                                    dbh_min,
-                                   growth_limit,
-                                   censuses){
+                                   diameter_growth_limit,
+                                   censuses,
+                                   i){
   #Make sure that it is ordered by increasing census time
-  tree <- tree[order(tree_temp$time),]
+  tree <- tree[order(tree$time),]
 
   recruitment_time <- min(tree$time)
 
   if(min(tree$time)>min(censuses) & sum(!is.na(tree$diameter))>0){
     prev_inv <- censuses[which(censuses == recruitment_time)-1]
-    if(tree$diameter[1] > dbh_min +(recruitment_time-prev_inv)*growth_limit){
+    if(tree$diameter[1] > dbh_min +(recruitment_time-prev_inv)*diameter_growth_limit){
 
       missing_censuses <- censuses[which(censuses < recruitment_time)]
 
@@ -218,7 +220,7 @@ correct_recruits <- function(data,
         if("plot" %in% names(tree)){
           new.rows <- data.frame(id = i,
                                  time = missing_censuses,
-                                 plot = rep(tree_temp$plot[1],length(missing_censuses)))
+                                 plot = rep(tree$plot[1],length(missing_censuses)))
         }
         else{
           new.rows <- data.frame(id = i,
@@ -231,9 +233,9 @@ correct_recruits <- function(data,
       }
 
       #Make sure that it is ordered by increasing census time
-      tree <- tree[order(tree_temp$time),]
+      tree <- tree[order(tree$time),]
 
-      coef <- lm(tree$diameter[which(!is.na(tree$diameter))]~tree$time[which(!is.na(tree$diameter))])$coefficients
+      coef <- stats::lm(tree$diameter[which(!is.na(tree$diameter))]~tree$time[which(!is.na(tree$diameter))])$coefficients
 
       if (is.na(coef[2])) {
         # tree$diameter[which(is.na(tree$status))] <- coef[1]

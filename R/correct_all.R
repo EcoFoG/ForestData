@@ -72,8 +72,7 @@ correct_all <- function(data,
                            size_col,
                            status_col,
                            measure_type,
-                           byplot,
-                           corrected_status)
+                           byplot)
   data <- correct_size(data,
                        size_col,
                        time_col,

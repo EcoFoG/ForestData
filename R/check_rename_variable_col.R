@@ -21,7 +21,7 @@ check_rename_variable_col <- function(arg, name, data){
   }
 
   if(!is.character(arg)){
-    stop(past0(name, ' must be a character corresponding to a column name. For more informations on what this argument corresponds to, see the help section.'))
+    stop(paste0(name, ' must be a character corresponding to a column name. For more informations on what this argument corresponds to, see the help section.'))
   }
   else if(!arg %in% names(data)){
     stop(paste0('The specified name for ', name,' (',arg,') does not match with the names of your dataset. For more informations on what this argument corresponds to, see the help section.'))

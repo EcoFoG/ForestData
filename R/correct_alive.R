@@ -84,13 +84,13 @@ correct_alive <- function(data,
   }else data$status <- NA
 
   data$status_corr <- data$status
-  # if (use_size != FALSE & !alive_col %in% names(data)) {
+  # if (use_size != FALSE & !status_col %in% names(data)) {
   #   stop(
   #     "The name you indicated (or let to default) for the tree vital status column is apparently not in the colnames of the dataset. You must specify it, or if it does not exist, use the argument use_size to create it from measurements under the hypothesis that only live trees were measured in your inventory"
   #   )
   # }
   # else
-  #   names(data)[which(names(data) == alive_col)] <- "status"
+  #   names(data)[which(names(data) == status_col)] <- "status"
 
   ## plots
   if(byplot) data <- check_rename_variable_col(plot_col, "plot",data)

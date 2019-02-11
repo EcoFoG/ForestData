@@ -4,14 +4,14 @@
 \alias{.correct_recruits_plot}
 \title{Internal function. plot-level correction for overgrown recruits.}
 \usage{
-.correct_recruits_plot(data_plot, dbh_min, growth_limit)
+.correct_recruits_plot(data_plot, dbh_min, diameter_growth_limit)
 }
 \arguments{
 \item{data_plot}{A data.frame containing a subset of forest inventory corresponding to one plot, formatted as in "correct_recruits".}
 
 \item{dbh_min}{A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters.}
 
-\item{growth_limit}{A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal.}
+\item{diameter_growth_limit}{A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal.}
 }
 \value{
 A data.frame containing the corrected plot
@@ -23,6 +23,5 @@ Internal function. plot-level correction for overgrown recruits.
 \dontrun{
 data("Paracou6")
 plots <- unique(Paracou6$Plot)
-for(p in plots) correct_recruits_plot(Paracou[Paracou$Plot == p,], 10, 5)
-}
+for(p in plots) correct_recruits_plot(Paracou[Paracou$Plot == p,], 10, 5)}
 }

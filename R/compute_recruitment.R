@@ -3,7 +3,7 @@
 #' This function computes recruitment in forest inventories according to plot
 #'
 #' @param data A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.
-#' @param alive_col Character. The name of the column containing tree vital status - 0=dead; 1=alive.
+#' @param status_col Character. The name of the column containing tree vital status - 0=dead; 1=alive.
 #' @param time_col Character. The name of the column containing census year
 #' @param id_col Character. The name of the column containing trees unique ids
 #' @param dead_confirmation_censuses Integer, defaults to 2. This is the number of censuses needed to state that a tree is considered dead, if unseen. In Paracou, we use the rule-of-thumb that if a tree is unseen twice, its probability to be actually dead is close to 1. The choice of this value involves that trees unseen during the X-1 last inventories can not be corrected for death, and thus mortality rates should not be calculated for these censuses.
@@ -18,7 +18,7 @@
 #' \dontrun{
 #' data("Paracou6")
 #' compute_recruitment(Paracou6,
-#' alive_col="status_corr",
+#' status_col="status_corr",
 #' time_col="CensusYear",
 #' id_col="idTree",
 #' dead_confirmation_censuses=2,
@@ -27,7 +27,7 @@
 #' corrected = TRUE)
 #' }
 compute_recruitment <- function(data,
-                              alive_col="status_corr",
+                              status_col="status_corr",
                               time_col,
                               id_col,
                               dead_confirmation_censuses=2,
@@ -46,12 +46,12 @@ compute_recruitment <- function(data,
   }
 
   data <- check_rename_variable_col(time_col, "time_col",data)
-  data <- check_rename_variable_col(alive_col, "status_corr_col",data)
+  data <- check_rename_variable_col(status_col, "status_corr_col",data)
   data <- check_rename_variable_col(id_col, "id_col",data)
   if(byplot) data <- check_rename_variable_col(plot_col, "plot_col",data)
 
   if(!corrected){
-    data <- correct_alive(data,alive_col=alive_col,time_col=time_col)
+    data <- correct_alive(data,status_col=status_col,time_col=time_col)
     warning("You specified that your dataset was not corrected beforehand. It has been automatically corrected prior to recruitment rate computation.")
   }
   # prepare dataset ---------------------------------------------------------

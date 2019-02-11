@@ -4,14 +4,14 @@
 \alias{compute_recruitment}
 \title{Compute Annual Recruitment Rates in Forest Inventories}
 \usage{
-compute_recruitment(data, alive_col = "status_corr", time_col, id_col,
+compute_recruitment(data, status_col = "status_corr", time_col, id_col,
   dead_confirmation_censuses = 2, byplot = TRUE, plot_col = "plot",
   corrected = TRUE)
 }
 \arguments{
 \item{data}{A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.}
 
-\item{alive_col}{Character. The name of the column containing tree vital status - 0=dead; 1=alive.}
+\item{status_col}{Character. The name of the column containing tree vital status - 0=dead; 1=alive.}
 
 \item{time_col}{Character. The name of the column containing census year}
 
@@ -35,7 +35,7 @@ This function computes recruitment in forest inventories according to plot
 \dontrun{
 data("Paracou6")
 compute_recruitment(Paracou6,
-alive_col="status_corr",
+status_col="status_corr",
 time_col="CensusYear",
 id_col="idTree",
 dead_confirmation_censuses=2,

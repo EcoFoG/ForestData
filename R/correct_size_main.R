@@ -39,30 +39,22 @@ correct_size <- function(data,
                          default_POM){
 
   # Checks and format -------------------------------------------------------
-  names(data)[which(names(data)== size_col)] <- "size"
-  names(data)[which(names(data)== status_col)] <- "status"
-  names(data)[which(names(data)== time_col)] <- "time"
-  names(data)[which(names(data)== id_col)] <- "id"
+  data <- check_rename_variable_col(size_col, "size",data)
+  data <- check_rename_variable_col(status_col, "status",data)
+  data <- check_rename_variable_col(time_col, "time",data)
+  data <- check_rename_variable_col(id_col, "id",data)
+  # names(data)[which(names(data)== size_col)] <- "size"
+  # names(data)[which(names(data)== status_col)] <- "status"
+  # names(data)[which(names(data)== time_col)] <- "time"
+  # names(data)[which(names(data)== id_col)] <- "id"
 
-  # Call internals by plot or not -------------------------------------------
+# Create size and status corr ---------------------------------------------
 
-  data <- .correct_size_plot(data,
-                             positive_growth_threshold,
-                             negative_growth_threshold,
-                             default_POM)
-
-}
-
-
-# Internals ---------------------------------------------------------------
-
-.correct_size_plot <- function(data_plot,
-                               positive_growth_threshold,
-                               negative_growth_threshold,
-                               default_POM = 1.3){
-  # Compute plot level growth
   data_plot$code_corr <- rep(0,nrow(data_plot))
   size_corr <- data_plot$size
+
+
+# Call internals ----------------------------------------------------------
 
 
 
@@ -72,47 +64,72 @@ correct_size <- function(data,
   # print(data_plot$cresc)
   # data_plot$cresc[which(mismatch != 0)+1] <- NA
 
+  # Sort data
+  data <- data[order(data$id,data$time),]
+
   # Extract ids and loop on indivs
 
-  ids <- unique(data_plot$id)
+  ids <- unique(data$id)
 
-  for(i in ids){
+  # for(i in ids){
+  #
+  #   tree <- data[which(data$id == i),]
+  #   size <- tree$size
+  #   size_corr <- tree$size_corr
+  #   code_corr <- tree$code_corr
+  #   time <- tree$time
+  #   POM <- tree$POM
+  #
+  #   # print(str(tree))
+  #   # print(size_corr)
+  #   res <- .correct_size_tree(size,
+  #                             size_corr,
+  #                             code_corr,
+  #                             time,
+  #                             POM,
+  #                             default_POM,
+  #                             positive_growth_threshold,
+  #                             negative_growth_threshold,
+  #                             i)
+  #
+  #   # print(data_plot[which(data_plot$id == i),which(names(data_plot)%in% c("size_corr","code_corr"))])
+  #   # print('data_plot[which(data_plot$id == i),c("size_corr","code_corr")]')
+  #   # print(nrow(data_plot[which(data_plot$id == i),c("size_corr","code_corr")]))
+  #
+  #   data[which(data$id == i),c("size_corr","code_corr")] <- res[,c("size_corr","code_corr")]
+  # }
+  data[,c("size_corr","code_corr")] <- do.call(rbind,lapply(ids,
+                                                            function(i){
+                                                              tree <- data[which(data$id == i),]
+                                                              size <- tree$size
+                                                              size_corr <- tree$size_corr
+                                                              code_corr <- tree$code_corr
+                                                              time <- tree$time
+                                                              POM <- tree$POM
+                                                              status <- tree$status
+                                                              res <- .correct_size_tree(size,
+                                                                                        size_corr,
+                                                                                        code_corr,
+                                                                                        time,
+                                                                                        status,
+                                                                                        POM,
+                                                                                        default_POM,
+                                                                                        positive_growth_threshold,
+                                                                                        negative_growth_threshold,
+                                                                                        i)
+                                                              return(res)
+                                                            }))
 
-    tree <- data_plot[which(data_plot$id == i),]
-
-
-    size <- tree$size
-    size_corr <- tree$size_corr
-    code_corr <- tree$code_corr
-    time <- tree$time
-    POM <- tree$POM
-
-    # print(str(tree))
-    # print(size_corr)
-    res <- .correct_size_tree(size,
-                              size_corr,
-                              code_corr,
-                              time,
-                              POM,
-                              default_POM,
-                              positive_growth_threshold,
-                              negative_growth_threshold,
-                              i)
-
-    # print(data_plot[which(data_plot$id == i),which(names(data_plot)%in% c("size_corr","code_corr"))])
-    # print('data_plot[which(data_plot$id == i),c("size_corr","code_corr")]')
-    # print(nrow(data_plot[which(data_plot$id == i),c("size_corr","code_corr")]))
-
-    data_plot[which(data_plot$id == i),c("size_corr","code_corr")] <- res[,c("size_corr","code_corr")]
-  }
-  return(data_plot)
+  return(data)
 }
 
+# Internals ---------------------------------------------------------------
 
 .correct_size_tree <- function(size,
                                size_corr,
                                code_corr,
                                time,
+                               status,
                                POM,
                                default_POM,
                                positive_growth_threshold,
@@ -166,7 +183,7 @@ correct_size <- function(data,
 
     ## replace missing values
     if (any(!is.na(size_corr))) {
-      size_corr <- repl_missing(size_corr, time)
+      size_corr <- .replace_missing(size_corr, time, status)
     }
     else {
       size_corr = rep(0, length(size_corr))
@@ -232,8 +249,10 @@ correct_size <- function(data,
           # we trust the set of measurements with more values
           # if they are the same size, then we trust the last one
           # ladders?
+
+          # CHECK SIZE OR SIZE CORR
           else {
-            if ((sum(!is.na(size[1:ab])) > sum(!is.na(size))/2) | isTRUE(ladder[ab] == 0 & ladder[ab+1] == 1)) {
+            if ((sum(!is.na(size[1:ab])) > sum(!is.na(size))/2)) { # | isTRUE(ladder[ab] == 0 & ladder[ab+1] == 1)
               size[(ab + 1):length(size)] <-
                 size[(ab + 1):length(size)] - cresc_abs[which.max(abs(cresc))] + meancresc *
                 diff(time)[ab]
@@ -256,7 +275,7 @@ correct_size <- function(data,
     }
   }
   # TAG TODO : add code corr
-  return(res)
+  return(data.frame("size_corr" = size, "code_corr" = code_corr ))
 }
 
 
@@ -331,34 +350,34 @@ correct_size <- function(data,
   return(res)
 }
 
-.replace_missing <- function(tree){ #function(size, time,status)
+.replace_missing <- function(size, time,status){
 
-  tree <- tree[order(time),c("time","size","status")] # in case data is not ordered yet
-  missing <- which(is.na(tree$size) & status == 1) # indices of the missing values
-  present <- !is.na(tree$size) # to simplify the code written hereafter
+  # tree <- tree[order(time),c("time","size","status")] # in case data is not ordered yet
+  missing <- which(is.na(size) & status == 1) # indices of the missing values
+  present <- !is.na(size) # to simplify the code written hereafter
 
-  corrected_values <- rep(NA, length(tree$size))
+  corrected_values <- rep(NA, length(size))
 
   # correct each value - apply replaced by for: faster and also clearer.
   for(i in missing){
     if(i < min(which(present))){
-      size_val <- tree$size[which(present)[1:min(2, sum(present))]]
-      time_val <- tree$time[which(!is.na(tree$size))[1:min(2, sum(present))]]
+      size_val <- size[which(present)[1:min(2, sum(present))]]
+      time_val <- time[which(!is.na(size))[1:min(2, sum(present))]]
     }
     else if(i > max(which(present))){
-      size_val <- tree$size[which(present)[(sum(present)-1):sum(present)]]
-      time_val <- tree$time[which(present)[(sum(present)-1):sum(present)]]
+      size_val <- size[which(present)[(sum(present)-1):sum(present)]]
+      time_val <- time[which(present)[(sum(present)-1):sum(present)]]
 
       size_val <- size_val[!is.na(size_val)]
       time_val <- time_val[!is.na(size_val)] ## Something weird here in C's original code
     }
     else{
-      size_val <- tree$size[c(max(which(!is.na(tree$size[1:(i-1)]))), i+min(which(!is.na(tree$size[(i+1):length(tree$size)]))))]
-      time_val <- tree$time[c(max(which(!is.na(tree$size[1:(i-1)]))), i+min(which(!is.na(tree$size[(i+1):length(tree$size)]))))]
+      size_val <- size[c(max(which(!is.na(size[1:(i-1)]))), i+min(which(!is.na(size[(i+1):length(size)]))))]
+      time_val <- time[c(max(which(!is.na(size[1:(i-1)]))), i+min(which(!is.na(size[(i+1):length(size)]))))]
     }
 
     reg <- stats::lm(size_val ~ time_val)$coef
-    corrected_values[i] <- reg[1] + reg[2]*tree$time[i]
+    corrected_values[i] <- reg[1] + reg[2]*time[i]
 
     if (sum(!is.na(time_val))==1) {
       corrected_values[i] <- size_val

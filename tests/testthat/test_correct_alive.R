@@ -8,12 +8,13 @@
 
 # Individual tree level ---------------------------------------------------
 rm(list = ls())
-context("correct_alive")
+# getwd()
+context("correct_alive.rda")
 library(testthat)
 
 # Test error messages -----------------------------------------------------
 
-data("example_alive")
+load("test_data/example_alive.rda")
 
 expect_error(correct_alive(data = as.list(example_alive),
                            id_col = "id",
@@ -106,15 +107,15 @@ test_that("correct_status_tree gives accurate results for control datasets", {
   ## We are going to test two datasets, for 2 modalities of death_confirmation_censuses, which
   ## represents the number of censuses needed to declare dead a tree if unsighted for such a duration.
   # Load dataset 1: When trees are unsighted, a corresponding line appears in the table with status NA
-  data("example_alive")
+  load("test_data/example_alive.rda")
   # Load dataset 2, where unsighted trees have no corresponding line in the table (realistic case)
-  data("example_alive_mini")
+  load("test_data/example_alive_mini.rda")
   # Corresponding hand-corrected datasets for death_confirmation_censuses = 3
-  data("expected_2_unseen")
-  data("expected_2_unseen_mini")
+  load("test_data/expected_2_unseen.rda")
+  load("test_data/expected_2_unseen_mini.rda")
   # Corresponding hand-corrected datasets for death_confirmation_censuses = 3
-  data("expected_3_unseen")
-  data("expected_3_unseen_mini")
+  load("test_data/expected_3_unseen.rda")
+  load("test_data/expected_3_unseen_mini.rda")
 
 
   # Remove one of the columns of the initial dataset. Unimportant step.
@@ -197,14 +198,14 @@ test_that("correct_status_tree gives accurate results for control datasets", {
 test_that("correct_status_plotlevel gives accurate results for control datasets", {
 
   # Load dataset 1: When trees are unsighted, a corresponding line appears in the table with status NA
-  data("example_alive")
+  load("test_data/example_alive.rda")
   # Load dataset 2, where unsighted trees have no corresponding line in the table (realistic case)
-  data("example_alive_mini")
+  load("test_data/example_alive_mini.rda")
   # Corresponding hand-corrected datasets
-  data("expected_2_unseen")
-  data("expected_2_unseen_mini")
-  data("expected_3_unseen")
-  data("expected_3_unseen_mini")
+  load("test_data/expected_2_unseen.rda")
+  load("test_data/expected_2_unseen_mini.rda")
+  load("test_data/expected_3_unseen.rda")
+  load("test_data/expected_3_unseen_mini.rda")
 
 
   names(expected_3_unseen)[which(names(expected_3_unseen)== "status_altern")] <- "status_corr"
@@ -319,14 +320,14 @@ test_that("correct_status_plotlevel gives accurate results for control datasets"
 test_that("correct_alive gives accurate results for control datasets", {
 
   # Load dataset 1: When trees are unsighted, a corresponding line appears in the table with status NA
-  data("example_alive")
+  load("test_data/example_alive.rda")
   # Load dataset 2, where unsighted trees have no corresponding line in the table (realistic case)
-  data("example_alive_mini")
+  load("test_data/example_alive_mini.rda")
   # Corresponding hand-corrected datasets
-  data("expected_2_unseen")
-  data("expected_2_unseen_mini")
-  data("expected_3_unseen")
-  data("expected_3_unseen_mini")
+  load("test_data/expected_2_unseen.rda")
+  load("test_data/expected_2_unseen_mini.rda")
+  load("test_data/expected_3_unseen.rda")
+  load("test_data/expected_3_unseen_mini.rda")
 
 
   example_alive <- example_alive[,which(names(example_alive) != "status_altern")]
@@ -403,7 +404,7 @@ test_that("correct_alive gives accurate results for control datasets", {
 # convert xls to rda
 #
 # fil <- list.files(file.path(getwd(),"data"))
-# nams <- c("example_alive","example_alive_mini","expected_2_unseen","expected_3_unseen")
+# nams <- c("test_data/example_alive.rda","test_data/example_alive_mini.rda","test_data/expected_2_unseen.rda","test_data/expected_3_unseen.rda")
 #
 # for(i in 1:4){
 #   assign(nams[i], read.csv2(file.path(getwd(),"data",fil[i])))
@@ -412,10 +413,10 @@ test_that("correct_alive gives accurate results for control datasets", {
 #   do.call(save, list(nams[i], file=file.path(getwd(),"data",paste(nams[i], "rda", sep = "."))))
 # }
 #
-# save(get("example_alive"), file = "example_alive.rda")
+# save(get("test_data/example_alive.rda"), file = "test_data/example_alive.rda")
 # file.path(getwd(),"data",paste(nams[i], "rda", sep = "."))
 
-# data("expected_3_unseen")
+# load("test_data/expected_3_unseen.rda")
 # expected_3_unseen[which(is.na(expected_3_unseen$status)),c("col1","col2")] <- NA
 # expected_3_unseen_mini <- expected_3_unseen
 # save(expected_3_unseen_mini, file = "data/expected_3_unseen_mini.rda")
@@ -431,3 +432,4 @@ test_that("correct_alive gives accurate results for control datasets", {
 #     print(i)
 #   }
 # }
+#

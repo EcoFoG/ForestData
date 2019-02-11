@@ -56,8 +56,8 @@ compute_growth_diameter <- function(data,
 
   if(measure_type == "C") data[,which(names(data)==size_col)] <- data[,which(names(data)==size_col)]/pi
 # Compute -----------------------------------------------------------------
-print(head(data$id))
-  print(head(data$size))
+# print(utils::head(data$id))
+  # print(utils::head(data$size))
   data <- .compute_growth_complete_data(data[order(data$id, data$size),])
 
   names(data$size) <- size_col
