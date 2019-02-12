@@ -21,7 +21,7 @@ test_that("check_rename_variable_col throws an error when non-character objects 
             expect_error(check_rename_variable_col(arg,3, data))
           })
 
-test_that("check_rename_variable_col throws an error when non-character objects are inputted as arguments arg or name",
+test_that("check_rename_variable_col throws an error when non length 1 objects are inputted as arguments arg or name",
           {
             expect_error(check_rename_variable_col(c("variable","variable2"),name, data))
             expect_error(check_rename_variable_col(arg,c("new","name"), data))
