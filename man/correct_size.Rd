@@ -4,8 +4,10 @@
 \alias{correct_size}
 \title{Correct Tree Size Measurements}
 \usage{
-correct_size(data, size_col, time_col, status_col, id_col, POM_col,
-  positive_growth_threshold, negative_growth_threshold, default_POM)
+correct_size(data, size_col = "Circ", time_col = "CensusYear",
+  status_col = "status_corr", id_col = "idTree", POM_col = "POM",
+  measure_type = "C", positive_growth_threshold = 5,
+  negative_growth_threshold = -2, default_POM = 1.3)
 }
 \arguments{
 \item{data}{Data.frame, no default. Forest inventory in the form of a long-format time series - one line is a measure for one individual during one census time.}
@@ -36,7 +38,7 @@ translating the points to offest the observed size loss by: after_shift_size_cor
 }
 \examples{
 \dontrun{
-correct_size <- function(data,
+correct_size(data,
 size_col,
 time_col,
 status_col,

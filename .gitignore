@@ -35,7 +35,7 @@ vignettes/*.pdf
 *.jpeg
 *.jpg
 
-/graphs/
+/test_circcorr/
 
 /error_patterns/
 
@@ -44,3 +44,10 @@ src/*.o
 src/*.so
 src/*.dll
 .Rproj.user
+
+# certain scripts
+
+spot_weird_circcorrs_2.R
+reconstitute_POM.R
+reattribute_fixed_informations.R
+test_circor.R
