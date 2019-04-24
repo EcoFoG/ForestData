@@ -149,14 +149,18 @@ compute_mortality <- function(data,
                 data_plot$time == t1 &
                 data_plot$status_corr == 1 &
                 data_plot$status_lagged == 1)
-    print(paste("t0 :", t0))
-    print(paste("N0 :", N0))
-    print(paste("t1 :", t1))
-    print(paste("N1 :", N1))
+
     # print(data$status_corr == 1)
     # print(data$status_lagged)
     print("next")
-    mortality_plot[which(mortality_plot$time == paste(t0, t1, sep = "_")),"annual_deathrate"] <- 1-((N1/N0) ^ (1/(t1-t0)))
+    mortality_plot[which(mortality_plot$time == paste(t0, t1, sep = "_")),"annual_deathrate"] <- 1-(N1/N0) ^ (1/(t1-t0))
+      # 1-((N1/N0) ^ (1/(t1-t0)))
+if((1-(N1/N0) ^ (1/(t1-t0))) < 0){
+  print(paste("t0 :", t0))
+  print(paste("N0 :", N0))
+  print(paste("t1 :", t1))
+  print(paste("N1 :", N1))
+}
 
   }
   return(mortality_plot)

@@ -1,0 +1,512 @@
+source('C:/Users/nino.page/Desktop/ForestData/R/utils_display.R')
+display_growth(test %>% filter(Plot %in% c(1,2,3) & SubPlot == 1))
+source('C:/Users/nino.page/Desktop/ForestData/R/utils_display.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/utils_display.R')
+test %>%
+filter(Plot%in% c(1,2,3) & SubPlot == 1) %>%
+ggplot()+
+do.call(geom_line,argues)+
+do.call(geom_ribbon, arguz)
+test <- compute_growth(dat)
+test %>%
+filter(Plot%in% 1:3) %>%
+ggplot(aes(x= annual_growth))+
+geom_histogram()
+test %>%
+filter(Plot%in% 1:3) %>%
+ggplot(aes(x= annual_growth))+
+geom_histogram(bins=30)
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5)
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth))+
+geom_histogram(bins=30)
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= log(annual_growth)))+
+geom_histogram(bins=30)
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth))+
+geom_histogram(bins=30)
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, color=Plot))+
+geom_histogram(bins=30)
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30)
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 1984)
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 1985) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 1986) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 1987) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 1988) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 1989) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 1990) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 1992) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2000) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2001) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2003) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2005) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2007) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 20011) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2011) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2013) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2015) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2017) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2017) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge", stat="density")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2017) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")+
+geom_density()
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(time == 2017) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+# geom_histogram(bins=30, position="dodge")+
+geom_density()
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+# geom_histogram(bins=30, position="dodge")+
+geom_density()
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+# geom_histogram(bins=30, position="dodge")+
+geom_density()
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge")
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge",alpha=0.5)
+test %>%
+filter(Plot%in% 1:3) %>%
+filter(annual_growth>-2 & annual_growth<5) %>%
+ggplot(aes(x= annual_growth, fill=Plot))+
+geom_histogram(bins=30, position="dodge",alpha=1)
+.do_graph_histogram  <- function(table,
+x_variable,
+position = "dodge",
+...,
+title = "Default title that can be modified",
+subtitle = "Default subtitle that has to be user-specified",
+x.axis.name = "Census year",
+y.axis.name = "Annual rate",
+transparence = 1,
+x.text.angle = 0,
+y.text.angle = 0){
+# Grab the ellipsis args
+args_dots <- list(...)
+# separate them into two categories: variable names, or not
+variables <- lapply(names(args_dots),
+function(n){
+if(args_dots[[n]] %in% names(table)){
+return(TRUE)
+}
+else
+return(FALSE)
+})
+# Isolate variable names to be passed to ggplot2::aes()
+if(!all(isFALSE(unlist(variables)))){
+aesthetics <- c(list(x = x_variable, y = y_variable),args_dots[unlist(variables)])
+}else{
+aesthetics <- list(x = x_variable, y = y_variable)
+}
+# Conversely, isolate scalar constants to be passed to ggplot2::geom_line()
+if(!all(isTRUE(unlist(variables)))){
+scalars <- c(list(alpha= transparence, size=linewidth), args_dots[!unlist(variables)])
+}else{
+scalars <- list(alpha= transparence, position=position)
+}
+# Ancien code
+# graph <- ggplot2::ggplot(data = table, mapping=aes_string(x = x_variable, y = y_variable, ...))+
+# geom_line(alpha = transparence,size = linewidth)+
+# Make the graph. Variables are passed to aes() and constants to geom_line()
+graph <- ggplot2::ggplot(data = table, mapping=do.call(what = ggplot2::aes_string, args = aesthetics))+
+do.call(what = ggplot2::geom_histogram, args = scalars)+
+ggplot2::scale_x_continuous(breaks = table[,which(names(table)==x_variable)], labels = table[,which(names(table)==x_variable)])+
+ggplot2::xlab(x.axis.name)+
+ggplot2::ylab(y.axis.name)+
+ggplot2::ggtitle(label = title, subtitle = subtitle)+
+ggplot2::theme(axis.text.x = ggplot2::element_text(angle=x.text.angle),
+axis.text.y = ggplot2::element_text(angle=y.text.angle))
+# print(graph)
+return(graph)
+}
+#     mutate(treatment = ifelse(Plot%in% c(1,6,11,13,14,15,16),
+#                               '0',
+#                               ifelse(Plot%in% c(2,7,9),
+#                                      '1',
+#                                      ifelse(Plot%in% c(3,5,10),
+#                                             '2',
+#                                             '3')))) %>%
+#   ggplot(aes(x = value, fill = rate))+
+#   geom_histogram(position = "dodge")+
+#   facet_wrap(~treatment)
+.do_graph_histogram  <- function(table,
+x_variable,
+position = "dodge",
+...,
+title = "Default title that can be modified",
+subtitle = "Default subtitle that has to be user-specified",
+x.axis.name = "Census year",
+y.axis.name = "Annual rate",
+transparence = 1,
+x.text.angle = 0,
+y.text.angle = 0){
+# Grab the ellipsis args
+args_dots <- list(...)
+# separate them into two categories: variable names, or not
+variables <- lapply(names(args_dots),
+function(n){
+if(args_dots[[n]] %in% names(table)){
+return(TRUE)
+}
+else
+return(FALSE)
+})
+# Isolate variable names to be passed to ggplot2::aes()
+if(!all(isFALSE(unlist(variables)))){
+aesthetics <- c(list(x = x_variable, y = y_variable),args_dots[unlist(variables)])
+}else{
+aesthetics <- list(x = x_variable, y = y_variable)
+}
+# Conversely, isolate scalar constants to be passed to ggplot2::geom_line()
+if(!all(isTRUE(unlist(variables)))){
+scalars <- c(list(alpha= transparence, size=linewidth), args_dots[!unlist(variables)])
+}else{
+scalars <- list(alpha= transparence, position=position)
+}
+# Ancien code
+# graph <- ggplot2::ggplot(data = table, mapping=aes_string(x = x_variable, y = y_variable, ...))+
+# geom_line(alpha = transparence,size = linewidth)+
+# Make the graph. Variables are passed to aes() and constants to geom_line()
+graph <- ggplot2::ggplot(data = table, mapping=do.call(what = ggplot2::aes_string, args = aesthetics))+
+do.call(what = ggplot2::geom_histogram, args = scalars)+
+ggplot2::scale_x_continuous(breaks = table[,which(names(table)==x_variable)], labels = table[,which(names(table)==x_variable)])+
+ggplot2::xlab(x.axis.name)+
+ggplot2::ylab(y.axis.name)+
+ggplot2::ggtitle(label = title, subtitle = subtitle)+
+ggplot2::theme(axis.text.x = ggplot2::element_text(angle=x.text.angle),
+axis.text.y = ggplot2::element_text(angle=y.text.angle))
+# print(graph)
+return(graph)
+}
+source('C:/Users/nino.page/Desktop/ForestData/R/utils_display.R')
+display_growth(test)
+display_growth(test, type = "histogram")
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+display_growth(test, type = "histogram")
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+display_growth(test, type = "histogram")
+#     mutate(treatment = ifelse(Plot%in% c(1,6,11,13,14,15,16),
+#                               '0',
+#                               ifelse(Plot%in% c(2,7,9),
+#                                      '1',
+#                                      ifelse(Plot%in% c(3,5,10),
+#                                             '2',
+#                                             '3')))) %>%
+#   ggplot(aes(x = value, fill = rate))+
+#   geom_histogram(position = "dodge")+
+#   facet_wrap(~treatment)
+.do_graph_histogram  <- function(table,
+x_variable,
+position = "dodge",
+...,
+title = "Default title that can be modified",
+subtitle = "Default subtitle that has to be user-specified",
+x.axis.name = "Census year",
+y.axis.name = "Annual rate",
+transparence = 1,
+x.text.angle = 0,
+y.text.angle = 0){
+# Grab the ellipsis args
+args_dots <- list(...)
+# separate them into two categories: variable names, or not
+variables <- lapply(names(args_dots),
+function(n){
+if(args_dots[[n]] %in% names(table)){
+return(TRUE)
+}
+else
+return(FALSE)
+})
+# Isolate variable names to be passed to ggplot2::aes()
+if(!all(isFALSE(unlist(variables)))){
+aesthetics <- c(list(x = x_variable, y = y_variable),args_dots[unlist(variables)])
+}else{
+aesthetics <- list(x = x_variable, y = y_variable)
+}
+# Conversely, isolate scalar constants to be passed to ggplot2::geom_line()
+if(!all(isTRUE(unlist(variables)))){
+scalars <- c(list(alpha= transparence, size=linewidth), args_dots[!unlist(variables)])
+}else{
+scalars <- list(alpha= transparence, position=position)
+}
+# Ancien code
+# graph <- ggplot2::ggplot(data = table, mapping=aes_string(x = x_variable, y = y_variable, ...))+
+# geom_line(alpha = transparence,size = linewidth)+
+# Make the graph. Variables are passed to aes() and constants to geom_line()
+graph <- ggplot2::ggplot(data = table, mapping=do.call(what = ggplot2::aes_string, args = aesthetics))+
+do.call(what = ggplot2::geom_histogram, args = scalars)+
+ggplot2::scale_x_continuous(breaks = table[,which(names(table)==x_variable)], labels = table[,which(names(table)==x_variable)])+
+ggplot2::xlab(x.axis.name)+
+ggplot2::ylab(y.axis.name)+
+ggplot2::ggtitle(label = title, subtitle = subtitle)+
+ggplot2::theme(axis.text.x = ggplot2::element_text(angle=x.text.angle),
+axis.text.y = ggplot2::element_text(angle=y.text.angle))
+# print(graph)
+return(graph)
+}
+source('C:/Users/nino.page/Desktop/ForestData/R/utils_display.R')
+display_growth(test, type = "histogram")
+source('C:/Users/nino.page/Desktop/ForestData/R/utils_display.R')
+display_growth(test, type = "histogram")
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/display_growth.R')
+display_growth(test, type = "histogram")
+source('C:/Users/nino.page/Desktop/ForestData/R/utils_display.R')
+display_growth(test, type = "histogram")
+source('C:/Users/nino.page/Desktop/ForestData/R/utils_display.R')
+display_growth(test, type = "histogram")
+source('C:/Users/nino.page/Desktop/ForestData/R/utils_display.R')
+print(variables)
+display_growth(test, type = "histogram")
+source('C:/Users/nino.page/Desktop/ForestData/R/utils_display.R')
+display_growth(test, type = "histogram")
+rlang::last_error()
+display_growth(test, type = "histogram", growth_variable = "annual_growth")
+display_growth(test %>% filter(time==2001), type = "histogram", growth_variable = "annual_growth")
+?reshape
+devtools::install_github("EcoFoG/EcoFoG")
+display_growth(test %>% filter(time==2001), type = "histogram", growth_variable = "annual_growth")
+datacorr <- corect_alive(dat)
+?correct_alive
+datacorr <- correct_alive(dat)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(dat)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(dat)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(dat)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(dat)
+data$status_corr
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+datacorr %>% filter(idTree > 74028) %>% View
+datacorr %>% filter(idTree > 74028) %>% arrange(idTree) %>% View
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(datacorr)
+datacorr %>% filter(Plot =="17 (Arbocel)")
+datacorr %>% filter(Plot =="17(Arbocel)")
+debug <- datacorr %>% filter(Plot =="17(Arbocel)")
+datarecr <- correct_recruits(debug)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(debug)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(debug)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(debug)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(debug)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(debug)
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+datarecr <- correct_recruits(debug)
+datarecr %>% filter(corrected_recruit == TRUE)
+View(datarecr)
+datasize <- correct_size(debug)
+datasize <- correct_size(debug %>% mutate(species = paste(Genus,Species, sep="_")))
+source('C:/Users/nino.page/Desktop/ForestData/R/correct_recruits.R')
+save(dat, file = "Paracou.rda")
+?correct_all
+library(ForestData)
+library(ForestData)
+?correct_all
+library(ForestData)
+?correct_alive

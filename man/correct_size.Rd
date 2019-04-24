@@ -5,31 +5,41 @@
 \title{Correct Tree Size Measurements}
 \usage{
 correct_size(data, size_col = "Circ", time_col = "CensusYear",
-  status_col = "status_corr", id_col = "idTree", POM_col = "POM",
-  measure_type = "C", positive_growth_threshold = 5,
-  negative_growth_threshold = -2, default_POM = 1.3)
+  status_col = "status_corr", species_col = "species",
+  id_col = "idTree", POM_col = "POM", measure_type = "C",
+  positive_growth_threshold = 5, negative_growth_threshold = -2,
+  default_POM = 1.3, pioneers = c("Cecropia", "Pourouma"),
+  pioneers_treshold = 7.5)
 }
 \arguments{
-\item{data}{Data.frame, no default. Forest inventory in the form of a long-format time series - one line is a measure for one individual during one census time.}
+\item{data}{data.frame, containing forest inventories in the form of a long-format time series - one line corresponds to a measurement for one individual at a given census time.}
 
-\item{size_col}{Character. The name of the column containing tree size measurements - diameter or circumference at breast height}
+\item{size_col}{character, name of the column corresponding to tree size (circumference or diameter) measurements .}
 
-\item{time_col}{Character. The name of the column containing census year}
+\item{time_col}{character, name of the column containing census years.}
 
-\item{status_col}{Character. The name of the column containing tree vital status - 0=dead; 1=alive.}
+\item{status_col}{character, name of the column corresponding to tree status: 0/FALSE for dead, 1/TRUE for alive.}
 
-\item{id_col}{Character. The name of the column containing trees unique ids}
+\item{species_col}{character, name of th column containing full species names (or other taxonomic identification)}
 
-\item{POM_col}{Character. The name of the column containing trees POM}
+\item{id_col}{character, name of the column containing trees unique IDs.}
 
-\item{positive_growth_threshold}{Numeric. Upper threshold over which an annual DIAMETER growth is considered abnormal. Defaults to 5 cm.}
+\item{POM_col}{character, name of the column corresponding the Point Of Measurement (POM).}
 
-\item{negative_growth_threshold}{Numeric. Lower threshold under which a negative annual DIAMETER growth is considered abnormal. Defaults to -2 cm.}
+\item{measure_type}{character, partially matching “Circumference” or “Diameter”, indicating what is the type of the measurements.}
 
-\item{default_POM}{Numeric. POM normally used in the forest inventory- defaults to the internationa convention of breast height, 1.3}
+\item{positive_growth_threshold}{positive numeric or integer, threshold over which an annual DIAMETER growth is considered abnormal (in cm). Defaults to 5 cm.}
+
+\item{negative_growth_threshold}{negative numeric or integer, threshold under which an absolute DIAMETER difference  is considered abnormal. To be given in centimeters. Defaults to -2 cm. Note that this threshold is applied between two consecutive censuses, regardless of the time between them, as it assumes that a tree diameter cannot decrease more than this value, even over a long period.}
+
+\item{default_POM}{scalar numeric, default POM used in the dataset, in the same unit as the POM. When the value in POM_col is different from default_POM, the corrected size is given at default_POM  . It defaults to 1.3 meters-according to current practice of measurement of diameter at breast height (DBH).}
+
+\item{pioneers}{character vector containing full species name (or other taxonomic identification)for which a specific positive growth threshold (used for instance for fast growing species for which the threshold to detect an abnormal growth is high).}
+
+\item{pioneers_treshold}{Positive DIAMETER growth limit to apply to pioneer species (specified in 'pioneers'), similar to . Expressed in centimeters. Defaults to 7.5 cm}
 }
 \value{
-The same data.frame with two additional columns: size_cor, containing corrected tree size measurements, and code_corr, containing codes that tag both corrections locations and type.
+The same data.frame with two additional columns: size_corr, containing corrected tree size measurements, and code_corr, containing codes that tag both corrections locations and type.
 }
 \description{
 This function provides corrections for tree size measurements in Forest Inventories.

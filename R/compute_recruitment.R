@@ -28,11 +28,11 @@
 #' }
 compute_recruitment <- function(data,
                               status_col="status_corr",
-                              time_col,
-                              id_col,
+                              time_col = "CensusYear",
+                              id_col = "idTree",
                               dead_confirmation_censuses=2,
                               byplot = TRUE,
-                              plot_col = "plot",
+                              plot_col = "Plot",
                               corrected = TRUE){
 
   # Checks ------------------------------------------------------------------
@@ -55,7 +55,6 @@ compute_recruitment <- function(data,
     warning("You specified that your dataset was not corrected beforehand. It has been automatically corrected prior to recruitment rate computation.")
   }
   # prepare dataset ---------------------------------------------------------
-  # print(order(data$id,data$time))
   data <- data[order(data$plot,data$id,data$time),]
 
   if(is.factor(data$id)) {
@@ -88,9 +87,6 @@ compute_recruitment <- function(data,
                          annual_recruitment_rate = NA,
                          plot = p)
       recruitment <- rbind(recruitment, temp)
-      # times
-      # times[-((length(times)-(dead_confirmation_censuses-1)):length(times))]
-      # times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))]
       rm(temp); rm(times)
     }
   }
@@ -126,7 +122,6 @@ compute_recruitment <- function(data,
 
   times <- sort(unique(data_plot$time), decreasing = F)
 
-  # print(1:(length(times) - max(1,dead_confirmation_censuses-1)))
   for(i in 1:(length(times) - max(1,dead_confirmation_censuses-1))){
     t0 <- times[i]
     t1 <- times[i+1]
@@ -134,22 +129,12 @@ compute_recruitment <- function(data,
     N0 <- sum(!is.na(data_plot$status_corr) &
                 data_plot$time == t1 &
                 data_plot$status_corr == 1)
-    # N1 <- sum(!is.na(data_plot$status_corr) &
-    #             !is.na(data_plot$status_lagged) &
-    #             data_plot$time == t1 &
-    #             data_plot$status_corr == 1 &
-    #             data_plot$status_lagged == 1)
+
     N1 <- sum(data_plot$time == t1 &
                 !is.na(data_plot$status_corr)&
                 data_plot$status_corr == 1 &
                 is.na(data_plot$status_lagged))
-    print(paste("t0 :", t0))
-    print(paste("N0 :", N0))
-    print(paste("t1 :", t1))
-    print(paste("N1 :", N1))
-    # print(data$status_corr == 1)
-    # print(data$status_lagged)
-    print("next")
+
     recruitment_plot[which(recruitment_plot$time == paste(t0, t1, sep = "_")),"annual_recruitment_rate"] <- ((N1/N0) ^ (1/(t1-t0)))
 
   }

@@ -4,47 +4,45 @@
 \alias{correct_recruits}
 \title{Correct Overgrown Recruits in Forest Inventories}
 \usage{
-correct_recruits(data, dbh_min = 10, diameter_growth_limit = 5,
-  time_col = "CensusYear", id_col = "id", plot_col = "Plot",
-  size_col = "Circ", status_col = "AliveCode",
+correct_recruits(data, dbh_min = 10, positive_growth_threshold = 5,
+  time_col = "CensusYear", id_col = "idTree", plot_col = "Plot",
+  size_col = "Circ", status_col = "status_corr",
   measure_type = "circumference", byplot = TRUE,
   correct_status = FALSE)
 }
 \arguments{
-\item{data}{A data.frame containing a forest inventory in which each line corresponds to an individual's measurement for one census}
+\item{data}{data.frame, containing forest inventories in the form of a long-format time series - one line corresponds to a measurement for one individual at a given census time.}
 
-\item{dbh_min}{A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters. Defaults to 10 cm.}
+\item{dbh_min}{scalar integer or numeric, indicating the minimum DIAMETER (in centimeters) at the default measurement height from which trees are recorded. Defaults to 10 cm.}
 
-\item{diameter_growth_limit}{A scalar, integer or numeric, indicating the maximum tolerated annual DIAMETER growth rate -in centimeters- over which a tree's growh is considered abnormal. Defaults to 5 cm, as set for Paracou inventories.}
+\item{positive_growth_threshold}{positive numeric or integer, threshold over which an annual DIAMETER growth is considered abnormal (in cm). Defaults to 5 cm.}
 
-\item{time_col}{A character indicating the name of the column containing census year information.}
+\item{time_col}{character, name of the column containing census years.}
 
-\item{id_col}{A character indicating the name of the column containing individual tree's IDs}
+\item{id_col}{character, name of the column containing trees unique IDs.}
 
-\item{plot_col}{A character indicating the name of the column containing plot indices or names.}
+\item{plot_col}{character, name of the column containing plot indices or names.}
 
-\item{size_col}{A character indicating the name of the column containing tree size measurements -diameters or circumferences-.}
+\item{size_col}{character, name of the column corresponding to tree size (circumference or diameter) measurements .}
 
-\item{status_col}{A character indicating the name of the column containing tree vital status - 0 for dead, 1 for alive, NA for unseen. No tree must appear with NA status before their first measurement.}
+\item{status_col}{character, name of the column corresponding to tree status: 0/FALSE for dead, 1/TRUE for alive.}
 
-\item{measure_type}{A character indicating the size measurement type : "C" for circumference, "D" for diameter. Defaults to "C".}
+\item{measure_type}{character, partially matching “Circumference” or “Diameter”, indicating what is the type of the measurements.}
 
-\item{byplot}{A logical indicating whether there are several plots in the dataset. Defaults to TRUE}
-
-\item{correct_status}{A logical indicating whether the dataset was corrected for tree vital status errors beforehand. If FALSE, the correct_mortality function is called first with default parameters - see the function info section.}
+\item{byplot}{logical, indicating whether the function has to process the data by plot (TRUE)or for the whole dataset (FALSE).}
 }
 \value{
 A corrected data.frame
 }
 \description{
-Spot individuals that have first been unseen during previous censuses but were already over the minimum counting dbh, and provide a correction that is useful to compute biomass estimates.
+correct recruits spots individuals that have first been unseen during previous censuses but were already over the minimum counting dbh, and provides a correction that is useful to compute biomass estimates.
 }
 \examples{
 \dontrun{
 data("Paracou6")
 correct_recruits(Paracou6,
 dbh_min = 10,
-diameter_growth_limit = 5,
+positive_growth_threshold = 5,
 time_col = "CensusYear",
 id_col = "id",
 plot_col = "Plot",

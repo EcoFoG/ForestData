@@ -41,10 +41,11 @@ mega_correction <- function(X, tm, status, limit=20) {
       if ( length(existing)>0 ) {
         if ((down>up & max(cresc_abs[existing]) + min(cresc_abs[existing])  < 5*(tm[existing[down]+1] - tm[existing[up]]) ) |
             (up>down &  max(cresc_abs[existing]) + min(cresc_abs[existing]) < 5*(tm[existing[up]+1] - tm[existing[down]])) )
-          {
+          { #TAG ERROR: the conditions here are not well
           # correction: abnormal values are deleted and will be replaced later on (see missing)
           first <- min(which.max(cresc), which.min(cresc))+1
           last <- max(which.max(cresc), which.min(cresc))
+          #TAG ERROR: Here, first and last are not correctly defined. They MUST be inside the interval (ab-2):(ab+2)
           X[first:last] <- NA
           code_corr[first:last] = 1
         } else {

@@ -3,8 +3,7 @@
 .Rapp.history
 
 # Session Data files
-*.RData
-
+.RData
 
 # Example code in package build process
 *-Ex.R
@@ -32,22 +31,9 @@ vignettes/*.pdf
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
-*.jpeg
-*.jpg
-
-/test_circcorr/
-
-/error_patterns/
 
 # C binaries
 src/*.o
 src/*.so
 src/*.dll
 .Rproj.user
-
-# certain scripts
-
-spot_weird_circcorrs_2.R
-reconstitute_POM.R
-reattribute_fixed_informations.R
-test_circor.R

@@ -4,8 +4,9 @@
 \alias{compute_recruitment}
 \title{Compute Annual Recruitment Rates in Forest Inventories}
 \usage{
-compute_recruitment(data, status_col = "status_corr", time_col, id_col,
-  dead_confirmation_censuses = 2, byplot = TRUE, plot_col = "plot",
+compute_recruitment(data, status_col = "status_corr",
+  time_col = "CensusYear", id_col = "idTree",
+  dead_confirmation_censuses = 2, byplot = TRUE, plot_col = "Plot",
   corrected = TRUE)
 }
 \arguments{

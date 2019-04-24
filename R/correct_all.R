@@ -1,25 +1,28 @@
 #' Full correction of a Forest Inventories Dataset
 #'
-#' Performs corrections for tree life status, overgrown recruits cases, size measurement errors and POM changes.
+#' correct_all performs corrections for tree life status, overgrown recruits cases, size measurement errors and POM changes, by calling correct_alive, correct_size and correct_recruits in this order.
 #'
-#' @param data Data.frame, no default. Forest inventory in the form of a long-format time series - one line is a measure for one individual during one census time.
-#' @param id_col Character. The name of the column containing trees unique ids
-#' @param time_col Character. The name of the column containing census year
-#' @param status_col Character. The name of the column containing tree vital status - 0=dead; 1=alive.
-#' @param size_col Character. The name of the column containing tree size measurements - diameter or circumference at breast height
-#' @param measure_type A single character indicating whether tree sizes are given in circumferences -"C"- or diameter -"D"-.
-#' @param dead_confirmation_censuses Integer, defaults to 2. This is the number of censuses needed to state that a tree is considered dead, if unseen. In Paracou, we use the rule-of-thumb that if a tree is unseen twice, its probability to be actually dead is close to 1. The choice of this value involves that trees unseen during the X-1 last inventories can not be corrected for death, and thus mortality rates should not be calculated for these censuses.
-#' @param plot_col Character. The name of the column containing the plots indices.
-#' @param byplot Logical. If there are several plots in your dataset, the correction is performed by plot, in case these would not be censuses the same years or with the same frequencies one another.
-#' @param POM_col Character. The name of the column containing trees POM
-#' @param positive_growth_threshold Numeric. Upper threshold over which an annual DIAMETER growth is considered abnormal. Defaults to 5 cm.
-#' @param negative_growth_threshold Numeric. Lower threshold under which a negative annual DIAMETER growth is considered abnormal. Defaults to -2 cm.
-#' @param default_POM Numeric. POM normally used in the forest inventory- defaults to the internationa convention of breast height, 1.3
-#' @param dbh_min A scalar, integer or numeric, indicating the minimum DIAMETER at breast height at which trees are recorded, in centimeters.
-#' @param use_size Character, but defaults to FALSE. Optional argument specifying that circumference or diameter must be used to create the vital status field. If your data already contains a field indicating whether the tree is dead -0 or FALSE- or alive -1 or TRUE-, let it to its default value. If you use this option, make sure beforehand that only live trees are measured - non-NA size - in your dataset's protocol.
+#' @param data data.frame, containing forest inventories in the form of a long-format time series - one line corresponds to a measurement for one individual at a given census time.
+#' @param id_col character, name of the column containing trees unique IDs.
+#' @param time_col character, name of the column containing census years.
+#' @param status_col character, name of the column corresponding to tree status: 0/FALSE for dead, 1/TRUE for alive.
+#' @param size_col character, name of the column corresponding to tree size (circumference or diameter) measurements .
+#' @param measure_type character, partially matching “Circumference” or “Diameter”, indicating what is the type of the measurements.
+#' @param dead_confirmation_censuses integer, defaults to 2: number of consecutive censuses for which a tree is unseen needed to consider the tree as dead. NB: status of trees unseen during the dead_confirmation_censuses -1 last inventories cannot be corrected, thus mortality rates should not be calculated for these censuses.
+#' @param plot_col  character, name of the column containing plot indices or names.
+#' @param byplot logical, indicating whether the function has to process the data by plot (TRUE)or for the whole dataset (FALSE).
+#' @param POM_col character, name of the column corresponding the Point Of Measurement (POM).
+#' @param positive_growth_threshold positive numeric or integer, threshold over which an annual DIAMETER growth is considered abnormal (in cm). Defaults to 5 cm.
+#' @param negative_growth_threshold negative numeric or integer, threshold under which an absolute DIAMETER difference  is considered abnormal. To be given in centimeters. Defaults to -2 cm. Note that this threshold is applied between two consecutive censuses, regardless of the time between them, as it assumes that a tree diameter cannot decrease more than this value, even over a long period.
+#' @param default_POM scalar numeric, default POM used in the dataset, in the same unit as the POM. When the value in POM_col is different from default_POM, the corrected size is given at default_POM  . It defaults to 1.3 meters-according to current practice of measurement of diameter at breast height (DBH).
+#' @param dbh_min scalar integer or numeric, indicating the minimum DIAMETER (in centimeters) at the default measurement height from which trees are recorded. Defaults to 10 cm.
+#' @param use_size character, defaults to FALSE. Optional argument specifying whether to use measurement column (circumference or diameter) to create a vital status field  in case it does not already exist. See Details.
+#' @param invariant_columns character vector, containing the name of the columns for which value remain constant for a given tree (for example species name or coordinates). When a row is added by the function correct_alive, values for invariant columns are taken from the value for other censuses.   Defaults to null
+#' @param species_col character, name of th column containing full species names (or other taxonomic identification)
+#' @param pioneers character vector containing full species name (or other taxonomic identification)for which a specific positive growth threshold (used for instance for fast growing species for which the threshold to detect an abnormal growth is high).
+#' @param pioneers_treshold Positive DIAMETER growth limit to apply to pioneer species (specified in 'pioneers'), similar to . Expressed in centimeters. Defaults to 7.5 cm
 #'
 #' @return A data.frame with additional columns: status_corr and size_corr for corrected tree vital status and size, code_corr for correction tag and types.
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -42,47 +45,63 @@ correct_all <- function(data,
                         id_col = "idTree",
                         time_col = "CensusYear",
                         status_col = "CodeAlive",
-                        POM_col,
-                        size_col = "Circ",
-                        measure_type = "circumference",
                         plot_col = "Plot",
                         byplot = TRUE,
                         dead_confirmation_censuses = 2,
-                        positive_growth_threshold,
-                        negative_growth_threshold,
-                        default_POM,
-                        dbh_min = 10,
-                        use_size = FALSE){
+                        use_size = FALSE,
+                        invariant_columns = c("Genus",
+                                              "Species",
+                                              "Plot",
+                                              "SubPlot",
+                                              "Plotsub"),
+                        size_col = "Circ",
+                        species_col = "species",#tag pioneer
+                        POM_col = "POM",
+                        measure_type = "C",
+                        positive_growth_threshold = 5,
+                        negative_growth_threshold = -2,
+                        default_POM = 1.3,
+                        pioneers = c("Cecropia","Pourouma"),#tag pioneer
+                        pioneers_treshold = 7.5,
+                        dbh_min = 10){
 
   data <- correct_alive(data,
-                        id_col,
-                        time_col,
-                        status_col,
-                        plot_col,
-                        byplot,
-                        dead_confirmation_censuses,
-                        use_size)
+                        id_col = id_col,
+                        time_col = time_col,
+                        status_col = status_col,
+                        plot_col = plot_col,
+                        byplot = byplot,
+                        dead_confirmation_censuses = dead_confirmation_censuses,
+                        use_size = use_size,
+                        invariant_columns = invariant_columns)
 
   data <- correct_recruits(data,
-                           dbh_min,
-                           diameter_growth_limit = positive_growth_threshold,
-                           time_col,
-                           id_col,
-                           plot_col,
-                           size_col,
-                           status_col,
-                           measure_type,
-                           byplot)
+                           size_col = size_col,
+                           time_col = time_col,
+                           status_col = "status_corr",
+                           species_col = species_col,#tag pioneer
+                           id_col = id_col,
+                           POM_col = POM_col,
+                           measure_type = measure_type,
+                           positive_growth_threshold = positive_growth_threshold,
+                           negative_growth_threshold = negative_growth_threshold,
+                           default_POM = default_POM,
+                           pioneers = pioneers,#tag pioneer
+                           pioneers_treshold = pioneers_treshold)
   data <- correct_size(data,
-                       size_col,
-                       time_col,
-                       status_col,
-                       id_col,
-                       POM_col,
-                       positive_growth_threshold,
-                       negative_growth_threshold,
-                       default_POM)
+                       dbh_min = 10,
+                       positive_growth_threshold = 5,
+                       time_col = time_col,
+                       id_col = id_col,
+                       plot_col = plot_col,
+                       size_col = size_col,
+                       status_col = "status_corr",
+                       measure_type = measure_type,
+                       byplot = byplot,
+                       correct_status = FALSE)
 
   return(data)
 }
+
+
 
