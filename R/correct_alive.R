@@ -57,11 +57,13 @@ correct_alive <- function(data,
                           use_size = FALSE,
                           invariant_columns = c("Genus",
                                                 "Species",
-                                                "Plot",
                                                 "SubPlot",
                                                 "Plotsub")){
   # Checks and preparation --------------------------------------------------
-
+  for(n in invariant_columns){
+    if(!n %in% names(data))
+      stop(paste("invariant_columns argument must contain one or several column names (see help).",n,"is apparently not a dataset's column"))
+  }
   # Trivial check of data arg
   if (!is.data.frame(data)) {
     stop("data must be a dataframe")
@@ -123,13 +125,15 @@ correct_alive <- function(data,
                            function(p){
                              .correct_status_plotlevel(data[which(data$plot == p), ],
                                                        dead_confirmation_censuses,
-                                                       use_size)
+                                                       use_size,
+                                                       invariant_columns)
                              }))
   }
   else
     data <- .correct_status_plotlevel(data,
                                       dead_confirmation_censuses,
-                                      use_size)
+                                      use_size,
+                                      invariant_columns)
 
   print(names(data))
   names(data)[which(names(data) == "id")] <- id_col
@@ -155,7 +159,7 @@ correct_alive <- function(data,
 #
 # @return a data.frame containing the inputted plot-level data with trees' corrected life statuses. 1 = alive, 0 = dead. NAs indicate that the tree was unseen and cannot be considered yet. The output does not necessarily have the same number of lines as the input. Lines are added when the tree is unseen then seen alive again, with all columns being NA except trees' id, plot, census year and corrected status. Useless lines -with NA status before first sight alive, or after death- are suppressed.
 
-.correct_status_plotlevel <- function(data_plot, dead_confirmation_censuses, use_size){
+.correct_status_plotlevel <- function(data_plot, dead_confirmation_censuses, use_size,invariant_columns){
   if(use_size != FALSE){
     if(!use_size %in% names(data_plot)){
       stop("use_size defaults to FALSE, but to activate this option, it must contain the name of the column containing circumference or diameter measurements")
@@ -173,7 +177,8 @@ correct_alive <- function(data,
   data_plot <- do.call(rbind,lapply(ids,function(i) .correct_alive_tree(data_plot[which(data_plot$id == i),],
                                                                         censuses,
                                                                         dead_confirmation_censuses,
-                                                                        i)))
+                                                                        i,
+                                                                        invariant_columns)))
   return(data_plot)
 }
 
@@ -186,7 +191,7 @@ correct_alive <- function(data,
 #
 # @return a data.frame containing the inputted individual-tree-level data with corrected life status. 1 = alive, 0 = dead. NAs indicate that the tree was unseen and cannot be considered yet. The output does not necessarily have the same number of lines as the input. Lines are added when the tree is unseen then seen alive again, with all columns being NA except trees' id, plot, census year and corrected status. Useless lines -with NA status before first sight alive, or after death- are suppressed.
 
-.correct_alive_tree <- function(tree_temp, censuses, dead_confirmation_censuses, i){
+.correct_alive_tree <- function(tree_temp, censuses, dead_confirmation_censuses, i, invariant_columns){
   #Store the names of the measured variables for tree_temp, for later use
   vars <- names(tree_temp)
   if(!length(unique(tree_temp$plot)) == 1){
@@ -228,6 +233,7 @@ correct_alive <- function(data,
       }
 
       new.rows[,vars[-which(vars%in%newnames)]] <- NA
+      # print(invariant_columns)
       new.rows[,vars[vars%in%invariant_columns]] <- reattribute_invariant_columns(new.rows = new.rows,
                                                                                   invariant_columns = invariant_columns,
                                                                                   tree_temp = tree_temp,
@@ -305,6 +311,9 @@ correct_alive <- function(data,
 # @examples
 reattribute_invariant_columns <- function(new.rows, invariant_columns, tree_temp,i){
   for(j in invariant_columns){
+    # print("ok")
+    # print(j)
+    # print(new.rows)
     if(any(is.na(new.rows[,j]))){
       uni <- unique(tree_temp[, j])
       if(any(is.na(uni)))

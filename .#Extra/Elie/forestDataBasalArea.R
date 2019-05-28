@@ -11,6 +11,7 @@
 #' @param Dmax
 #'
 #' @return
+#' @export
 #'
 #' @examples
 #' forestData.guyafor_BasalArea(data = DataGuyafor, forest = "Paracou", plot=1, subplot =  1, year =  2016, surface = 500, Dmin = 20)
@@ -50,6 +51,7 @@ guyafor_BasalArea <- function(data, forest, plot = F, subplot = F, taxon = F, ye
 #' @param Surface Surface contain a surface
 #'
 #' @return Numeric Value
+#' @export
 #'
 #' @examples
 #' basalArea(c(20,25,30,70,40,20,35),50)
