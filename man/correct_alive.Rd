@@ -7,8 +7,7 @@
 correct_alive(data, id_col = "idTree", time_col = "CensusYear",
   status_col = "CodeAlive", plot_col = "Plot", byplot = TRUE,
   dead_confirmation_censuses = 2, use_size = FALSE,
-  invariant_columns = c("Genus", "Species", "Plot", "SubPlot",
-  "Plotsub"))
+  invariant_columns = c("Genus", "Species", "SubPlot", "Plotsub"))
 }
 \arguments{
 \item{data}{data.frame, containing forest inventories in the form of a long-format time series - one line corresponds to a measurement for one individual at a given census time.}

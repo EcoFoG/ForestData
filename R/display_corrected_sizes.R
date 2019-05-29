@@ -1,3 +1,19 @@
+#' Title
+#'
+#'display_corrected_sizes allows to visualise the corrections performed on tree size measurements using ggplot2 utilities to make a points graph displaying raw (uncorrected) and corrected measurement series for censused trees, with all the specified relevant information.
+#'
+#' @inheritParams correct_all
+#' @inheritParams display_rates
+#' @param code_corr_col Single character, the name of the column containing tree correction codes (see the output of correct_size)
+#' @param size_corr_col Single character, the name of the column containing tree corrected size measurements
+#' @param status_corr_col Single character, the name of the column containing tree corrected status
+#' @param info_cols Single or multiple character, the name(s) of the column containing the information that has to appear in the graphs' subtitle.
+#' @param tag_pom Logical, whether POM shifts should be displayed with a vertical line on the graph, or not. Use only if you have a POm field in your dataset.
+#'
+#' @return
+#' @export
+#'
+#' @examples
 display_corrected_trees <- function(data,
                                     code_corr_col="code_corr",
                                     size_corr_col = "size_corr",
@@ -27,6 +43,7 @@ display_corrected_trees <- function(data,
   data <- check_rename_variable_col(size_col, "size_col",data)
   data <- check_rename_variable_col(plot_col, "plot_col",data)
   data <- check_rename_variable_col(size_corr_col, "size_corr_col",data)
+  data <- check_rename_variable_col(status_corr_col, "status_cor_col",data)
 
   if(pmatch(measure_type, "Circumferenre")== 1 | pmatch(measure_type, "circumferenre")== 1){
     data$size <- data$size/pi
