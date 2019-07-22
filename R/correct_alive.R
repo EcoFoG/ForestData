@@ -60,9 +60,18 @@ correct_alive <- function(data,
                                                 "SubPlot",
                                                 "Plotsub")){
   # Checks and preparation --------------------------------------------------
+  names_args <- c(id_col, time_col, status_col, plot_col)
   for(n in invariant_columns){
-    if(!n %in% names(data))
+    if(!n %in% names(data)){
       stop(paste("invariant_columns argument must contain one or several column names (see help).",n,"is apparently not a dataset's column"))
+    }
+    else if(n %in% names_args){
+      message(paste0("Note that you must not specify", n,
+                     " as an invariant column since this name already corresponds to ",
+                     c("id_col","time_col","status_col","plot_col")[which(names_args == n)]))
+      invariant_columns <- invariant_columns[-which(invariant_columns == n)]
+    }
+
   }
   # Trivial check of data arg
   if (!is.data.frame(data)) {
@@ -290,8 +299,6 @@ correct_alive <- function(data,
 # Secure the sub-functions to be used independently by the users that really want to test it ?
 ## i.e. making them relatively independant from above-level formating and ordering
 
-# Rename back the output
-
 # Create a status_correction_code to indicate the type of correction and the reason why ?
 ## can help flagging the "unseen not yet statable as dead" without loosing status_corr 's logical datatype
 ## but is maybe of low informative power, thus could be set as an option.
@@ -311,9 +318,11 @@ correct_alive <- function(data,
 # @examples
 reattribute_invariant_columns <- function(new.rows, invariant_columns, tree_temp,i){
   for(j in invariant_columns){
+    # print(invariant_columns)
     # print("ok")
     # print(j)
     # print(new.rows)
+
     if(any(is.na(new.rows[,j]))){
       uni <- unique(tree_temp[, j])
       if(any(is.na(uni)))
