@@ -14,17 +14,22 @@ display_corrected_trees(data, code_corr_col = "code_corr",
   save_graph = TRUE)
 }
 \arguments{
-\item{data}{data.frame, containing forest inventories in the form of a long-format time series - one line corresponds to a measurement for one individual at a given census time.}
+\item{data}{data.frame, containing forest inventories in the form of a
+long-format time series - one line corresponds to a measurement for one
+individual at a given census time.}
 
 \item{code_corr_col}{Single character, the name of the column containing tree correction codes (see the output of correct_size)}
 
 \item{size_corr_col}{Single character, the name of the column containing tree corrected size measurements}
 
-\item{size_col}{character, name of the column corresponding to tree size (circumference or diameter) measurements .}
+\item{size_col}{character, name of the column corresponding to tree size
+(circumference or diameter) measurements .}
 
-\item{plot_col}{character, name of the column containing plot indices or names.}
+\item{plot_col}{character, name of the column containing plot indices or
+names.}
 
-\item{measure_type}{character, partially matching “Circumference” or “Diameter”, indicating what is the type of the measurements.}
+\item{measure_type}{character, partially matching “Circumference” or
+“Diameter”, indicating what is the type of the measurements.}
 
 \item{time_col}{character, name of the column containing census years.}
 

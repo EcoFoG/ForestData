@@ -11,13 +11,18 @@ compute_growth(data, size_col = "Circ", measure_type = "cir",
   ...)
 }
 \arguments{
-\item{data}{data.frame, containing forest inventories in the form of a long-format time series - one line corresponds to a measurement for one individual at a given census time.}
+\item{data}{data.frame, containing forest inventories in the form of a
+long-format time series - one line corresponds to a measurement for one
+individual at a given census time.}
 
-\item{size_col}{character, name of the column corresponding to tree size (circumference or diameter) measurements .}
+\item{size_col}{character, name of the column corresponding to tree size
+(circumference or diameter) measurements .}
 
-\item{measure_type}{character, partially matching “Circumference” or “Diameter”, indicating what is the type of the measurements.}
+\item{measure_type}{character, partially matching “Circumference” or
+“Diameter”, indicating what is the type of the measurements.}
 
-\item{status_col}{character, name of the column corresponding to tree status: 0/FALSE for dead, 1/TRUE for alive.}
+\item{status_col}{character, name of the column corresponding to tree status:
+0/FALSE for dead, 1/TRUE for alive.}
 
 \item{id_col}{character, name of the column containing trees unique IDs.}
 

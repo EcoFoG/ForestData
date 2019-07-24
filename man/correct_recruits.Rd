@@ -11,25 +11,36 @@ correct_recruits(data, dbh_min = 10, positive_growth_threshold = 5,
   correct_status = FALSE)
 }
 \arguments{
-\item{data}{data.frame, containing forest inventories in the form of a long-format time series - one line corresponds to a measurement for one individual at a given census time.}
+\item{data}{data.frame, containing forest inventories in the form of a
+long-format time series - one line corresponds to a measurement for one
+individual at a given census time.}
 
-\item{dbh_min}{scalar integer or numeric, indicating the minimum DIAMETER (in centimeters) at the default measurement height from which trees are recorded. Defaults to 10 cm.}
+\item{dbh_min}{scalar integer or numeric, indicating the minimum DIAMETER (in
+centimeters) at the default measurement height from which trees are
+recorded. Defaults to 10 cm.}
 
-\item{positive_growth_threshold}{positive numeric or integer, threshold over which an annual DIAMETER growth is considered abnormal (in cm). Defaults to 5 cm.}
+\item{positive_growth_threshold}{positive numeric or integer, threshold over
+which an annual DIAMETER growth is considered abnormal (in cm). Defaults to
+5 cm.}
 
 \item{time_col}{character, name of the column containing census years.}
 
 \item{id_col}{character, name of the column containing trees unique IDs.}
 
-\item{plot_col}{character, name of the column containing plot indices or names.}
+\item{plot_col}{character, name of the column containing plot indices or
+names.}
 
-\item{size_col}{character, name of the column corresponding to tree size (circumference or diameter) measurements .}
+\item{size_col}{character, name of the column corresponding to tree size
+(circumference or diameter) measurements .}
 
-\item{status_col}{character, name of the column corresponding to tree status: 0/FALSE for dead, 1/TRUE for alive.}
+\item{status_col}{character, name of the column corresponding to tree status:
+0/FALSE for dead, 1/TRUE for alive.}
 
-\item{measure_type}{character, partially matching “Circumference” or “Diameter”, indicating what is the type of the measurements.}
+\item{measure_type}{character, partially matching “Circumference” or
+“Diameter”, indicating what is the type of the measurements.}
 
-\item{byplot}{logical, indicating whether the function has to process the data by plot (TRUE)or for the whole dataset (FALSE).}
+\item{byplot}{logical, indicating whether the function has to process the
+data by plot (TRUE)or for the whole dataset (FALSE).}
 }
 \value{
 A corrected data.frame
