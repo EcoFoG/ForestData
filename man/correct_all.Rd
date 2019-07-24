@@ -15,49 +15,91 @@ correct_all(data, id_col = "idTree", time_col = "CensusYear",
   dbh_min = 10)
 }
 \arguments{
-\item{data}{data.frame, containing forest inventories in the form of a long-format time series - one line corresponds to a measurement for one individual at a given census time.}
+\item{data}{data.frame, containing forest inventories in the form of a
+long-format time series - one line corresponds to a measurement for one
+individual at a given census time.}
 
 \item{id_col}{character, name of the column containing trees unique IDs.}
 
 \item{time_col}{character, name of the column containing census years.}
 
-\item{status_col}{character, name of the column corresponding to tree status: 0/FALSE for dead, 1/TRUE for alive.}
+\item{status_col}{character, name of the column corresponding to tree status:
+0/FALSE for dead, 1/TRUE for alive.}
 
-\item{plot_col}{character, name of the column containing plot indices or names.}
+\item{plot_col}{character, name of the column containing plot indices or
+names.}
 
-\item{byplot}{logical, indicating whether the function has to process the data by plot (TRUE)or for the whole dataset (FALSE).}
+\item{byplot}{logical, indicating whether the function has to process the
+data by plot (TRUE)or for the whole dataset (FALSE).}
 
-\item{dead_confirmation_censuses}{integer, defaults to 2: number of consecutive censuses for which a tree is unseen needed to consider the tree as dead. NB: status of trees unseen during the dead_confirmation_censuses -1 last inventories cannot be corrected, thus mortality rates should not be calculated for these censuses.}
+\item{dead_confirmation_censuses}{integer, defaults to 2: number of
+consecutive censuses for which a tree is unseen that are needed to consider
+the tree as dead. NB: for the trees unseen during the
+dead_confirmation_censuses -1 last inventories, the status cannot be
+corrected, thus mortality rates should not be calculated for these
+censuses.}
 
-\item{use_size}{character, defaults to FALSE. Optional argument specifying whether to use measurement column (circumference or diameter) to create a vital status field  in case it does not already exist. See Details.}
+\item{use_size}{character, defaults to FALSE. Optional argument specifying
+whether to use measurement column (circumference or diameter) to create a
+vital status field  in case it does not already exist. See Details.}
 
-\item{invariant_columns}{character vector, containing the name of the columns for which value remain constant for a given tree (for example species name or coordinates). When a row is added by the function correct_alive, values for invariant columns are taken from the value for other censuses.   Defaults to null}
+\item{invariant_columns}{character vector, containing the name of the columns
+for which value remain constant for a given tree (for example species name
+or coordinates). When a row is added by the function correct_alive, values
+for invariant columns are taken from the value for other censuses. Defaults
+to null}
 
-\item{size_col}{character, name of the column corresponding to tree size (circumference or diameter) measurements .}
+\item{size_col}{character, name of the column corresponding to tree size
+(circumference or diameter) measurements .}
 
-\item{species_col}{character, name of th column containing full species names (or other taxonomic identification)}
+\item{species_col}{character, name of th column containing full species names
+(or other taxonomic identification)}
 
-\item{POM_col}{character, name of the column corresponding the Point Of Measurement (POM).}
+\item{POM_col}{character, name of the column corresponding the Point Of
+Measurement (POM).}
 
-\item{measure_type}{character, partially matching “Circumference” or “Diameter”, indicating what is the type of the measurements.}
+\item{measure_type}{character, partially matching “Circumference” or
+“Diameter”, indicating what is the type of the measurements.}
 
-\item{positive_growth_threshold}{positive numeric or integer, threshold over which an annual DIAMETER growth is considered abnormal (in cm). Defaults to 5 cm.}
+\item{positive_growth_threshold}{positive numeric or integer, threshold over
+which an annual DIAMETER growth is considered abnormal (in cm). Defaults to
+5 cm.}
 
-\item{negative_growth_threshold}{negative numeric or integer, threshold under which an absolute DIAMETER difference  is considered abnormal. To be given in centimeters. Defaults to -2 cm. Note that this threshold is applied between two consecutive censuses, regardless of the time between them, as it assumes that a tree diameter cannot decrease more than this value, even over a long period.}
+\item{negative_growth_threshold}{negative numeric or integer, threshold under
+which an absolute DIAMETER difference  is considered abnormal. To be given
+in centimeters. Defaults to -2 cm. Note that this threshold is applied
+between two consecutive censuses, regardless of the time between them, as
+it assumes that a tree diameter cannot decrease more than this value, even
+over a long period.}
 
-\item{default_POM}{scalar numeric, default POM used in the dataset, in the same unit as the POM. When the value in POM_col is different from default_POM, the corrected size is given at default_POM  . It defaults to 1.3 meters-according to current practice of measurement of diameter at breast height (DBH).}
+\item{default_POM}{scalar numeric, default POM used in the dataset, in the
+same unit as the POM. When the value in POM_col is different from
+default_POM, the corrected size is given at default_POM  . It defaults to
+1.3 meters-according to current practice of measurement of diameter at
+breast height (DBH).}
 
-\item{pioneers}{character vector containing full species name (or other taxonomic identification)for which a specific positive growth threshold (used for instance for fast growing species for which the threshold to detect an abnormal growth is high).}
+\item{pioneers}{character vector containing full species name (or other
+taxonomic identification)for which a specific positive growth threshold
+(used for instance for fast growing species for which the threshold to
+detect an abnormal growth is high).}
 
-\item{pioneers_treshold}{Positive DIAMETER growth limit to apply to pioneer species (specified in 'pioneers'), similar to . Expressed in centimeters. Defaults to 7.5 cm}
+\item{pioneers_treshold}{Positive DIAMETER growth limit to apply to pioneer
+species (specified in 'pioneers'), similar to . Expressed in centimeters.
+Defaults to 7.5 cm}
 
-\item{dbh_min}{scalar integer or numeric, indicating the minimum DIAMETER (in centimeters) at the default measurement height from which trees are recorded. Defaults to 10 cm.}
+\item{dbh_min}{scalar integer or numeric, indicating the minimum DIAMETER (in
+centimeters) at the default measurement height from which trees are
+recorded. Defaults to 10 cm.}
 }
 \value{
-A data.frame with additional columns: status_corr and size_corr for corrected tree vital status and size, code_corr for correction tag and types.
+A data.frame with additional columns: status_corr and size_corr for
+  corrected tree vital status and size, code_corr for correction tag and
+  types.
 }
 \description{
-correct_all performs corrections for tree life status, overgrown recruits cases, size measurement errors and POM changes, by calling correct_alive, correct_size and correct_recruits in this order.
+correct_all performs corrections for tree life status, overgrown recruits
+cases, size measurement errors and POM changes, by calling correct_alive,
+correct_size and correct_recruits in this order.
 }
 \examples{
 \dontrun{

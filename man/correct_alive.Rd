@@ -10,56 +10,75 @@ correct_alive(data, id_col = "idTree", time_col = "CensusYear",
   invariant_columns = c("Genus", "Species", "SubPlot", "Plotsub"))
 }
 \arguments{
-\item{data}{data.frame, containing forest inventories in the form of a long-format time series - one line corresponds to a measurement for one individual at a given census time.}
+\item{data}{data.frame, containing forest inventories in the form of a
+long-format time series - one line corresponds to a measurement for one
+individual at a given census time.}
 
 \item{id_col}{character, name of the column containing trees unique IDs.}
 
 \item{time_col}{character, name of the column containing census years.}
 
-\item{status_col}{character, name of the column corresponding to tree status: 0/FALSE for dead, 1/TRUE for alive.}
+\item{status_col}{character, name of the column corresponding to tree status:
+0/FALSE for dead, 1/TRUE for alive.}
 
-\item{plot_col}{character, name of the column containing plot indices or names.}
+\item{plot_col}{character, name of the column containing plot indices or
+names.}
 
-\item{byplot}{logical, indicating whether the function has to process the data by plot (TRUE)or for the whole dataset (FALSE).}
+\item{byplot}{logical, indicating whether the function has to process the
+data by plot (TRUE)or for the whole dataset (FALSE).}
 
-\item{dead_confirmation_censuses}{integer, defaults to 2: number of consecutive censuses for which a tree is unseen needed to consider the tree as dead. NB: status of trees unseen during the dead_confirmation_censuses -1 last inventories cannot be corrected, thus mortality rates should not be calculated for these censuses.}
+\item{dead_confirmation_censuses}{integer, defaults to 2: number of
+consecutive censuses for which a tree is unseen that are needed to consider
+the tree as dead. NB: for the trees unseen during the
+dead_confirmation_censuses -1 last inventories, the status cannot be
+corrected, thus mortality rates should not be calculated for these
+censuses.}
 
-\item{use_size}{character, defaults to FALSE. Optional argument specifying whether to use measurement column (circumference or diameter) to create a vital status field  in case it does not already exist. See Details.}
+\item{use_size}{character, defaults to FALSE. Optional argument specifying
+whether to use measurement column (circumference or diameter) to create a
+vital status field  in case it does not already exist. See Details.}
 
-\item{invariant_columns}{character vector, containing the name of the columns for which value remain constant for a given tree (for example species name or coordinates). When a row is added by the function correct_alive, values for invariant columns are taken from the value for other censuses.   Defaults to null}
+\item{invariant_columns}{character vector, containing the name of the columns
+for which value remain constant for a given tree (for example species name
+or coordinates). When a row is added by the function correct_alive, values
+for invariant columns are taken from the value for other censuses. Defaults
+to null}
 }
 \value{
-a data.frame containing the corrected data - with trees' corrected
+a data.frame containing the corrected data, with trees' corrected
   life statuses. 1 = alive, 0 = dead. NAs indicate that the tree was unseen
-  and cannot be considered yet. The output does not necessarily have the same
-  number of lines as the input. Lines are added when the trees were unseen
-  then seen alive again, with all columns being NA except trees' id, plot,
-  census year and corrected status. Useless lines -with NA status before
-  first sight alive, or after death- are suppressed.
+  and cannot be considered dead yet. The output does not necessarily have the
+  same number of lines as the input. Lines are added when the trees were
+  unseen then seen alive again, with all columns being set NA except trees'
+  id, plot, census year, corrected status, and the columns specified in
+  \code{invariant_columns} argument. Useless lines, with NA status before
+  first sight alive, or after death statement, are suppressed.
 }
 \description{
-correct_alive spots unseen trees, adds corresponding lines and corrects their status.
+correct_alive spots unseen trees, adds corresponding lines and corrects their
+status.
 }
 \details{
 \strong{\emph{Argument \code{death_confirmation_censuses}}}
 \code{death_confirmation_censuses} is an argument that comes from the Paracou
-forest plots' censusins protocol, in which tree death is stated with
+forest plots' censusing protocol, in which tree death is stated with
 certainty only if unsighting happens for at least the two last censuses. This
 is because the temporal resolution -the frequency with which the plots are
-censused- is high enough to use this cross-verification rule for the cases of
+censused- is high enough to use this cross-verification rule in case of
 unsighting. This means that mortality rates cannot be calculated with
 certainty for the last census, and that is why this argument is also in
 \code{compute_mortality} and \code{compute_rates} functions. Please set this
-argument according to your protocol's resolution and exigencies
+argument according to your protocol's resolution and exigencies.
 
 \code{use_size} defaults to FALSE, and activates a specific internal function
 that creates a \code{$status} field in the dataset. If you use this option,
-make SURE that only LIVE trees are measured -with non-NA size - in your
-dataset's protocol. In several protocols, dead trees are measured for the
-census when daeth is recorded. In this case, this option has not to be
-activated, and the status field has to be created manually. If your data
-ALREADY contains a field indicating whether the tree is dead -0 or FALSE-, or
-alive -1 or TRUE-, please let \code{use_size} to its default value.
+make SURE that only LIVE trees are measured (with non-NA size) in your
+dataset's protocol. In several protocols, e.g. the Paracou Disturbance
+Experiment, dead trees are measured for the census when death is recorded. In
+this case, this option must not be activated, and the status field has to be
+created manually. If your data ALREADY contains a field indicating whether
+the tree is dead -0 or FALSE-, or alive -1 or TRUE-, please let
+\code{use_size} to its default value.
 }
 \examples{
 \dontrun{

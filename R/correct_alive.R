@@ -1,6 +1,7 @@
 #' Correct Trees Life Status in a Forest Inventory
 #'
-#' correct_alive spots unseen trees, adds corresponding lines and corrects their status.
+#' correct_alive spots unseen trees, adds corresponding lines and corrects their
+#' status.
 #'
 #' @inheritParams correct_all
 #'
@@ -8,31 +9,33 @@
 #'
 #' \strong{\emph{Argument \code{death_confirmation_censuses}}}
 #' \code{death_confirmation_censuses} is an argument that comes from the Paracou
-#' forest plots' censusins protocol, in which tree death is stated with
+#' forest plots' censusing protocol, in which tree death is stated with
 #' certainty only if unsighting happens for at least the two last censuses. This
 #' is because the temporal resolution -the frequency with which the plots are
-#' censused- is high enough to use this cross-verification rule for the cases of
+#' censused- is high enough to use this cross-verification rule in case of
 #' unsighting. This means that mortality rates cannot be calculated with
 #' certainty for the last census, and that is why this argument is also in
 #' \code{compute_mortality} and \code{compute_rates} functions. Please set this
-#' argument according to your protocol's resolution and exigencies
+#' argument according to your protocol's resolution and exigencies.
 #'
 #' \code{use_size} defaults to FALSE, and activates a specific internal function
 #' that creates a \code{$status} field in the dataset. If you use this option,
-#' make SURE that only LIVE trees are measured -with non-NA size - in your
-#' dataset's protocol. In several protocols, dead trees are measured for the
-#' census when daeth is recorded. In this case, this option has not to be
-#' activated, and the status field has to be created manually. If your data
-#' ALREADY contains a field indicating whether the tree is dead -0 or FALSE-, or
-#' alive -1 or TRUE-, please let \code{use_size} to its default value.
+#' make SURE that only LIVE trees are measured (with non-NA size) in your
+#' dataset's protocol. In several protocols, e.g. the Paracou Disturbance
+#' Experiment, dead trees are measured for the census when death is recorded. In
+#' this case, this option must not be activated, and the status field has to be
+#' created manually. If your data ALREADY contains a field indicating whether
+#' the tree is dead -0 or FALSE-, or alive -1 or TRUE-, please let
+#' \code{use_size} to its default value.
 #'
-#' @return a data.frame containing the corrected data - with trees' corrected
+#' @return a data.frame containing the corrected data, with trees' corrected
 #'   life statuses. 1 = alive, 0 = dead. NAs indicate that the tree was unseen
-#'   and cannot be considered yet. The output does not necessarily have the same
-#'   number of lines as the input. Lines are added when the trees were unseen
-#'   then seen alive again, with all columns being NA except trees' id, plot,
-#'   census year and corrected status. Useless lines -with NA status before
-#'   first sight alive, or after death- are suppressed.
+#'   and cannot be considered dead yet. The output does not necessarily have the
+#'   same number of lines as the input. Lines are added when the trees were
+#'   unseen then seen alive again, with all columns being set NA except trees'
+#'   id, plot, census year, corrected status, and the columns specified in
+#'   \code{invariant_columns} argument. Useless lines, with NA status before
+#'   first sight alive, or after death statement, are suppressed.
 #' @export
 #'
 #' @examples
@@ -135,16 +138,20 @@ correct_alive <- function(data,
                              .correct_status_plotlevel(data[which(data$plot == p), ],
                                                        dead_confirmation_censuses,
                                                        use_size,
-                                                       invariant_columns)
+                                                       invariant_columns,
+                                                       plots,
+                                                       p)
                              }))
   }
   else
     data <- .correct_status_plotlevel(data,
                                       dead_confirmation_censuses,
                                       use_size,
-                                      invariant_columns)
+                                      invariant_columns,
+                                      plots = NULL,
+                                      p = NULL)
 
-  print(names(data))
+  # print(names(data))
   names(data)[which(names(data) == "id")] <- id_col
   names(data)[which(names(data) == "time")] <- time_col
   names(data)[which(names(data) == "status")] <- status_col
@@ -168,7 +175,12 @@ correct_alive <- function(data,
 #
 # @return a data.frame containing the inputted plot-level data with trees' corrected life statuses. 1 = alive, 0 = dead. NAs indicate that the tree was unseen and cannot be considered yet. The output does not necessarily have the same number of lines as the input. Lines are added when the tree is unseen then seen alive again, with all columns being NA except trees' id, plot, census year and corrected status. Useless lines -with NA status before first sight alive, or after death- are suppressed.
 
-.correct_status_plotlevel <- function(data_plot, dead_confirmation_censuses, use_size,invariant_columns){
+.correct_status_plotlevel <- function(data_plot, dead_confirmation_censuses, use_size,invariant_columns,plots,p){
+
+  if(length(plots) > 1){
+    message <- paste0("Correcting plot ",p," : ",which(plots == p),"/",length(plots))
+  }
+
   if(use_size != FALSE){
     if(!use_size %in% names(data_plot)){
       stop("use_size defaults to FALSE, but to activate this option, it must contain the name of the column containing circumference or diameter measurements")
@@ -179,7 +191,7 @@ correct_alive <- function(data,
   }
 
   censuses <- sort(unique(data_plot$time), decreasing = FALSE)
-  print(censuses)
+  # print(censuses)
   ids <- unique(data_plot$id)
   data_plot <- data_plot[order(data_plot$id, data_plot$time),]
 
@@ -203,12 +215,14 @@ correct_alive <- function(data,
 .correct_alive_tree <- function(tree_temp, censuses, dead_confirmation_censuses, i, invariant_columns){
   #Store the names of the measured variables for tree_temp, for later use
   vars <- names(tree_temp)
+  # tree_tempsav <- tree_temp
   if(!length(unique(tree_temp$plot)) == 1){
     stop(paste0("tree ",unique(tree_temp$id)," has multiple plots: " ,paste0(unique(tree_temp$plot), collapse = "/")))
   }
 
   #Find when the tree is first recorded ALIVE
-  first_record <- tree_temp$time[which(tree_temp$status == 1)[1]]
+  first_record <- ifelse(any(tree_temp$status==1),min(tree_temp$time[which(tree_temp$status == 1)]), NA)
+
 
 
   if(is.na(first_record)){ #Sometimes, there is no first record. It can correspond to two cases for which we warn explicitely. We choosed not to stop the function for these cases. The user must be careful enough to read the warning messages.
@@ -220,8 +234,36 @@ correct_alive <- function(data,
     warning(message)
   }else{
     #If there is an actual first record, let's take a look to when the tree was not seen (i.e. no corresponding line)
-    absents <- (censuses > first_record & !censuses %in% tree_temp$time)
-    nabs <- sum(absents)
+
+    if(any(tree_temp$status == 0)){ # if tree has ever been recorded dead
+      last_death_record <- max(tree_temp$time[tree_temp$status==0]) # we take the last census for which it has been recorded dead (in case there are several)
+      if(any(tree_temp$time > last_death_record)){ # We then test if lines exist for censuses after last tree death
+        after <- which(tree_temp$time > last_death_record) #let's call these censuses "after" if they exist
+        if(any(!is.na(tree_temp$status[after]) & tree_temp$status[after] == TRUE)){ #If there is any "alive" report after last reported death
+          absents <- (censuses > first_record & !censuses %in% tree_temp$time) #  we search for unsightings in all the censuses.
+        }
+        else{ # else we just search up to last death record...
+          absents <- (censuses > first_record &
+                        censuses < last_death_record &
+                        !censuses %in% tree_temp$time)
+        }
+      }
+      else{ #idem, if there are no lines for censuses ulterior to tree death report, we search for unsightings until tree death.
+        absents <- (censuses > first_record &
+                      censuses < last_death_record &
+                      !censuses %in% tree_temp$time)
+      }
+
+    }
+    else{ #if tree has not been reported dead yet, we search in all censuses
+      absents <- (censuses > first_record & !censuses %in% tree_temp$time)
+    }
+# if(i == 75599){
+#   print(absents)
+#   print("-----------------------")
+# }
+
+    nabs <- sum(absents) # absent is a logical vector giving the census times for which trees were not seen.
     if(nabs > 0){
       # if(tree_temp$plot[1] == 1) print(tree_temp$plot[1])
       if("plot" %in% vars){
@@ -232,25 +274,61 @@ correct_alive <- function(data,
                                plot = unique(tree_temp$plot),
                                stringsAsFactors =  FALSE)
         newnames <- c("id","time","status","status_corr","plot")
+
       }
       else{
         new.rows <- data.frame(id = i,
                                time = censuses[absents],
-                               NA,
-                               NA)
+                               status = NA,
+                               status_corr = NA,
+                               stringsAsFactors = FALSE)
         newnames <- c("id","time","status","status_corr")
       }
 
-      new.rows[,vars[-which(vars%in%newnames)]] <- NA
+      # new.rows[,vars[-which(vars%in%newnames)]] <- NA
+      new.rows[,invariant_columns] <- NA
+      # if(i == 75599){
+      #   print(new.rows)
+      #   print("-----------------------")
+      # }
       # print(invariant_columns)
-      new.rows[,vars[vars%in%invariant_columns]] <- reattribute_invariant_columns(new.rows = new.rows,
-                                                                                  invariant_columns = invariant_columns,
-                                                                                  tree_temp = tree_temp,
-                                                                                  i=i)
-      tree_temp[(nrow(tree_temp)+1):(nrow(tree_temp)+nabs),newnames] <- new.rows
+      # new.rows[,vars[vars%in%invariant_columns]] <- reattribute_invariant_columns(new.rows = new.rows,
+      #                                                                             invariant_columns = invariant_columns,
+      #                                                                             tree_temp = tree_temp,
+      #                                                                             i=i)
+      new.rows <- reattribute_invariant_columns(new.rows = new.rows,
+                                                invariant_columns = invariant_columns,
+                                                tree_temp = tree_temp,
+                                                i=i)
+      # print(new.rows)
+      # if(i == 75599){
+      #   # print(tree_tempsav)
+      #   print("############rows")
+      #   print(c(ncol(new.rows),ncol(tree_temp)))
+      # }
+      new_rows_init <- (nrow(tree_temp)+1)
+      new_rows_end <- (nrow(tree_temp)+nabs)
+      tree_temp[new_rows_init:new_rows_end,vars] <- NA
+      tree_temp[new_rows_init:new_rows_end,newnames] <- new.rows[,newnames]
+      # if(i == 75599){
+      #   # print(tree_tempsav)
+      #   print("###########tree1")
+      #   print(tree_temp)
+      # }
+      tree_temp[new_rows_init:new_rows_end,invariant_columns] <- new.rows[,invariant_columns]
+
       tree_temp <- tree_temp[order(tree_temp$time),]
+      # if(i == 75599){
+      #   # print(tree_tempsav)
+      #   print("############tree2")
+      #   print(tree_temp)
+      # }
     }
     if(!all(is.na(tree_temp$status))){
+      if(all(!tree_temp$status)){
+        print(tree_temp$status)
+        print("#")
+      }
       first_seen_alive <- which(tree_temp$status == 1)[1]
       last_seen_alive <- max(which(tree_temp$status == 1))
       tree_temp$status_corr[first_seen_alive:last_seen_alive] <- 1
@@ -346,6 +424,9 @@ reattribute_invariant_columns <- function(new.rows, invariant_columns, tree_temp
       }
     }
   }
+  # ret <- new.rows[,names(new.rows)%in%invariant_columns]
+  # print(ret)
+  return(new.rows)
 }
 
 
