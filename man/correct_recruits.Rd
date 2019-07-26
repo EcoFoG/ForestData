@@ -44,10 +44,37 @@ to null}
 data by plot (TRUE)or for the whole dataset (FALSE).}
 }
 \value{
-A corrected data.frame
+A forest inventory with added lines, which correspond to overgrown
+  recruits estimated trajectories. To use with caution in certain analyses,
+  e.g. biomass monitoring.
 }
 \description{
-correct recruits spots individuals that have first been unseen during previous censuses but were already over the minimum counting dbh, and provides a correction that is useful to compute biomass estimates.
+correct recruits spots "ovegrown recruits", i.e. trees that were first
+registered with an abnormally high DBH, given the protocol's minimum
+censusing DBH and the upper threshold over which tree growth is considered
+abnormal. In other terms, trees that were certainly there and over minimum
+DBH in some censuses before they were first registered. The function then
+reconstitutes the growth trajectory of these tree before their first register
+and thus adds the corresponding lines to the inventory, flagging these lines
+with a logical field named "corrected_recruit".
+}
+\details{
+If a tree is recruited (first registered after the initial census)
+  with an excessive size, its size trajectory is reconstituted using a linear
+  model on existing values, for census years corresponding to the plot.
+
+  Only the estimated sizes that are still over the minimum DBH censusing
+  limit are kept in the output.
+
+  If the tree size never varied in the registered measurement, the same value
+  is kept for censuses before the tree's first registering.
+
+  Abnormal size at recruitment is defined according to the study's minimum
+  censusing DBH (minimum_dbh) and a "tolerated growth threshold"
+  (positive_growth_threshold), estimated by local expertise or other means,
+  and over which annual growth is considered abnormal/suspicious. A recruit
+  is considered overgrown if the size at recruitment time exceeds
+  minimum_dbh+(recruitment_time - previous_census)*positive_growth_threshold.
 }
 \examples{
 \dontrun{
