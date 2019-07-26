@@ -19,6 +19,17 @@
 #'
 #' @details
 #'
+#' Signification of the code_corr values (short):
+#' - p_incr: punctual increase corrected by inter- or extrapolation
+#' - p_decr: punctual decrease corrected by inter- or extrapolation
+#' - def_incr_rp: definitive increase (or positive shift) corrected by realigning the most
+#' recent series upon the previous one.
+#' - def_decr_rp: definitive decrease (or negative shift) corrected by realigning the most
+#' recent series upon the previous one.
+#' - def_incr_rl: definitive increase (or positive shift) corrected by realigning the previous
+#' series on the most recent
+#' - def_decr_rl: definitive decrease (or negative shift) corrected by realigning the previous
+#' series on the most recent
 #'
 #' This is an adaptation from Camille Piponiot's original correction function.
 #' This version is primarily designed to explicitely account for POM shifts. If
@@ -28,8 +39,8 @@
 #' applied thresholds.
 #'
 #' The optional argument "ignore_POM" triggers the version of the algorithm
-#' designed for cases in which POM shifts have not been registered, but this
-#' should not be used if the information is available.
+#' designed for cases in which POM shifts have not been registered. This should
+#' not be used if the information is available.
 #'
 #' This function automates a quite simple yet efficient detection method based
 #' on using meaningful thresholds to detect errors, and using linear inter- or
@@ -62,15 +73,18 @@
 #' outlyer, for some reason (this has been observed in the base but not yet
 #' explained). To separate efficiently shifts from punctual errors, the
 #' algorithm search for the complementary diameter variation up to 2 censuses
-#' after the first anomaly.
+#' after the first anomaly. The values of code_corr corresponding to punctual
+#' increase or decrease are respectively p_incr and p_decr
 #'
 #' - A shift is defined as an abnormal increase or decrease in diameter that is
-#' not compensated by neighboring measurements. In most cases, shifts are
-#' negative and ared ue to changes in Point Of Measurement (POM). For hihly
-#' non-cylindric tree stems that rises difficulties to accurately measure
-#' diameter or circumference, the size is estimated and the information about
-#' this is reported in a "measurement code". Estimations can cause positive as
-#' well as negative shifts in the Paracou database.
+#' not compensated by neighboring measurements.
+#'
+#' - In most cases, shifts are negative and ared due to changes in Point Of
+#' Measurement (POM). In Paracou, for hihly non-cylindric tree stems that cause
+#' difficulties to accurately measure diameter or circumference, the size is
+#' estimated and the information about this is reported in a "measurement code".
+#' Estimations can cause positive as well as negative shifts in the Paracou
+#' database.
 #'
 #' - The changes in POM for the Paracou can be retrieved at least partially from
 #' the "measurement code" field. This seems to be the most accurate way to
@@ -102,9 +116,9 @@
 #'
 #' - For shifts, one of the two "series" of measurement have to be re-aligned
 #' upon the other. The criteria used to choose which series should be taken as a
-#' reference depend among others on whether the POM are explicitely accounted
-#' for in the correction, or not. If POM are not available, most of the shifts
-#' to correct are supposed to be due to POM changes, leading to the choice to
+#' reference depend on whether the POM are explicitely accounted for in the
+#' correction, or not. If POM are not available, most of the shifts to correct
+#' are supposed to be due to POM changes, leading to the choice to
 #' systematically re-align the more recent series upon the older one in case of
 #' negative shift. If POM is available, and is reliable enough to allow
 #' eliminating most POM shifts, remaining negative shift have roughly the same
@@ -112,6 +126,11 @@
 #' this case, the series having the highest number of values is supposed to be
 #' more reliable than the other, and if both series are of same length, the most
 #' recent is picked.
+#'
+#' - The codes corresponding to shifts are composed of a first part that describes
+#' the shift (def_incr or def_decr for definitive increase or decrease respectively)
+#' and a suffix that describes the realignment (_rp or _rl for realigned with previous
+#' or last series, respectively)
 #'
 #'
 #' @return The same data.frame with two additional columns: size_corr,
@@ -182,8 +201,10 @@ correct_size <- function(data,
 
   ids <- unique(data$id)
 
+  pb <- txtProgressBar(min = 0, max = length(ids), style = 3)
   res <- do.call(rbind,lapply(ids,
                               function(i){
+                                setTxtProgressBar(pb, which(ids == i))
                                 tree <- data[which(data$id == i),]
                                 #tag pioneer
                                 if(unique(tree$species %in% pioneer_sp)){
@@ -201,13 +222,16 @@ correct_size <- function(data,
                                                           code_corr = tree$code_corr,
                                                           time = tree$time,
                                                           status = tree$status,
+                                                          ignore_POM = ignore_POM,
                                                           POM = POMt,
-                                                          default_POM,
+                                                          default_POM = default_POM,
                                                           positive_growth_threshold = thresh, #tag pioneer
-                                                          negative_growth_threshold,
-                                                          i))
+                                                          negative_growth_threshold = negative_growth_threshold,
+                                                          ids = ids,
+                                                          i = i))
 
                               }))
+  close(pb)
   data[,c("size_corr","code_corr")] <- res[,c("size_corr","code_corr")]
 
   names(data)[which(names(data) =="size")] <- size_col
@@ -225,11 +249,15 @@ correct_size <- function(data,
                                code_corr,
                                time,
                                status,
+                               ignore_POM,
                                POM,
                                default_POM,
                                positive_growth_threshold,
                                negative_growth_threshold,
+                               ids,
                                i) {
+
+  # print(paste0("Correcting tree ",i,": ",which(ids == i),"/",length(ids)))
   # cresc_abs: absolute
   cresc_abs <- rep(0, length(size) - 1)
   cresc <- rep(0, length(size) - 1)
@@ -346,10 +374,10 @@ correct_size <- function(data,
       # print(abnormals)
       if(length(ab)!= 1){
         if(length(ab)== 0){
-          print("solved!")
+          # print("solved!")
           next
         }
-        else stop("erreur")
+        else stop("erreur: length(ab) > 1")
       }
       # print(length(ab))
         if (cresc[ab] >= positive_growth_threshold |
@@ -474,15 +502,15 @@ correct_size <- function(data,
                   if(delta > 0){
                     codetemp <- as.character(ifelse(
                       code_corr[c] == "0",
-                      "def_incr_realign_on_previous",
-                      paste(code_corr[c], "def_incr_realign_on_previous", sep = "+")
+                      "def_incr_rp",
+                      paste(code_corr[c], "def_incr_rp", sep = "+")
                     ))
                   }
                   else if(delta < 0){
                     codetemp <- as.character(ifelse(
                       code_corr[c] == "0",
-                      "def_decr_realign_on_previous",
-                      paste(code_corr[c], "def_decr_realign_on_previous", sep = "+")
+                      "def_decr_rp",
+                      paste(code_corr[c], "def_decr_rp", sep = "+")
                     ))
                   }
                   code_corr[c] <- codetemp
@@ -500,14 +528,14 @@ correct_size <- function(data,
                     codetemp <- as.character(ifelse(
                       code_corr[c] == "0",
                       "def_incr_R_recent",
-                      paste(code_corr[c], "def_incr_realign_on_recent", sep = "+")
+                      paste(code_corr[c], "def_incr_rl", sep = "+")
                     ))
                   }
                   else if(delta < 0){
                     codetemp <- as.character(ifelse(
                       code_corr[c] == "0",
                       "def_decr_R_recent",
-                      paste(code_corr[c], "def_decr_realign_on_recent", sep = "+")
+                      paste(code_corr[c], "def_decr_rl", sep = "+")
                     ))
                   }
                   code_corr[c] <- codetemp
@@ -535,8 +563,8 @@ correct_size <- function(data,
                 for (c in (ab+1):length(size_corr)){
                   codetemp <- as.character(ifelse(
                     code_corr[c] == "0",
-                    "def_decr_realign_on_previous",
-                    paste(code_corr[c], "def_decr_realign_on_previous", sep = "+")
+                    "def_decr_rp",
+                    paste(code_corr[c], "def_decr_rp", sep = "+")
                   ))
                 }
               }
@@ -550,8 +578,8 @@ correct_size <- function(data,
                   for (c in (ab+1):length(size_corr)){
                     codetemp <- as.character(ifelse(
                       code_corr[c] == "0",
-                      "def_incr_realign_on_previous",
-                      paste(code_corr[c], "def_incr_realign_on_previous", sep = "+")
+                      "def_incr_rp",
+                      paste(code_corr[c], "def_incr_rp", sep = "+")
                     ))
                   }
 
@@ -563,8 +591,8 @@ correct_size <- function(data,
                   for (c in (ab+1):length(size_corr)){
                     codetemp <- as.character(ifelse(
                       code_corr[c] == "0",
-                      "def_incr_realign_on_next",
-                      paste(code_corr[c], "def_incr_realign_on_recent", sep = "+")
+                      "def_incr_rl",
+                      paste(code_corr[c], "def_incr_rl", sep = "+")
                     ))
                   }
                 }

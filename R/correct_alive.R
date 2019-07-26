@@ -131,10 +131,21 @@ correct_alive <- function(data,
   # Call internals by plot or not --------------------------------------------
 
   if (byplot){
+
     plots <- unique(data$plot)
+    #create progressbar
+    pb <- txtProgressBar(min = 0, max = length(plots), style = 3)
+
+
+
+
+
+
     data <- do.call(rbind,
                     lapply(plots,
                            function(p){
+                             # Update between-plots progress bar
+                             setTxtProgressBar(pb, which(plots == p), title = "Plot")
                              .correct_status_plotlevel(data[which(data$plot == p), ],
                                                        dead_confirmation_censuses,
                                                        use_size,
@@ -142,6 +153,7 @@ correct_alive <- function(data,
                                                        plots,
                                                        p)
                              }))
+    close(pb)
   }
   else
     data <- .correct_status_plotlevel(data,
@@ -150,6 +162,7 @@ correct_alive <- function(data,
                                       invariant_columns,
                                       plots = NULL,
                                       p = NULL)
+
 
   # print(names(data))
   names(data)[which(names(data) == "id")] <- id_col

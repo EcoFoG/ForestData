@@ -6,8 +6,9 @@
 \usage{
 correct_recruits(data, dbh_min = 10, positive_growth_threshold = 5,
   time_col = "CensusYear", id_col = "idTree", plot_col = "Plot",
-  size_col = "Circ", status_col = "status_corr",
-  measure_type = "circumference", byplot = TRUE,
+  size_corr_col = "size_corr", status_corr_col = "status_corr",
+  measure_type = "circumference", invariant_columns = c("SubPlot",
+  "species", "Genus", "Species"), byplot = TRUE,
   correct_status = FALSE)
 }
 \arguments{
@@ -30,14 +31,14 @@ which an annual DIAMETER growth is considered abnormal (in cm). Defaults to
 \item{plot_col}{character, name of the column containing plot indices or
 names.}
 
-\item{size_col}{character, name of the column corresponding to tree size
-(circumference or diameter) measurements .}
-
-\item{status_col}{character, name of the column corresponding to tree status:
-0/FALSE for dead, 1/TRUE for alive.}
-
 \item{measure_type}{character, partially matching “Circumference” or
 “Diameter”, indicating what is the type of the measurements.}
+
+\item{invariant_columns}{character vector, containing the name of the columns
+for which value remain constant for a given tree (for example species name
+or coordinates). When a row is added by the function correct_alive, values
+for invariant columns are taken from the value for other censuses. Defaults
+to null}
 
 \item{byplot}{logical, indicating whether the function has to process the
 data by plot (TRUE)or for the whole dataset (FALSE).}
@@ -57,8 +58,8 @@ positive_growth_threshold = 5,
 time_col = "CensusYear",
 id_col = "id",
 plot_col = "Plot",
-size_col = "Circ",
-status_col = "AliveCode",
+size_corr_col = "Circ",
+status_corr_col = "AliveCode",
 measure_type = "circumference",
 byplot = TRUE,
 correct_status = FALSE)

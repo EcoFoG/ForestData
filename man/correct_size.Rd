@@ -84,6 +84,18 @@ observed size loss by: after_shift_size_corrected = after_shift_size_original
 + difference_before_after + expected_growth.
 }
 \details{
+Signification of the code_corr values (short):
+- p_incr: punctual increase corrected by inter- or extrapolation
+- p_decr: punctual decrease corrected by inter- or extrapolation
+- def_incr_rp: definitive increase (or positive shift) corrected by realigning the most
+recent series upon the previous one.
+- def_decr_rp: definitive decrease (or negative shift) corrected by realigning the most
+recent series upon the previous one.
+- def_incr_rl: definitive increase (or positive shift) corrected by realigning the previous
+series on the most recent
+- def_decr_rl: definitive decrease (or negative shift) corrected by realigning the previous
+series on the most recent
+
 This is an adaptation from Camille Piponiot's original correction function.
 This version is primarily designed to explicitely account for POM shifts. If
 the POM were registered reliably, using it enables 1- to eliminate anomalies
@@ -92,8 +104,8 @@ due to POM shifts (typically, abnormal decreases in size without return to
 applied thresholds.
 
 The optional argument "ignore_POM" triggers the version of the algorithm
-designed for cases in which POM shifts have not been registered, but this
-should not be used if the information is available.
+designed for cases in which POM shifts have not been registered. This should
+not be used if the information is available.
 
 This function automates a quite simple yet efficient detection method based
 on using meaningful thresholds to detect errors, and using linear inter- or
@@ -126,15 +138,18 @@ this offsetting decrease of increase may not come immediately after the first
 outlyer, for some reason (this has been observed in the base but not yet
 explained). To separate efficiently shifts from punctual errors, the
 algorithm search for the complementary diameter variation up to 2 censuses
-after the first anomaly.
+after the first anomaly. The values of code_corr corresponding to punctual
+increase or decrease are respectively p_incr and p_decr
 
 - A shift is defined as an abnormal increase or decrease in diameter that is
-not compensated by neighboring measurements. In most cases, shifts are
-negative and ared ue to changes in Point Of Measurement (POM). For hihly
-non-cylindric tree stems that rises difficulties to accurately measure
-diameter or circumference, the size is estimated and the information about
-this is reported in a "measurement code". Estimations can cause positive as
-well as negative shifts in the Paracou database.
+not compensated by neighboring measurements.
+
+- In most cases, shifts are negative and ared due to changes in Point Of
+Measurement (POM). In Paracou, for hihly non-cylindric tree stems that cause
+difficulties to accurately measure diameter or circumference, the size is
+estimated and the information about this is reported in a "measurement code".
+Estimations can cause positive as well as negative shifts in the Paracou
+database.
 
 - The changes in POM for the Paracou can be retrieved at least partially from
 the "measurement code" field. This seems to be the most accurate way to
@@ -166,9 +181,9 @@ are extrapolated.
 
 - For shifts, one of the two "series" of measurement have to be re-aligned
 upon the other. The criteria used to choose which series should be taken as a
-reference depend among others on whether the POM are explicitely accounted
-for in the correction, or not. If POM are not available, most of the shifts
-to correct are supposed to be due to POM changes, leading to the choice to
+reference depend on whether the POM are explicitely accounted for in the
+correction, or not. If POM are not available, most of the shifts to correct
+are supposed to be due to POM changes, leading to the choice to
 systematically re-align the more recent series upon the older one in case of
 negative shift. If POM is available, and is reliable enough to allow
 eliminating most POM shifts, remaining negative shift have roughly the same
@@ -176,6 +191,11 @@ chances to correspond to e.g. erroneous estimation on non-cylindric stems. In
 this case, the series having the highest number of values is supposed to be
 more reliable than the other, and if both series are of same length, the most
 recent is picked.
+
+- The codes corresponding to shifts are composed of a first part that describes
+the shift (def_incr or def_decr for definitive increase or decrease respectively)
+and a suffix that describes the realignment (_rp or _rl for realigned with previous
+or last series, respectively)
 }
 \examples{
 \dontrun{

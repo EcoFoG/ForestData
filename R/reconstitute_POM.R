@@ -32,7 +32,7 @@ reconstitute_pom_paracou <- function(data,
         base <- temp$POM[j-1]
       }
 
-      if(temp$code[j] != 0){
+      if(!is.na(temp$code[j]) & temp$code[j] != 0){
         if(temp$code[j] %in% c(1,2,3)){
           pomtemp <- base+(temp$code[j]*0.5)
         }
