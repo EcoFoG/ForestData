@@ -46,8 +46,8 @@ reconstitute_pom_paracou <- function(data,
       else{
         pomtemp <- base
       }
-print(temp$code[j])
-  print(pomtemp)
+# print(temp$code[j])
+  # print(pomtemp)
       temp$POM[j] <- pomtemp
 
 

@@ -213,9 +213,13 @@ correct_size <- function(data,
                                 else{
                                   thresh <- positive_growth_threshold#tag pioneer
                                 }
-                                POMt <- ifelse(isTRUE(ignore_POM),
-                                               NULL,
-                                               tree$POM)
+                                if(isTRUE(ignore_POM)){
+                                  POMt <- NULL
+                                }
+                                else{
+                                  POMt <- tree$POM
+                                }
+
 
                                 return(.correct_size_tree(size = tree$size,
                                                           size_corr = tree$size_corr,
