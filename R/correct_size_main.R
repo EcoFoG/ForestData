@@ -172,6 +172,10 @@ correct_size <- function(data,
   data <- check_rename_variable_col(species_col, "species",data) #tag pioneer
 
   if(!isTRUE(ignore_POM)) data <- check_rename_variable_col(POM_col, "POM",data)
+  else{
+    warning("You decided to correct tree size measurements without explicitely accounting for POM changes.")
+    message("PLEASE BE AWARE THAT THE CORRECTIONS WILL THEREFORE BE SUB-OPTIMAL, LESS RELIABLE THAN WHAT THIS PACKAGE ORIGINALLY PROVIDES")
+  }
 
 # Create size and status corr ---------------------------------------------
 
@@ -272,6 +276,7 @@ correct_size <- function(data,
       diff(size[!is.na(size)]) / diff(time[!is.na(size)])
     cresc_abs[which(!is.na(size))[-1] - 1] <- diff(size[!is.na(size)])
   }
+  else message(paste0("Tree",i," has no data to correct, all size measurements are NA"))
 
   if (length(cresc) > 0) {
 
@@ -289,16 +294,15 @@ correct_size <- function(data,
       size_corr <- res$size_corr
       code_corr <- as.character(res$code_corr)
     }
-    else{
-      warning("You decided to correct tree size measurements without explicitely accounting for POM changes.")
-      message("PLEASE BE AWARE THAT THE CORRECTIONS WILL THEREFORE BE SUB-OPTIMAL, LESS RELIABLE THAN WHAT THIS PACKAGE ORIGINALLY PROVIDES")
-    }
+
 
     if (sum(!is.na(size_corr)) > 1) {
       cresc[which(!is.na(size_corr))[-1] - 1] <-
         diff(size_corr[!is.na(size_corr)]) / diff(time[!is.na(size_corr)])
       cresc_abs[which(!is.na(size_corr))[-1] - 1] <- diff(size_corr[!is.na(size_corr)])
     }
+    else message("Tree has no data to correct, all size measurements are NA")
+
 
     res <- .correct_abnormal_growth_tree(size_corr,
                                          code_corr,
@@ -343,7 +347,23 @@ correct_size <- function(data,
   ####    if there is a DBH change > 5cm/year or < negative_growth_threshold cm   ####
   ### do as many corrections as there are abnormal DBH change values ###
   # cresc_abn = sum(abs(cresc) >= positive_growth_threshold | cresc_abs < negative_growth_threshold)
+
   n_cresc_abn = sum(cresc >= positive_growth_threshold | cresc_abs < negative_growth_threshold)
+  if(is.na(n_cresc_abn)){
+    message("It seems like the following tree is generating an exception during growth rate computation :")
+    print("tree id")
+    print(j)
+    print("census years")
+    print(time)
+    print("size corr before correcting for abnormal diameter variations")
+    print(size_corr)
+    print("calculated annual growth rate...")
+    print(cresc)
+    print("calculated absolute growth")
+    print(cresc_abs)
+    message("this is probably due to multiple measurements for a same census year (or several), that generate a division by zero when annual growth rate is calculated: the formula is (size_n+1 - size_n) / (time_n+1 - time_n)")
+    message("This error comes either from infra-annual censusing timestep (not yet handled by these methods) or multiple-stemmed trees for which stems are not discriminated using different IDs; please check it out beforehand")
+  }
   if (n_cresc_abn > 0) {
     #last adding, to fix a recently observed behavior: Some negative growth were not corrected
     #mainly because of the "which.max(abs(cresc))". We detect with more strictness negative growths
