@@ -1,3 +1,33 @@
+# Reconstitute Point Of Measurement values for the Paracou Database
+#
+# This function reconstitutes a POM field using measure codes (1: 50cm uprise,
+# 2: 100cm, 3:150cm). This is the function that has been used to obtaine such
+# values in the example dataset. Note that these values are obtained without
+# verification and are used just to show the features of ForestData in the
+# examples (correct_recruits, display_corrected_trees). More reliable values
+# will be obtained with more in-depth work and verifications lead by Gaelle
+# Jaouen and Geraldine Derroire. Contact them directly for any matter regarding
+# POM for the Paracou Database.
+#
+# @param data data.frame, a forest inventory
+# @param default_pom numeric, the default POM expressed in meters (defaults to 1.3)
+# @param id_col character, the name of the column containing tree ids.
+# @param measure_col character, the name of the column containing tree size measurements
+# @param measure_code_col character, the name of the column containing measure codes (works only for Paracou or Guyafor datasets)
+# @param time_col character, the name of the column containing census years.
+#
+# @return The same data.frame with a POM field.
+# @export
+#
+# @examples
+# data(example_census)
+# ex = reconstitute_pom_paracou(example_census,
+# default_pom = 1.3,
+# id_col = "idTree",
+# measure_col = "Circ",
+# measure_code_col = "CodeMeas",
+# time_col = "CensusYear")
+#
 reconstitute_pom_paracou <- function(data,
                              default_pom = 1.3,
                              id_col = "idTree",

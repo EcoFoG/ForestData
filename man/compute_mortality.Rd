@@ -30,11 +30,10 @@ compute_mortality(data, status_col = "status_corr",
 A data.frame with absolute and annual mortality rates by plot and census interval.
 }
 \description{
-This function computes mortality in forest inventories according to plot
+This function computes mortality in forest inventories according to plot if there are several
 }
 \examples{
-\dontrun{
-data("Paracou6")
+data("example_census")
 compute_mortality(Paracou6,
 status_col="status_corr",
 time_col="CensusYear",
@@ -43,5 +42,5 @@ dead_confirmation_censuses=2,
 byplot = TRUE,
 plot_col = "Plot",
 corrected = TRUE)
-}
+
 }

@@ -139,24 +139,52 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' correct_size(data,
-#' size_col,
-#' time_col,
-#' status_col,
-#' id_col,
-#' POM_col,
-#' positive_growth_threshold,
-#' negative_growth_threshold,
-#' default_POM)}
+#' #Load the provided example dataset
+#' data("example_census")
+#'
+#' #Take a look to its structure
+#' str(example_status_corr)
+#'
+#'
+#'
+#' #Correct it (short version with column names set with prepare_forestdata)
+#'
+#' prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+#'
+#' example_size_corr <- correct_size(example_status_corr,
+#' species_col = "binomial_name",#tag pioneer
+#' pioneers = c("Cecropia","Pourouma"),
+#' pioneers_treshold = 7.5,
+#' ignore_POM = FALSE)
+#'
+#' str(example_status_corr)
+#'
+#' #Correct it (full call)
+#' example_size_corr <- correct_size(example_status_corr,
+#' size_col = "Circ",
+#' time_col = "CensusYear",
+#' status_col = "status_corr",
+#' species_col = "binomial_name",
+#' id_col = "idTree",
+#' POM_col = "POM",
+#' measure_type ="C",
+#' positive_growth_threshold = 5,
+#' negative_growth_threshold = -2,
+#' default_POM = 1.3,
+#' pioneers = c("Cecropia","Pourouma"),
+#' pioneers_treshold = 7.5,
+#' ignore_POM = FALSE)
+#'
+#'
+#' str(example_status_corr)
 correct_size <- function(data,
-                         size_col = "Circ",
-                         time_col = "CensusYear",
+                         size_col = getOption("size_col"),
+                         time_col = getOption("time_col"),
                          status_col = "status_corr",
-                         species_col = "species",#tag pioneer
-                         id_col = "idTree",
-                         POM_col = "POM",
-                         measure_type = "C",
+                         species_col = "binomial_name",#tag pioneer
+                         id_col = getOption("id_col"),
+                         POM_col = getOption("POM_col"),
+                         measure_type =getOption("measure_type"),
                          positive_growth_threshold = 5,
                          negative_growth_threshold = -2,
                          default_POM = 1.3,
@@ -165,6 +193,12 @@ correct_size <- function(data,
                          ignore_POM = FALSE){ #tag pioneer
 
   # Checks and format -------------------------------------------------------
+
+  opts_args <- c(id_col, size_col, species_col, POM_col, time_col, status_col)
+  for(n in 1:length(opts_args))
+    if(is.null(opts_args[n]))
+      stop(paste0("The following argument need to be specified:",c("id_col", "size_col", "species_col", "POM_col", "time_col", "status_col")[n]))
+
   data <- check_rename_variable_col(size_col, "size",data)
   data <- check_rename_variable_col(status_col, "status",data)
   data <- check_rename_variable_col(time_col, "time",data)
@@ -223,7 +257,7 @@ correct_size <- function(data,
                                 else{
                                   POMt <- tree$POM
                                 }
-
+# print(tree)
 
                                 return(.correct_size_tree(size = tree$size,
                                                           size_corr = tree$size_corr,
@@ -246,6 +280,7 @@ correct_size <- function(data,
   names(data)[which(names(data) == "status")] <- status_col
   names(data)[which(names(data) == "time")] <- time_col
   names(data)[which(names(data) == "id")] <- id_col
+  names(data)[which(names(data) == "species")] <- species_col
 
   return(data)
 }
@@ -276,11 +311,15 @@ correct_size <- function(data,
       diff(size[!is.na(size)]) / diff(time[!is.na(size)])
     cresc_abs[which(!is.na(size))[-1] - 1] <- diff(size[!is.na(size)])
   }
+  else if(length(size == 1)){
+    message(paste0("Tree",i," has only one measurement and has no growth to correct"))
+  }
   else message(paste0("Tree",i," has no data to correct, all size measurements are NA"))
 
   if (length(cresc) > 0) {
 
     if(!ignore_POM){
+      # print("here")
       res <- .correct_POM_changes(size,
                                   size_corr,
                                   code_corr,
@@ -291,6 +330,7 @@ correct_size <- function(data,
                                   positive_growth_threshold,
                                   negative_growth_threshold,
                                   i)
+      # print("here2")
       size_corr <- res$size_corr
       code_corr <- as.character(res$code_corr)
     }
@@ -522,23 +562,27 @@ correct_size <- function(data,
 
 
                 #tag correction with code_corr
-                for (c in (ab+1):length(size_corr)) {
-                  if(delta > 0){
+                if(delta > 0){
+                  for (c in (ab+1):length(size_corr)) {
                     codetemp <- as.character(ifelse(
                       code_corr[c] == "0",
                       "def_incr_rp",
                       paste(code_corr[c], "def_incr_rp", sep = "+")
                     ))
+                    code_corr[c] <- codetemp
                   }
-                  else if(delta < 0){
-                    codetemp <- as.character(ifelse(
-                      code_corr[c] == "0",
-                      "def_decr_rp",
-                      paste(code_corr[c], "def_decr_rp", sep = "+")
-                    ))
-                  }
+                }
+                else if(delta < 0){
+                  for (c in (ab+1):length(size_corr)) {
+                  codetemp <- as.character(ifelse(
+                    code_corr[c] == "0",
+                    "def_decr_rp",
+                    paste(code_corr[c], "def_decr_rp", sep = "+")
+                  ))
                   code_corr[c] <- codetemp
                 }
+
+              }
               }
               else {
 
@@ -714,7 +758,7 @@ correct_size <- function(data,
 .replace_missing <- function(size_corr, time,status){
 
   # tree <- tree[order(time),c("time","size","status")] # in case data is not ordered yet
-  missing <- which(is.na(size_corr) & status == 1) # indices of the missing values
+  missing <- which(is.na(size_corr) & !is.na(status) & status == 1) # indices of the missing values
   present <- !is.na(size_corr) # to simplify the code written hereafter
 
   corrected_values <- rep(NA, length(size_corr))
@@ -757,11 +801,13 @@ correct_size <- function(data,
     else{
       while(any(is.na(POM))){
         index <- which.max(is.na(POM))
+        # print(index);print(length(POM))
         if(index == 1){
           POM[1:(which.max(!is.na(POM))[-1])] <- POM[(which.max(!is.na(POM)))]
         }
         else if(index == length(POM)){
-          POM[which(is.na(POM))[length(which(is.na(POM)))]:(which.max(!is.na(POM))[-1])] <- POM[(which.max(!is.na(POM)))]
+
+          POM[index] <- POM[index-1]
         }
       }
     }

@@ -4,10 +4,13 @@
 \alias{correct_alive}
 \title{Correct Trees Life Status in a Forest Inventory}
 \usage{
-correct_alive(data, id_col = "idTree", time_col = "CensusYear",
-  status_col = "CodeAlive", plot_col = "Plot", byplot = TRUE,
+correct_alive(data, id_col = getOption("id_col"),
+  time_col = getOption("time_col"),
+  status_col = getOption("status_col"),
+  plot_col = getOption("plot_col"), byplot = TRUE,
   dead_confirmation_censuses = 2, use_size = FALSE,
-  invariant_columns = c("Genus", "Species", "SubPlot", "Plotsub"))
+  invariant_columns = c("Forest", "Family", "Genus", "Species",
+  "binomial_name"))
 }
 \arguments{
 \item{data}{data.frame, containing forest inventories in the form of a
@@ -81,15 +84,35 @@ the tree is dead -0 or FALSE-, or alive -1 or TRUE-, please let
 \code{use_size} to its default value.
 }
 \examples{
-\dontrun{
-data("Paracou6")
-correct_alive(Paracou6,
+#Load the provided example dataset
+data("example_census")
+
+#Take a look to its structure
+str(example_census)
+
+#Correct it (short version with column names set with prepare_forestdata)
+example_status_corr <- correct_alive(example_census,
+invariant_columns = c("Genus",
+"Species",
+"Family",
+"Forest",
+"binomial_name"))
+
+#Correct it (full call)
+example_status_corr <- correct_alive(example_census,
 id_col = "idTree",
 time_col = "CensusYear",
 status_col = "CodeAlive",
-plot_col = "SubPlot",
+plot_col = "Plot",
 byplot = TRUE,
 dead_confirmation_censuses = 2,
-use_size = FALSE)
-}
+use_size = FALSE,
+invariant_columns = c("Genus",
+"Species",
+"Family",
+"Forest",
+"binomial_name"))
+
+
+str(example_status_corr)
 }

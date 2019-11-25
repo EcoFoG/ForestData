@@ -35,35 +35,44 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' data("Paracou6")
-#' correct_recruits(Paracou6,
+#'
+#' ## From a bare dataset - better using after correct_alive and correct_size
+#'
+#' data("example_census")
+#'
+
+#' correct_recruits(data,
 #' dbh_min = 10,
 #' positive_growth_threshold = 5,
 #' time_col = "CensusYear",
-#' id_col = "id",
+#' id_col = "idTree",
 #' plot_col = "Plot",
-#' size_corr_col = "Circ",
-#' status_corr_col = "AliveCode",
+#' size_corr_col = "size_corr",
+#' status_corr_col = "status_corr",
 #' measure_type = "circumference",
+#' invariant_columns = c("SubPlot","species","Genus","binomial_name"),
 #' byplot = TRUE,
 #' correct_status = FALSE)
-#' }
+#'
 correct_recruits <- function(data,
                              dbh_min = 10,
                              positive_growth_threshold = 5,
-                             time_col = "CensusYear",
-                             id_col = "idTree",
-                             plot_col = "Plot",
+                             time_col = getOption("time_col"),
+                             id_col = getOption("id_col"),
+                             plot_col = getOption("plot_col"),
                              size_corr_col = "size_corr",
                              status_corr_col = "status_corr",
-                             measure_type = "circumference",
-                             invariant_columns = c("SubPlot","species","Genus","Species"),
+                             measure_type = getOption("measure_type"),
+                             invariant_columns = c("Forest","Family","Genus","Species","binomial_name"),
                              byplot = TRUE,
                              correct_status = FALSE){
 
 
 # Argument checks ---------------------------------------------------------
+  opts_args <- c(id_col, time_col, plot_col, measure_type)
+  for(n in 1:length(opts_args))
+    if(is.null(opts_args[n]))
+      stop(paste0("The following argument need to be specified:",c("id_col", "time_col","plot_col","measure_type")[n]))
 
 
   if(!is.character(invariant_columns)){

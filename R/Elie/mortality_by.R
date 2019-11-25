@@ -10,12 +10,12 @@
 #' @export
 #'
 #' @examples
-compute_ba <- function(data,
+compute_ba2 <- function(data,
                        measure_col = "CircCorr",
                        measure_type = "C",
                        time_col = "CensusYear",
-                       by = c("Plot"),
-                       surface = F){
+                       by = c("Plot","binomial_name"),
+                       surface = 1.5625){
 
 
   if(!measure_col %in% names(data)){

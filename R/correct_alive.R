@@ -39,31 +39,59 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' data("Paracou6")
-#' correct_alive(Paracou6,
+#' #Load the provided example dataset
+#' data("example_census")
+#'
+#' #Take a look to its structure
+#' str(example_census)
+#'
+#' #Correct it (short version with column names set with prepare_forestdata)
+#'
+#' prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+#'
+#' example_status_corr <- correct_alive(example_census,
+#' invariant_columns = c("Genus",
+#' "Species",
+#' "Family",
+#' "Forest",
+#' "binomial_name"))
+#'
+#' #Correct it (full call)
+#' example_status_corr <- correct_alive(example_census,
 #' id_col = "idTree",
 #' time_col = "CensusYear",
 #' status_col = "CodeAlive",
-#' plot_col = "SubPlot",
+#' plot_col = "Plot",
 #' byplot = TRUE,
 #' dead_confirmation_censuses = 2,
-#' use_size = FALSE)
-#' }
+#' use_size = FALSE,
+#' invariant_columns = c("Genus",
+#' "Species",
+#' "Family",
+#' "Forest",
+#' "binomial_name"))
+#'
+#'
+#' str(example_status_corr)
 correct_alive <- function(data,
-                          id_col = "idTree",
-                          time_col = "CensusYear",
-                          status_col = "CodeAlive",
-                          plot_col = "Plot",
+                          id_col = getOption("id_col"),
+                          time_col = getOption("time_col"),
+                          status_col = getOption("status_col"),
+                          plot_col = getOption("plot_col"),
                           byplot = TRUE,
                           dead_confirmation_censuses = 2,
                           use_size = FALSE,
-                          invariant_columns = c("Genus",
+                          invariant_columns = c("Forest",
+                                                "Family",
+                                                "Genus",
                                                 "Species",
-                                                "SubPlot",
-                                                "Plotsub")){
+                                                "binomial_name")){
   # Checks and preparation --------------------------------------------------
   names_args <- c(id_col, time_col, status_col, plot_col)
+  for(n in 1:length(names_args))
+    if(is.null(names_args[n]))
+      stop(paste0("The following argument(s) need to be specified:",c("id_col", "time_col", "status_col", "plot_col")[n]))
+
   for(n in invariant_columns){
     if(!n %in% names(data)){
       stop(paste("invariant_columns argument must contain one or several column names (see help).",n,"is apparently not a dataset's column"))

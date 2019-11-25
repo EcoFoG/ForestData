@@ -3,7 +3,7 @@
 #' compute_ba computes Basal Area according to user-specified grouping variables -Plot, species, etc- and time.
 #'
 #' @param data A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.
-#' @param measure_col character containing the name of the tree size measurements column -either circumference or diameter.
+#' @param size_col character containing the name of the tree size measurements column -either circumference or diameter.
 #' @param measure_type A single character indicating whether tree sizes are given in circumferences -"C"- or diameter -"D"-.
 #' @param by A character vector containing the name of the columns containing the variables -other than census time- according to which the result will be aggregated. Be it plots, subplots or species name...
 #' @param surface Either a scalar containing the surface area of each plot -if they have the same dimensions- or a data.frame of the surface area according to some of the grouping variables -e.g. Plot and subplot. However, defaults to FALSE and in this case, only absolute BA is returned.
@@ -13,29 +13,31 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' data("Paracou6")
-#' function(Paracou6,
-#' measure_col = "CircCorr",
+#' data("example_census")
+#' ba <- compute_ba(example_census,
+#' size_col = "CircCorr",
 #' measure_type = "C",
 #' time_col = "CensusYear",
-#' by = c("Species"),
-#' surface = 6.25)
-#' }
+#' by = c("Species","Plot"),
+#' surface = 1.5625)
+#'
+#' str(ba)
+#' head(ba)
+#'
 compute_ba <- function(data,
-                       by = c("Plot","SubPlot"),
-                       measure_col = "CircCorr",
-                       measure_type = "C",
-                       time_col = "CensusYear",
+                       by = c("Plot","binomial_name"),
+                       size_col = "size_corr",
+                       measure_type = getOption("measure_type"),
+                       time_col = getOption("time_col"),
                        status_col = "status_corr",
                        surface = 1.5625){
 
 
-  if(!measure_col %in% names(data)){
-    stop("Argument measure_col does not match any column name in the forest inventory you provided")
+  if(!size_col %in% names(data)){
+    stop("Argument size_col does not match any column name in the forest inventory you provided")
   }
   else{
-    names(data)[which(names(data)==measure_col)]<- "size"
+    names(data)[which(names(data)==size_col)]<- "size"
     if(!is.numeric(data$size)){
       stop("Tree size measurements must be numeric, which is apparently not the case in your forest inventory")
     }
@@ -49,7 +51,7 @@ compute_ba <- function(data,
     }
   }
 
-  if(!measure_col %in% names(data)){
+  if(!status_col %in% names(data)){
     stop("Argument status_col does not match any column name in the forest inventory you provided")
   }
   else{
@@ -78,7 +80,7 @@ compute_ba <- function(data,
   }
   else{
     # print("hey, let's get started")
-    data <- data[,which(data$status_corr ==1)]
+    data <- data[which(data$status_corr ==1),]
     data$bys <- do.call(paste, c(data[,by], sep="_"))
 
       # do.call(c(), lapply(1:nrow(data), function(i) paste0(data[i,by], collapse = "_")))
@@ -105,7 +107,7 @@ compute_ba <- function(data,
     # for(i in 1:nrow(basal_area))
     # basal_area$bys <- unlist(lapply(1:nrow(basal_area),
                                     # function(l){paste0(basal_area[l,by], collapse = "_")}))
-print("her")
+# print("her")
     basal_area <- data.frame(basal_area,"absolute_basal_area" = NA, "surface_area" = NA, "basal_area_per_ha" = NA, stringsAsFactors = FALSE)
 
     if(!isFALSE(surface)){
@@ -153,7 +155,7 @@ print("her")
       #                             rowval,
       #                             paste0("'",rowval,"'"))),
       #                      collapse = " & ")
-      print(rowval)
+      # print(rowval)
       # print(ifelse(is.numeric(rowval),
       #              rowval,
       #              paste0("'",rowval,"'")))

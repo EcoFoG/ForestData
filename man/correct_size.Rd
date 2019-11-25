@@ -4,9 +4,11 @@
 \alias{correct_size}
 \title{Correct Tree Size Measurements}
 \usage{
-correct_size(data, size_col = "Circ", time_col = "CensusYear",
-  status_col = "status_corr", species_col = "species",
-  id_col = "idTree", POM_col = "POM", measure_type = "C",
+correct_size(data, size_col = getOption("size_col"),
+  time_col = getOption("time_col"), status_col = "status_corr",
+  species_col = "binomial_name", id_col = getOption("id_col"),
+  POM_col = getOption("POM_col"),
+  measure_type = getOption("measure_type"),
   positive_growth_threshold = 5, negative_growth_threshold = -2,
   default_POM = 1.3, pioneers = c("Cecropia", "Pourouma"),
   pioneers_treshold = 7.5, ignore_POM = FALSE)
@@ -198,14 +200,37 @@ and a suffix that describes the realignment (_rp or _rl for realigned with previ
 or last series, respectively)
 }
 \examples{
-\dontrun{
-correct_size(data,
-size_col,
-time_col,
-status_col,
-id_col,
-POM_col,
-positive_growth_threshold,
-negative_growth_threshold,
-default_POM)}
+#Load the provided example dataset
+data("example_census")
+
+#Take a look to its structure
+str(example_status_corr)
+
+#Correct it (short version with column names set with prepare_forestdata)
+example_size_corr <- correct_size(example_status_corr,
+species_col = "binomial_name",#tag pioneer
+pioneers = c("Cecropia","Pourouma"),
+pioneers_treshold = 7.5,
+ignore_POM = FALSE)
+
+str(example_status_corr)
+
+#Correct it (full call)
+example_size_corr <- correct_size(example_status_corr,
+size_col = "Circ",
+time_col = "CensusYear",
+status_col = "status_corr",
+species_col = "binomial_name",
+id_col = "idTree",
+POM_col = "POM",
+measure_type ="C",
+positive_growth_threshold = 5,
+negative_growth_threshold = -2,
+default_POM = 1.3,
+pioneers = c("Cecropia","Pourouma"),
+pioneers_treshold = 7.5,
+ignore_POM = FALSE)
+
+
+str(example_status_corr)
 }

@@ -1,6 +1,6 @@
 #' Compute Annual Mortality Rates in Forest Inventories
 #'
-#' This function computes mortality in forest inventories according to plot
+#' This function computes mortality in forest inventories according to plot if there are several
 #'
 #' @param data A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.
 #' @param status_col Character. The name of the column containing tree vital status - 0=dead; 1=alive.
@@ -15,9 +15,8 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' data("Paracou6")
-#' compute_mortality(Paracou6,
+#' data("example_census")
+#' compute_mortality(example_census)
 #' status_col="status_corr",
 #' time_col="CensusYear",
 #' id_col="idTree",
@@ -25,7 +24,7 @@
 #' byplot = TRUE,
 #' plot_col = "Plot",
 #' corrected = TRUE)
-#' }
+#'
 compute_mortality <- function(data,
                               status_col="status_corr",
                               time_col="CensusYear",

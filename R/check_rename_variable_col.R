@@ -1,17 +1,17 @@
-#' Check that a Column Name is in a Dataset and Replace it by a Temp Name
-#'
-#' Internal and unexported function of ForestData
-#'
-#' @param arg A character argument corresponding to a column name, that must be checked
-#' @param name A name which replaces the original column name inside the function where the check/replace is called
-#' @param data A data.frame
-#'
-#' @return A data.frame in which the target colname has been replaced by one that will be used internally
-#'
-#' @examples
-#' \dontrun{
-#' data <- check_rename_variable_col(status_col, "status",data)
-#' }
+# Check that a Column Name is in a Dataset and Replace it by a Temp Name
+#
+# Internal and unexported function of ForestData
+#
+# @param arg A character argument corresponding to a column name, that must be checked
+# @param name A name which replaces the original column name inside the function where the check/replace is called
+# @param data A data.frame
+#
+# @return A data.frame in which the target colname has been replaced by one that will be used internally
+#
+# @examples
+# \dontrun{
+# data <- check_rename_variable_col(status_col, "status",data)
+# }
 check_rename_variable_col <- function(arg, name, data){
   if(!inherits(name,"character")){
     stop('Internal error in check_variable_col(): name must be a character')

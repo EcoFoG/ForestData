@@ -5,11 +5,12 @@
 \title{Correct Overgrown Recruits in Forest Inventories}
 \usage{
 correct_recruits(data, dbh_min = 10, positive_growth_threshold = 5,
-  time_col = "CensusYear", id_col = "idTree", plot_col = "Plot",
-  size_corr_col = "size_corr", status_corr_col = "status_corr",
-  measure_type = "circumference", invariant_columns = c("SubPlot",
-  "species", "Genus", "Species"), byplot = TRUE,
-  correct_status = FALSE)
+  time_col = getOption("time_col"), id_col = getOption("id_col"),
+  plot_col = getOption("plot_col"), size_corr_col = "size_corr",
+  status_corr_col = "status_corr",
+  measure_type = getOption("measure_type"),
+  invariant_columns = c("SubPlot", "species", "Genus", "Species"),
+  byplot = TRUE, correct_status = FALSE)
 }
 \arguments{
 \item{data}{data.frame, containing forest inventories in the form of a
@@ -78,17 +79,24 @@ If a tree is recruited (first registered after the initial census)
 }
 \examples{
 \dontrun{
-data("Paracou6")
-correct_recruits(Paracou6,
+
+## From a bare dataset - better using after correct_alive and correct_size
+
+data("example_census")
+
+example_census$species = paste(example_census$Genus, example_census$Species, sep = "_")
+correct_recruits(data,
 dbh_min = 10,
 positive_growth_threshold = 5,
 time_col = "CensusYear",
-id_col = "id",
+id_col = "idTree",
 plot_col = "Plot",
-size_corr_col = "Circ",
-status_corr_col = "AliveCode",
+size_corr_col = "size_corr",
+status_corr_col = "status_corr",
 measure_type = "circumference",
+invariant_columns = c("SubPlot","species","Genus","Species"),
 byplot = TRUE,
 correct_status = FALSE)
+
 }
 }
