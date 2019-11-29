@@ -4,13 +4,17 @@
 \alias{correct_alive}
 \title{Correct Trees Life Status in a Forest Inventory}
 \usage{
-correct_alive(data, id_col = getOption("id_col"),
+correct_alive(
+  data,
+  id_col = getOption("id_col"),
   time_col = getOption("time_col"),
   status_col = getOption("status_col"),
-  plot_col = getOption("plot_col"), byplot = TRUE,
-  dead_confirmation_censuses = 2, use_size = FALSE,
-  invariant_columns = c("Forest", "Family", "Genus", "Species",
-  "binomial_name"))
+  plot_col = getOption("plot_col"),
+  byplot = TRUE,
+  dead_confirmation_censuses = 2,
+  use_size = FALSE,
+  invariant_columns = c("Forest", "Family", "Genus", "Species", "binomial_name")
+)
 }
 \arguments{
 \item{data}{data.frame, containing forest inventories in the form of a
@@ -91,6 +95,9 @@ data("example_census")
 str(example_census)
 
 #Correct it (short version with column names set with prepare_forestdata)
+
+prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+
 example_status_corr <- correct_alive(example_census,
 invariant_columns = c("Genus",
 "Species",

@@ -4,14 +4,22 @@
 \alias{correct_size}
 \title{Correct Tree Size Measurements}
 \usage{
-correct_size(data, size_col = getOption("size_col"),
-  time_col = getOption("time_col"), status_col = "status_corr",
-  species_col = "binomial_name", id_col = getOption("id_col"),
+correct_size(
+  data,
+  size_col = getOption("size_col"),
+  time_col = getOption("time_col"),
+  status_col = "status_corr",
+  species_col = "binomial_name",
+  id_col = getOption("id_col"),
   POM_col = getOption("POM_col"),
   measure_type = getOption("measure_type"),
-  positive_growth_threshold = 5, negative_growth_threshold = -2,
-  default_POM = 1.3, pioneers = c("Cecropia", "Pourouma"),
-  pioneers_treshold = 7.5, ignore_POM = FALSE)
+  positive_growth_threshold = 5,
+  negative_growth_threshold = -2,
+  default_POM = 1.3,
+  pioneers = c("Cecropia", "Pourouma"),
+  pioneers_treshold = 7.5,
+  ignore_POM = FALSE
+)
 }
 \arguments{
 \item{data}{data.frame, containing forest inventories in the form of a
@@ -206,7 +214,12 @@ data("example_census")
 #Take a look to its structure
 str(example_status_corr)
 
+
+
 #Correct it (short version with column names set with prepare_forestdata)
+
+prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+
 example_size_corr <- correct_size(example_status_corr,
 species_col = "binomial_name",#tag pioneer
 pioneers = c("Cecropia","Pourouma"),

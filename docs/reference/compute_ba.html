@@ -109,10 +109,15 @@
     <p>compute_ba computes Basal Area according to user-specified grouping variables -Plot, species, etc- and time.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>compute_ba</span>(<span class='no'>data</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Plot"</span>, <span class='st'>"binomial_name"</span>),
-  <span class='kw'>size_col</span> <span class='kw'>=</span> <span class='st'>"size_corr"</span>, <span class='kw'>measure_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"measure_type"</span>),
-  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"time_col"</span>), <span class='kw'>status_col</span> <span class='kw'>=</span> <span class='st'>"status_corr"</span>,
-  <span class='kw'>surface</span> <span class='kw'>=</span> <span class='fl'>1.5625</span>)</pre>
+    <pre class="usage"><span class='fu'>compute_ba</span>(
+  <span class='no'>data</span>,
+  <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Plot"</span>, <span class='st'>"binomial_name"</span>),
+  <span class='kw'>size_col</span> <span class='kw'>=</span> <span class='st'>"size_corr"</span>,
+  <span class='kw'>measure_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"measure_type"</span>),
+  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"time_col"</span>),
+  <span class='kw'>status_col</span> <span class='kw'>=</span> <span class='st'>"status_corr"</span>,
+  <span class='kw'>surface</span> <span class='kw'>=</span> <span class='fl'>1.5625</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -148,15 +153,15 @@
     <p>A dataframe containing, for each combination of grouping variables, the plot-level and per-ha basal area for a given census year.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"example_census"</span>)
-<span class='fu'>compute_ba</span>(<span class='no'>example_census</span>,
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"example_census"</span>)
+<span class='no'>ba</span> <span class='kw'>&lt;-</span> <span class='fu'>compute_ba</span>(<span class='no'>example_census</span>,
 <span class='kw'>size_col</span> <span class='kw'>=</span> <span class='st'>"CircCorr"</span>,
 <span class='kw'>measure_type</span> <span class='kw'>=</span> <span class='st'>"C"</span>,
 <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"CensusYear"</span>,
 <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Species"</span>,<span class='st'>"Plot"</span>),
-<span class='kw'>surface</span> <span class='kw'>=</span> <span class='fl'>1.5625</span>)
-}</div></pre>
+<span class='kw'>surface</span> <span class='kw'>=</span> <span class='fl'>1.5625</span>)</div><div class='output co'>#&gt; <span class='error'>Error in compute_ba(example_census, size_col = "CircCorr", measure_type = "C",     time_col = "CensusYear", by = c("Species", "Plot"), surface = 1.5625): Argument size_col does not match any column name in the forest inventory you provided</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>(<span class='no'>ba</span>)</div><div class='output co'>#&gt; <span class='error'>Error in str(ba): objet 'ba' introuvable</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>ba</span>)</div><div class='output co'>#&gt; <span class='error'>Error in head(ba): objet 'ba' introuvable</span></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

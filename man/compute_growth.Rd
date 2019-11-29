@@ -4,11 +4,20 @@
 \alias{compute_growth}
 \title{Title}
 \usage{
-compute_growth(data, size_col = "Circ", measure_type = "cir",
-  status_col = "CodeAlive", id_col = "idTree",
-  time_col = "CensusYear", what_output = "annual", aggregate = FALSE,
-  by = c("Plot", "SubPlot"), stat = "mean", percentiles = c(5, 95),
-  ...)
+compute_growth(
+  data,
+  size_col = "Circ",
+  measure_type = "cir",
+  status_col = "CodeAlive",
+  id_col = "idTree",
+  time_col = "CensusYear",
+  what_output = "annual",
+  aggregate = FALSE,
+  by = c("Plot", "SubPlot"),
+  stat = "mean",
+  percentiles = c(5, 95),
+  ...
+)
 }
 \arguments{
 \item{data}{data.frame, containing forest inventories in the form of a

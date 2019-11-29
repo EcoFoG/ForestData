@@ -1,6 +1,6 @@
 #' Compute Basal Area in Forest Inventories
 #'
-#' compute_ba computes Basal Area according to user-specified grouping variables -Plot, species, etc- and time.
+#' compute_ba computes Basal Area according to user-specified grouping variables -e.g. Plot, species, etc- and time.
 #'
 #' @param data A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.
 #' @param size_col character containing the name of the tree size measurements column -either circumference or diameter.
@@ -13,12 +13,20 @@
 #' @export
 #'
 #' @examples
-#' data("example_census")
-#' ba <- compute_ba(example_census,
-#' size_col = "CircCorr",
+#' data("example_recruits_corr")
+#'
+#' ba_plots <- compute_ba(example_recruits_corr,
+#' size_col = "size_corr",
 #' measure_type = "C",
 #' time_col = "CensusYear",
-#' by = c("Species","Plot"),
+#' by = "Plot",
+#' surface = 1.5625)
+#'
+#' ba_taxa <- compute_ba(example_recruits_corr,
+#' size_col = "size_corr",
+#' measure_type = "C",
+#' time_col = "CensusYear",
+#' by = c("binomial_name","Plot"),
 #' surface = 1.5625)
 #'
 #' str(ba)
@@ -33,6 +41,13 @@ compute_ba <- function(data,
                        surface = 1.5625){
 
 
+  if(!status_col %in% names(data)){
+    stop("Argument status_col does not match any column name in the forest inventory you provided")
+  }
+  else{
+    names(data)[names(data)==status_col] <- "status_corr"
+  }
+
   if(!size_col %in% names(data)){
     stop("Argument size_col does not match any column name in the forest inventory you provided")
   }
@@ -42,7 +57,7 @@ compute_ba <- function(data,
       stop("Tree size measurements must be numeric, which is apparently not the case in your forest inventory")
     }
     else{
-      if(anyNA(data$size)){
+      if(any(is.na(data$size) & !is.na(data$status_corr) & data$status_corr == 1)){
         warning("Tree size measurements contain NA values. Have you used the correction and completion functions that we provide beforehand ?")
       }
       if(measure_type == "C"){
@@ -51,12 +66,6 @@ compute_ba <- function(data,
     }
   }
 
-  if(!status_col %in% names(data)){
-    stop("Argument status_col does not match any column name in the forest inventory you provided")
-  }
-  else{
-    names(data)[names(data)==status_col] <- "status_corr"
-  }
 
   data$ba <- pi*(data$size*data$size)/4
 

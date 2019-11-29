@@ -4,14 +4,25 @@
 \alias{display_corrected_trees}
 \title{Title}
 \usage{
-display_corrected_trees(data, code_corr_col = "code_corr",
-  size_corr_col = "size_corr", size_col, plot_col = "plot",
-  measure_type = "Circ", time_col = "CensusYear",
-  status_corr = "status_corr", id_col = "id",
-  info_cols = c("species", "plot"), path_save = "./graphs",
-  name = "diameter_corrections_", tag_pom = FALSE,
-  create_folder = TRUE, overwrite = TRUE, device = "jpeg",
-  save_graph = TRUE)
+display_corrected_trees(
+  data,
+  code_corr_col = "code_corr",
+  size_corr_col = "size_corr",
+  size_col,
+  plot_col = "plot",
+  measure_type = "Circ",
+  time_col = "CensusYear",
+  status_corr = "status_corr",
+  id_col = "id",
+  info_cols = c("species", "plot"),
+  path_save = "./graphs",
+  name = "diameter_corrections_",
+  tag_pom = FALSE,
+  create_folder = TRUE,
+  overwrite = TRUE,
+  device = "jpeg",
+  save_graph = TRUE
+)
 }
 \arguments{
 \item{data}{data.frame, containing forest inventories in the form of a
@@ -65,6 +76,9 @@ Defaults to \code{FALSE}. If \code{TRUE}, please set the above described
 arguments in an appropriate way.}
 
 \item{status_corr_col}{Single character, the name of the column containing tree corrected status}
+}
+\value{
+
 }
 \description{
 display_corrected_sizes allows to visualise the corrections performed on tree size measurements using ggplot2 utilities to make a points graph displaying raw (uncorrected) and corrected measurement series for censused trees, with all the specified relevant information.

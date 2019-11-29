@@ -4,12 +4,16 @@
 \alias{prepare_forestdata}
 \title{Prepare global options to run ForestData more easily}
 \usage{
-prepare_forestdata(data, plot_col = getOption("plot_col"),
-  id_col = getOption("id_col"), time_col = getOption("time_col"),
+prepare_forestdata(
+  data,
+  plot_col = getOption("plot_col"),
+  id_col = getOption("id_col"),
+  time_col = getOption("time_col"),
   status_col = getOption("status_col"),
   size_col = getOption("size_col"),
   measure_type = getOption("measure_type"),
-  POM_col = getOption("POM_col"))
+  POM_col = getOption("POM_col")
+)
 }
 \arguments{
 \item{data}{data.frame, the forest census dataset that you want to treat with

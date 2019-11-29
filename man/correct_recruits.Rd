@@ -4,13 +4,20 @@
 \alias{correct_recruits}
 \title{Correct Overgrown Recruits in Forest Inventories}
 \usage{
-correct_recruits(data, dbh_min = 10, positive_growth_threshold = 5,
-  time_col = getOption("time_col"), id_col = getOption("id_col"),
-  plot_col = getOption("plot_col"), size_corr_col = "size_corr",
+correct_recruits(
+  data,
+  dbh_min = 10,
+  positive_growth_threshold = 5,
+  time_col = getOption("time_col"),
+  id_col = getOption("id_col"),
+  plot_col = getOption("plot_col"),
+  size_corr_col = "size_corr",
   status_corr_col = "status_corr",
   measure_type = getOption("measure_type"),
-  invariant_columns = c("SubPlot", "species", "Genus", "Species"),
-  byplot = TRUE, correct_status = FALSE)
+  invariant_columns = c("Forest", "Family", "Genus", "Species", "binomial_name"),
+  byplot = TRUE,
+  correct_status = FALSE
+)
 }
 \arguments{
 \item{data}{data.frame, containing forest inventories in the form of a
@@ -78,13 +85,11 @@ If a tree is recruited (first registered after the initial census)
   minimum_dbh+(recruitment_time - previous_census)*positive_growth_threshold.
 }
 \examples{
-\dontrun{
 
 ## From a bare dataset - better using after correct_alive and correct_size
 
 data("example_census")
 
-example_census$species = paste(example_census$Genus, example_census$Species, sep = "_")
 correct_recruits(data,
 dbh_min = 10,
 positive_growth_threshold = 5,
@@ -94,9 +99,8 @@ plot_col = "Plot",
 size_corr_col = "size_corr",
 status_corr_col = "status_corr",
 measure_type = "circumference",
-invariant_columns = c("SubPlot","species","Genus","Species"),
+invariant_columns = c("SubPlot","species","Genus","binomial_name"),
 byplot = TRUE,
 correct_status = FALSE)
 
-}
 }

@@ -117,15 +117,25 @@ according to user-specified parameters. This function requires the
 installation of the package <code><a href='https://ggplot2.tidyverse.org/reference/ggplot2-package.html'>ggplot2</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>display_rates</span>(<span class='kw'>mortality</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>recruitment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>rates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"line"</span>, <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"time"</span>, <span class='kw'>color_col</span> <span class='kw'>=</span> <span class='st'>"plot"</span>,
+    <pre class="usage"><span class='fu'>display_rates</span>(
+  <span class='kw'>mortality</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>recruitment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>rates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"line"</span>,
+  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"time"</span>,
+  <span class='kw'>color_col</span> <span class='kw'>=</span> <span class='st'>"plot"</span>,
   <span class='kw'>faceting</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>"Annual mortality and recruitment rates in function of census intervals."</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>save_graph</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>device</span> <span class='kw'>=</span> <span class='st'>"png"</span>,
-  <span class='kw'>path_save</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"ForestGraphs"</span>,
-  <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"annual_mortality_recruitment_"</span>, <span class='no'>type</span>, <span class='st'>".png"</span>)),
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"annual_recruitment_mortality.png"</span>, <span class='kw'>create_folder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>save_graph</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>device</span> <span class='kw'>=</span> <span class='st'>"png"</span>,
+  <span class='kw'>path_save</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"ForestGraphs"</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"annual_mortality_recruitment_"</span>, <span class='no'>type</span>,
+    <span class='st'>".png"</span>)),
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"annual_recruitment_mortality.png"</span>,
+  <span class='kw'>create_folder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

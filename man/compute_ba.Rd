@@ -4,10 +4,15 @@
 \alias{compute_ba}
 \title{Compute Basal Area in Forest Inventories}
 \usage{
-compute_ba(data, by = c("Plot", "binomial_name"),
-  size_col = "size_corr", measure_type = getOption("measure_type"),
-  time_col = getOption("time_col"), status_col = "status_corr",
-  surface = 1.5625)
+compute_ba(
+  data,
+  by = c("Plot", "binomial_name"),
+  size_col = "size_corr",
+  measure_type = getOption("measure_type"),
+  time_col = getOption("time_col"),
+  status_col = "status_corr",
+  surface = 1.5625
+)
 }
 \arguments{
 \item{data}{A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.}
@@ -29,13 +34,15 @@ A dataframe containing, for each combination of grouping variables, the plot-lev
 compute_ba computes Basal Area according to user-specified grouping variables -Plot, species, etc- and time.
 }
 \examples{
-\dontrun{
 data("example_census")
-compute_ba(example_census,
+ba <- compute_ba(example_census,
 size_col = "CircCorr",
 measure_type = "C",
 time_col = "CensusYear",
 by = c("Species","Plot"),
 surface = 1.5625)
-}
+
+str(ba)
+head(ba)
+
 }

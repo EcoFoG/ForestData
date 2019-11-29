@@ -117,14 +117,22 @@ observed size loss by: after_shift_size_corrected = after_shift_size_original
 + difference_before_after + expected_growth.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>correct_size</span>(<span class='no'>data</span>, <span class='kw'>size_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"size_col"</span>),
-  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"time_col"</span>), <span class='kw'>status_col</span> <span class='kw'>=</span> <span class='st'>"status_corr"</span>,
-  <span class='kw'>species_col</span> <span class='kw'>=</span> <span class='st'>"binomial_name"</span>, <span class='kw'>id_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"id_col"</span>),
+    <pre class="usage"><span class='fu'>correct_size</span>(
+  <span class='no'>data</span>,
+  <span class='kw'>size_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"size_col"</span>),
+  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"time_col"</span>),
+  <span class='kw'>status_col</span> <span class='kw'>=</span> <span class='st'>"status_corr"</span>,
+  <span class='kw'>species_col</span> <span class='kw'>=</span> <span class='st'>"binomial_name"</span>,
+  <span class='kw'>id_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"id_col"</span>),
   <span class='kw'>POM_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"POM_col"</span>),
   <span class='kw'>measure_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"measure_type"</span>),
-  <span class='kw'>positive_growth_threshold</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>negative_growth_threshold</span> <span class='kw'>=</span> -<span class='fl'>2</span>,
-  <span class='kw'>default_POM</span> <span class='kw'>=</span> <span class='fl'>1.3</span>, <span class='kw'>pioneers</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Cecropia"</span>, <span class='st'>"Pourouma"</span>),
-  <span class='kw'>pioneers_treshold</span> <span class='kw'>=</span> <span class='fl'>7.5</span>, <span class='kw'>ignore_POM</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>positive_growth_threshold</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>negative_growth_threshold</span> <span class='kw'>=</span> -<span class='fl'>2</span>,
+  <span class='kw'>default_POM</span> <span class='kw'>=</span> <span class='fl'>1.3</span>,
+  <span class='kw'>pioneers</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Cecropia"</span>, <span class='st'>"Pourouma"</span>),
+  <span class='kw'>pioneers_treshold</span> <span class='kw'>=</span> <span class='fl'>7.5</span>,
+  <span class='kw'>ignore_POM</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -338,7 +346,17 @@ or last series, respectively)</p>
 #&gt;  $ binomial_name: chr  "Sandwithia_guyanensis" "Sandwithia_guyanensis" "Sandwithia_guyanensis" "Sandwithia_guyanensis" ...
 #&gt;  $ POM          : num  1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 ...
 #&gt;  $ status_corr  : num  1 1 1 1 1 1 1 1 1 1 ...</div><div class='input'>
+
+
 <span class='co'>#Correct it (short version with column names set with prepare_forestdata)</span>
+
+<span class='fu'><a href='prepare_forestdata.html'>prepare_forestdata</a></span>(<span class='no'>example_census</span>,<span class='kw'>plot_col</span><span class='kw'>=</span><span class='st'>"Plot"</span>,<span class='kw'>id_col</span><span class='kw'>=</span><span class='st'>"idTree"</span>,<span class='kw'>time_col</span><span class='kw'>=</span><span class='st'>"CensusYear"</span>, <span class='kw'>status_col</span> <span class='kw'>=</span> <span class='st'>"CodeAlive"</span>,<span class='kw'>size_col</span><span class='kw'>=</span><span class='st'>"Circ"</span>,<span class='kw'>measure_type</span> <span class='kw'>=</span> <span class='st'>"C"</span>,<span class='kw'>POM_col</span> <span class='kw'>=</span> <span class='st'>"POM"</span>)</div><div class='output co'>#&gt; [1] "plot_col let to its default or previous value"
+#&gt; [1] "id_col let to its default or previous value"
+#&gt; [1] "time_col let to its default or previous value"
+#&gt; [1] "status_col let to its default or previous value"
+#&gt; [1] "size_col let to its default or previous value"
+#&gt; [1] "measure_type let to its default or previous value"
+#&gt; [1] "POM_col let to its default or previous value"</div><div class='input'>
 <span class='no'>example_size_corr</span> <span class='kw'>&lt;-</span> <span class='fu'>correct_size</span>(<span class='no'>example_status_corr</span>,
 <span class='kw'>species_col</span> <span class='kw'>=</span> <span class='st'>"binomial_name"</span>,<span class='co'>#tag pioneer</span>
 <span class='kw'>pioneers</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Cecropia"</span>,<span class='st'>"Pourouma"</span>),

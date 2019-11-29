@@ -49,3 +49,6 @@ example_size_corr <- correct_size(example_status_corr)
 save(example_size_corr, file = "./data/example_size_corr.RData")
 example_recruits_corr <- correct_recruits(example_size_corr)
 save(example_recruits_corr, file = "./data/example_recruits_corr.RData")
+
+
+ba <- compute_ba(example_recruits_corr)

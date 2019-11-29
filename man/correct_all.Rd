@@ -4,18 +4,27 @@
 \alias{correct_all}
 \title{Full correction of a Forest Inventories Dataset}
 \usage{
-correct_all(data, id_col = getOption("id_col"),
+correct_all(
+  data,
+  id_col = getOption("id_col"),
   time_col = getOption("time_col"),
   status_col = getOption("status_col"),
-  plot_col = getOption("plot_col"), byplot = TRUE,
-  dead_confirmation_censuses = 2, use_size = FALSE,
-  invariant_columns = c("Genus", "Species", "binomial_name", "Forest",
-  "Family"), size_col = getOption("size_col"),
-  species_col = "binomial_name", POM_col = getOption("POM_col"),
+  plot_col = getOption("plot_col"),
+  byplot = TRUE,
+  dead_confirmation_censuses = 2,
+  use_size = FALSE,
+  invariant_columns = c("Genus", "Species", "binomial_name", "Forest", "Family"),
+  size_col = getOption("size_col"),
+  species_col = "binomial_name",
+  POM_col = getOption("POM_col"),
   measure_type = getOption("measure_type"),
-  positive_growth_threshold = 5, negative_growth_threshold = -2,
-  default_POM = 1.3, pioneers = c("Cecropia", "Pourouma"),
-  pioneers_treshold = 7.5, dbh_min = 10)
+  positive_growth_threshold = 5,
+  negative_growth_threshold = -2,
+  default_POM = 1.3,
+  pioneers = c("Cecropia", "Pourouma"),
+  pioneers_treshold = 7.5,
+  dbh_min = 10
+)
 }
 \arguments{
 \item{data}{data.frame, containing forest inventories in the form of a

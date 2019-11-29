@@ -18,7 +18,7 @@
 #' @return A ggplot2 graphical object.
 #'
 #' @examples
-display_recruitment <- function(mortality = NULL,
+display_mortality <- function(mortality = NULL,
                           type = "line",
                           time_col = "time",
                           color_col = "plot",

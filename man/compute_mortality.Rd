@@ -4,10 +4,16 @@
 \alias{compute_mortality}
 \title{Compute Annual Mortality Rates in Forest Inventories}
 \usage{
-compute_mortality(data, status_col = "status_corr",
-  time_col = "CensusYear", id_col = "idTree",
-  dead_confirmation_censuses = 2, byplot = TRUE, plot_col = "Plot",
-  corrected = TRUE)
+compute_mortality(
+  data,
+  status_col = "status_corr",
+  time_col = "CensusYear",
+  id_col = "idTree",
+  dead_confirmation_censuses = 2,
+  byplot = TRUE,
+  plot_col = "Plot",
+  corrected = TRUE
+)
 }
 \arguments{
 \item{data}{A data.frame containing a time-series tree-wise forest inventory -i.e. every line is a single tree measurement for a single year.}
@@ -34,7 +40,7 @@ This function computes mortality in forest inventories according to plot if ther
 }
 \examples{
 data("example_census")
-compute_mortality(Paracou6,
+compute_mortality(example_census)
 status_col="status_corr",
 time_col="CensusYear",
 id_col="idTree",

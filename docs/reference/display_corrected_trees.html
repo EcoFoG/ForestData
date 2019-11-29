@@ -109,14 +109,25 @@
     <p>display_corrected_sizes allows to visualise the corrections performed on tree size measurements using ggplot2 utilities to make a points graph displaying raw (uncorrected) and corrected measurement series for censused trees, with all the specified relevant information.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>display_corrected_trees</span>(<span class='no'>data</span>, <span class='kw'>code_corr_col</span> <span class='kw'>=</span> <span class='st'>"code_corr"</span>,
-  <span class='kw'>size_corr_col</span> <span class='kw'>=</span> <span class='st'>"size_corr"</span>, <span class='no'>size_col</span>, <span class='kw'>plot_col</span> <span class='kw'>=</span> <span class='st'>"plot"</span>,
-  <span class='kw'>measure_type</span> <span class='kw'>=</span> <span class='st'>"Circ"</span>, <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"CensusYear"</span>,
-  <span class='kw'>status_corr</span> <span class='kw'>=</span> <span class='st'>"status_corr"</span>, <span class='kw'>id_col</span> <span class='kw'>=</span> <span class='st'>"id"</span>,
-  <span class='kw'>info_cols</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"species"</span>, <span class='st'>"plot"</span>), <span class='kw'>path_save</span> <span class='kw'>=</span> <span class='st'>"./graphs"</span>,
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"diameter_corrections_"</span>, <span class='kw'>tag_pom</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>create_folder</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>device</span> <span class='kw'>=</span> <span class='st'>"jpeg"</span>,
-  <span class='kw'>save_graph</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>display_corrected_trees</span>(
+  <span class='no'>data</span>,
+  <span class='kw'>code_corr_col</span> <span class='kw'>=</span> <span class='st'>"code_corr"</span>,
+  <span class='kw'>size_corr_col</span> <span class='kw'>=</span> <span class='st'>"size_corr"</span>,
+  <span class='no'>size_col</span>,
+  <span class='kw'>plot_col</span> <span class='kw'>=</span> <span class='st'>"plot"</span>,
+  <span class='kw'>measure_type</span> <span class='kw'>=</span> <span class='st'>"Circ"</span>,
+  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"CensusYear"</span>,
+  <span class='kw'>status_corr</span> <span class='kw'>=</span> <span class='st'>"status_corr"</span>,
+  <span class='kw'>id_col</span> <span class='kw'>=</span> <span class='st'>"id"</span>,
+  <span class='kw'>info_cols</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"species"</span>, <span class='st'>"plot"</span>),
+  <span class='kw'>path_save</span> <span class='kw'>=</span> <span class='st'>"./graphs"</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"diameter_corrections_"</span>,
+  <span class='kw'>tag_pom</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>create_folder</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>device</span> <span class='kw'>=</span> <span class='st'>"jpeg"</span>,
+  <span class='kw'>save_graph</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -209,12 +220,18 @@ arguments in an appropriate way.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    
+
+
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
     </ul>
 
   </div>

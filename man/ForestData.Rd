@@ -3,7 +3,6 @@
 \docType{package}
 \name{ForestData}
 \alias{ForestData}
-\alias{ForestData-package}
 \title{ForestData}
 \description{
 Post-inventory processing of forest plot data

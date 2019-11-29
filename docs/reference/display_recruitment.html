@@ -111,23 +111,41 @@ Display recruitment Rates with ggplot2" />
 <p>Display recruitment Rates with ggplot2</p>
     </div>
 
-    <pre class="usage"><span class='fu'>display_recruitment</span>(<span class='kw'>recruitment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"line"</span>,
-  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"time"</span>, <span class='kw'>color_col</span> <span class='kw'>=</span> <span class='st'>"plot"</span>, <span class='kw'>faceting</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+    <pre class="usage"><span class='fu'>display_recruitment</span>(
+  <span class='kw'>recruitment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"line"</span>,
+  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"time"</span>,
+  <span class='kw'>color_col</span> <span class='kw'>=</span> <span class='st'>"plot"</span>,
+  <span class='kw'>faceting</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>"Annual recruitment and recruitment rates in function of census intervals."</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>save_graph</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>device</span> <span class='kw'>=</span> <span class='st'>"png"</span>,
-  <span class='kw'>path_save</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"ForestGraphs"</span>,
-  <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"annual_recruitment_recruitment_"</span>, <span class='no'>type</span>, <span class='st'>".png"</span>)),
+  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>save_graph</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>device</span> <span class='kw'>=</span> <span class='st'>"png"</span>,
+  <span class='kw'>path_save</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"ForestGraphs"</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"annual_recruitment_recruitment_"</span>, <span class='no'>type</span>,
+    <span class='st'>".png"</span>)),
   <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"Annual recruitment and Recruitment rates for each between-census interval"</span>,
-  <span class='kw'>create_folder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+  <span class='kw'>create_folder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>
+)
 
-<span class='fu'>display_recruitment</span>(<span class='kw'>recruitment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"line"</span>,
-  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"time"</span>, <span class='kw'>color_col</span> <span class='kw'>=</span> <span class='st'>"plot"</span>, <span class='kw'>faceting</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+<span class='fu'>display_recruitment</span>(
+  <span class='kw'>recruitment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"line"</span>,
+  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"time"</span>,
+  <span class='kw'>color_col</span> <span class='kw'>=</span> <span class='st'>"plot"</span>,
+  <span class='kw'>faceting</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>"Annual recruitment and recruitment rates in function of census intervals."</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>save_graph</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>device</span> <span class='kw'>=</span> <span class='st'>"png"</span>,
-  <span class='kw'>path_save</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"ForestGraphs"</span>,
-  <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"annual_recruitment_recruitment_"</span>, <span class='no'>type</span>, <span class='st'>".png"</span>)),
+  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>save_graph</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>device</span> <span class='kw'>=</span> <span class='st'>"png"</span>,
+  <span class='kw'>path_save</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"ForestGraphs"</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"annual_recruitment_recruitment_"</span>, <span class='no'>type</span>,
+    <span class='st'>".png"</span>)),
   <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"Annual recruitment and Recruitment rates for each between-census interval"</span>,
-  <span class='kw'>create_folder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>create_folder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -135,58 +153,6 @@ Display recruitment Rates with ggplot2" />
     <tr>
       <th>recruitment</th>
       <td><p>data.frame, output of compute_recruitment</p></td>
-    </tr>
-    <tr>
-      <th>type</th>
-      <td><p>character, partially matching one of the following: "line", "histogram", "bar", "smooth". For the moment, only "line" is implemented, being the most relevant in this case. Corresponds to the type of graph to be done, for examples see ggplot2 examples for geom_line, geom_histogram, geom_bar and geom_smooth.</p></td>
-    </tr>
-    <tr>
-      <th>time_col</th>
-      <td><p>Character, name of the column corresponding to census time</p></td>
-    </tr>
-    <tr>
-      <th>color_col</th>
-      <td><p>Character, name of the colomn used to define lines' colors, defaults to "Plot".</p></td>
-    </tr>
-    <tr>
-      <th>faceting</th>
-      <td><p>Character, name of the variable used for faceting -see after- but defaults to FALSE i.e. no faceting. Faceting refers, here, to using a categorical, grouping variable to layout multiple plots, each corresponding to a category of the grouping variable. For example, one can do a single graph per station -if there are several forest plots in each station-, or one per taxon if looking to several specific taxa' mortality and recruitment rates in detail. If offers the advantage to avoir plotting too much information on a graph, but it can lead to difficulties to compare lines with one another. The scales are free on the x axis -basically, it correspond to several groups not necessarily having the same censusing temporal resolution-, but are bound on y -i.e., the rates are displayed on the same scale for comparison purposes.</p></td>
-    </tr>
-    <tr>
-      <th>title</th>
-      <td><p>Character,title of the graph.</p></td>
-    </tr>
-    <tr>
-      <th>subtitle</th>
-      <td><p>Character, defaulting to null. The subtitle of the graph</p></td>
-    </tr>
-    <tr>
-      <th>save_graph</th>
-      <td><p>Logical, indicates whether the graph must be saved or not. If TRUE, please set the above described arguments in an appropriate way.</p></td>
-    </tr>
-    <tr>
-      <th>device</th>
-      <td><p>Character, the graphical device to be used to save the graph</p></td>
-    </tr>
-    <tr>
-      <th>path_save</th>
-      <td><p>Character, a path indicating in which FOLDER the graph has to be saved</p></td>
-    </tr>
-    <tr>
-      <th>name</th>
-      <td><p>Character, the name of the folder containing the graph. It can be followd by the extension corresponding to the device - avoid .jpg for the jpeg device, use .jpeg instead. If the extension is missing, it is automatically added according to the selected device.</p></td>
-    </tr>
-    <tr>
-      <th>create_folder</th>
-      <td><p>Logical, indicated whether the folders in the given path must be created in case they do not exist yet, or not</p></td>
-    </tr>
-    <tr>
-      <th>overwrite</th>
-      <td><p>Logical, indicating whether a file already existing under the same name must be overwritten, or kept. In the second case, the function aborts with an explicit error message.</p></td>
-    </tr>
-    <tr>
-      <th>mortality</th>
-      <td><p>data.frame, output of compute_mortality</p></td>
     </tr>
     <tr>
       <th>type</th>
@@ -235,6 +201,10 @@ Display recruitment Rates with ggplot2" />
     <tr>
       <th>overwrite</th>
       <td><p>Logical, indicating whether a file already existing under the same name must be overwritten, or kept. In the second case, the function aborts with an explicit error message.</p></td>
+    </tr>
+    <tr>
+      <th>mortality</th>
+      <td><p>data.frame, output of compute_mortality</p></td>
     </tr>
     </table>
 

@@ -4,15 +4,25 @@
 \alias{display_rates}
 \title{Display Forest Mortality and Recruitment Data with ggplot2}
 \usage{
-display_rates(mortality = NULL, recruitment = NULL, rates = NULL,
-  type = "line", time_col = "time", color_col = "plot",
+display_rates(
+  mortality = NULL,
+  recruitment = NULL,
+  rates = NULL,
+  type = "line",
+  time_col = "time",
+  color_col = "plot",
   faceting = FALSE,
   title = "Annual mortality and recruitment rates in function of census intervals.",
-  subtitle = NULL, save_graph = FALSE, device = "png",
-  path_save = file.path("ForestGraphs",
-  paste0("annual_mortality_recruitment_", type, ".png")),
-  name = "annual_recruitment_mortality.png", create_folder = FALSE,
-  overwrite = FALSE, ...)
+  subtitle = NULL,
+  save_graph = FALSE,
+  device = "png",
+  path_save = file.path("ForestGraphs", paste0("annual_mortality_recruitment_", type,
+    ".png")),
+  name = "annual_recruitment_mortality.png",
+  create_folder = FALSE,
+  overwrite = FALSE,
+  ...
+)
 }
 \arguments{
 \item{mortality}{data.frame, output of \code{compute_mortality}.}

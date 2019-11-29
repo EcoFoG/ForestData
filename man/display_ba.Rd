@@ -4,14 +4,23 @@
 \alias{display_ba}
 \title{Display Forest Mortality and Recruitment Data with ggplot2}
 \usage{
-display_ba(basal_area, type = "line", time_col = "time",
-  color_col = "PlotSub", faceting = FALSE,
+display_ba(
+  basal_area,
+  type = "line",
+  time_col = "time",
+  color_col = "PlotSub",
+  faceting = FALSE,
   title = "Basal area per hectare measured at each census",
-  subtitle = NULL, save_graph = FALSE, device = "png",
-  path_save = file.path("ForestGraphs",
-  paste0("annual_mortality_recruitment_", type, ".png")),
-  name = "annual_recruitment_mortality.png", create_folder = FALSE,
-  overwrite = FALSE, ...)
+  subtitle = NULL,
+  save_graph = FALSE,
+  device = "png",
+  path_save = file.path("ForestGraphs", paste0("annual_mortality_recruitment_", type,
+    ".png")),
+  name = "annual_recruitment_mortality.png",
+  create_folder = FALSE,
+  overwrite = FALSE,
+  ...
+)
 }
 \arguments{
 \item{basal_area}{data.frame, output of compute_ba, or if obtained another
@@ -81,4 +90,7 @@ display_ba take a basal area table, obtained with thes \code{compute_ba}
 function, and returns a nice graph according to user-specified parameters.
 This function requires the installation of the package
 \code{\link[ggplot2]{ggplot2}}.
+}
+\details{
+
 }
