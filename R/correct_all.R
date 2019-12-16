@@ -144,19 +144,8 @@ correct_all <- function(data,
                         use_size = use_size,
                         invariant_columns = invariant_columns)
 
-  data <- correct_size(data,
-                       dbh_min = 10,
-                       positive_growth_threshold = 5,
-                       time_col = time_col,
-                       id_col = id_col,
-                       plot_col = plot_col,
-                       size_col = size_col,
-                       status_col = "status_corr",
-                       measure_type = measure_type,
-                       byplot = byplot,
-                       correct_status = FALSE)
 
-  data <- correct_recruits(data,
+  data <- correct_size(data,
                            size_col = size_col,
                            time_col = time_col,
                            status_col = "status_corr",
@@ -170,6 +159,17 @@ correct_all <- function(data,
                            pioneers = pioneers,#tag pioneer
                            pioneers_treshold = pioneers_treshold)
 
+  data <- correct_recruits(data,
+                           dbh_min = 10,
+                           positive_growth_threshold = 5,
+                           time_col = time_col,
+                           id_col = id_col,
+                           plot_col = plot_col,
+                           size_corr_col = "size_corr",
+                           status_corr_col = "status_corr",
+                           measure_type = measure_type,
+                           byplot = byplot,
+                           correct_status = FALSE)
 
   return(data)
 }

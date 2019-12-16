@@ -3,8 +3,8 @@
 .Rapp.history
 
 # Session Data files
-*.RData
-paracou.RData
+.RData
+Paracou.RData
 
 # Example code in package build process
 *-Ex.R
@@ -40,3 +40,4 @@ src/*.dll
 .Rproj.user
 
 *.jar
+inst/doc

@@ -356,7 +356,7 @@ print(unlist(variables))
                         create_folder,
                         overwrite){
   # .test_install_package("ggplot2",".save_graph")
-  path_elements <- strsplit(path_save, sep = "/")[[1]]
+  path_elements <- strsplit(path_save, split = "/")[[1]]
   if(length(path_elements) > 0){
     for(i in 1:length(path_elements[-length(path_elements)])){
       pathtemp <- file.path(path_elements[1:i])

@@ -1,0 +1,119 @@
+---
+title: "How to use ForestData's corrections"
+author: "Nino Page"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to use ForestData's corrections}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# What is ForestData ?
+
+ForestData is a package that gathers methods to works with dendrometric censuses datasets. 
+
+In particular, ForestData has been designed especially to implement and make available Camille Piponiot's corrections algorithms, but it also includes other functions to compute classical rates or metrics (basal area, stem growth, mortality and recruitment) and display them efficiently.
+
+This vignette details how to use these functions, step by step and using the built-in example dataset. ForestData has three main "families" of functions depending on what is intended to do: `correct_`,`compute_` and `display_`. Each "family" will be detailed, so if you only are interested by one of these items, you can jump directly to the corresponding section.
+
+# Install and load the package 
+
+ForestData is not yet published on the CRAN. It can easily be downloaded from EcoFoG's eponym github repository (on [this page](https://github.com/EcoFoG/ForestData)), and even more easily be installed directly into R with devtools' `install_github` function.
+```{r setup}
+if(!"ForestData" %in% installed.packages()){
+  
+  if(!"devtools" %in% installed.packages()){
+    install.packages("devtools")
+  }
+  
+  devtools::install_github("EcoFoG/ForestData")
+} 
+
+library(ForestData)
+```
+
+# Use ForestData to correct dendrometric censuses data
+
+
+The prime goal of ForestData is to perform generic and simple corrections adapted for forest censuses. Three functions are implemented in order to correct different error sources in such datasets:
+
++ Tree life status
++ Tree size measurements
++ Overgrown recruits
+
+
+## Prepare your dataset
+
+### A Forest census
+
+The type of dataset that Forestdata's function are designed to treat is a long-format time series: each line corresponds to a single tree measurements at one census time. Furthermore, the dataset must respect those conditions:
+
+* Census time is, in our case, specified in a dedicated field and expressed only as census year (thus, numeric) as infra-annual time resolution is not implemented for now. 
+* The individual tree IDs must be unique among the dataset (not dependent to or redundant accross plot, subplot or other grouping variables) and each ID must correspond to only one stem: multiple stems of the same individual must be discriminater by the IDs if treated by this package's function. 
+* Tree life status is specified in one dedicated field, and trees are either alive (1), dead (0) or unseen at a given census time (NA). 
+* Tree stem size can correspond to either diameter of circumference, and is measured in centimeters (cm) at a given default POM ( Point Of Measurement; generally at "breast height", i.e. 130 cm).
+* The dataset can include censuses for one or several forest plots. If there are several, a dedicated field must specify to which plot belongs each tree. 
+
+To illustrate the following explanations, a built-in example dataset will be used. It corresponds to the squares 1 and 3 of the 6th Plot of the Paracou Experiment database (more information [here](https://paracou.cirad.fr/))
+
+The dataset can be loaded using function `data` from the package "utils"
+
+```{r dataset, eval=FALSE}
+data(example_census)
+str(example_census)
+```
+
+## Use `prepare_forestdata` to simplify your workflow
+
+ForestData's function have a lot of arguments, including because there is no constraints on the user side for the dataset's column names, and also to allow the user set the functions entirely to adapt it to every specific dataset... However, most of these arguments are redundant and it can be exhausting to write long calls only to specify column names or that kind of stuff.
+
+Fortunately, there is a function that does the job for you: `prepare_forestdata`. If you specify everything only once using this function, your argument settings will be kept in memory as global variables and called automatically by the following functions:
+
+```{r prepare_forestdata, eval = FALSE}
+# specify the example dataset's column names
+prepare_forestdata(example_census,
+                   plot_col="Plot",
+                   id_col="idTree",
+                   time_col="CensusYear", 
+                   status_col = "CodeAlive",
+                   size_col="Circ",
+                   measure_type = "C",
+                   POM_col = "POM")
+# checking that the options have been set
+getOption("plot_col"); getOption("time_col")
+
+# If the function is run twice with similar specification for one or several options, a message indicates that these specific option.s kept unchanged
+prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+
+## Note that if one column name is erroneous, then the function stops with explicit erro message
+```
+
+## Use `correct_alive` to correct tree life status errors in your dataset
+
+Forest censuses are all about tree life statuses: mortality and recruitment depend directly on these variables, and other metrics such as basal area of growth rates should be only computed for live trees, right ? Thus, avoiding errors in tree life statuses is the prime step to ensure in order to work with dendrometric data. 
+correct_alive's algorithm takes as an input your data with uncorrected tree life status and detects unseen trees (with no corresponding line of with NA status for a given census year ; the function does it "by plot" if there are several plots with different censusing resolutions) and "reviving" events (when a tree is declared dead but seen alive later on), and corrects it by creating a new field names "status_corr".
+
+## Use `correct_size` to correct tree size measurements
+
+## Use `correct_recruits` to spot and correct overgrown recruits
+
+## Use `display_corrected_trees` to generate the graphs and check the corrections.
+
+# Use ForestData to compute and display classical metrics in Forest Ecology
+
+## Compute and display mortality rates with `compute_mortality` and `display_mortality`
+
+## Compute and display recruitment rates with `compute_recruitment` and `display_recruitment`
+
+## What about doing it for both rates with `compute_rates` and `display_rates`?
+
+## Compute and display basal_area with `compute_ba` and `display_ba`
+
+## Compute and display annual and absolute growth with `compute_growth` and `display_growth`
