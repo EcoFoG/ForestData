@@ -37,9 +37,10 @@
 #' # If one column name is erroneous, then the function stops with explicit erro message
 #' \dontrun{
 #' prepare_forestdata(example_census,plot_col="SAUCISSON",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
-#' }
 #' ## "Error in prepare_forestdata(example_census, plot_col = "SAUCISSON", id_col = "idTree",  :
-#'   plot_col is not any of your dataset's column name..."
+#' ## plot_col is not any of your dataset's column name..."
+#'   }
+
 prepare_forestdata <- function(data,
                                plot_col = getOption("plot_col"),
                                id_col = getOption("id_col"),

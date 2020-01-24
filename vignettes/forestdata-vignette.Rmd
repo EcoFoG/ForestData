@@ -25,7 +25,7 @@ This vignette details how to use these functions, step by step and using the bui
 
 # Install and load the package 
 
-ForestData is not yet published on the CRAN. It can easily be downloaded from EcoFoG's eponym github repository (on [this page](https://github.com/EcoFoG/ForestData)), and even more easily be installed directly into R with devtools' `install_github` function.
+ForestData is not yet published on the CRAN. It can easily be downloaded from EcoFoG's github repository (on [this page](https://github.com/EcoFoG/ForestData)) and compiled locally, and even more easily be installed directly into R with devtools' `install_github` function. You can use the following code to install ForestData.
 ```{r setup}
 if(!"ForestData" %in% installed.packages()){
   
@@ -44,10 +44,12 @@ library(ForestData)
 
 The prime goal of ForestData is to perform generic and simple corrections adapted for forest censuses. Three functions are implemented in order to correct different error sources in such datasets:
 
-+ Tree life status
-+ Tree size measurements
-+ Overgrown recruits
++ Tree life status can have errors due to non-observation of some trees, or mistaken death statement. This impacts mortality computations. The implemented function is able to spot when a tree has not been seen, or if it has been stated dead but is seen alive afterwards, and thus correct the tree's life history, and re-creates the missing lines (with NA measurements) when needed. 
++ Tree size measurements can be mistaken due to many reasons, including POM shifts or difficulties in measurement due to non-cylindric conformation. With POM reports, the implemented algorithm first corrects the size series shifts due to POM changes and then spot abnormal increases or decreases in size, and correct them according to the nature of such anomalies (punctual, permanent...), accounting for positive and negative thresholds as well as whether the trees belong to pioneer species or not.
++ Overgrown recruits are trees registered after the first census of the experiment, but with a size that suggests they just weren't seen before, although they were already there and with a stem over the minimal censusing diameter limit. These trees can represent a non-negligible error in terms of biomass or basal area, and it is sometimes needed to correct a dataset by re-creating missed measurements before their first record. Being highly hypothetical, such a correction has to be done as parcimoniously as possible (and only used when there is no alternative). There is a function in ForestData that offers a way to do so.
 
+
+After presenting the format and contents of the dataset and a preparation function that simplifies the correction functions calls, we'll go through the presentation of each function in the recommended order (correct_alive, correct_size, correct_recruits).
 
 ## Prepare your dataset
 
@@ -55,28 +57,44 @@ The prime goal of ForestData is to perform generic and simple corrections adapte
 
 The type of dataset that Forestdata's function are designed to treat is a long-format time series: each line corresponds to a single tree measurements at one census time. Furthermore, the dataset must respect those conditions:
 
-* Census time is, in our case, specified in a dedicated field and expressed only as census year (thus, numeric) as infra-annual time resolution is not implemented for now. 
+* Census time is, in our case, specified in a dedicated field and expressed only as census year (thus, numeric) as infra-annual time resolution is not supported for now. 
 * The individual tree IDs must be unique among the dataset (not dependent to or redundant accross plot, subplot or other grouping variables) and each ID must correspond to only one stem: multiple stems of the same individual must be discriminater by the IDs if treated by this package's function. 
 * Tree life status is specified in one dedicated field, and trees are either alive (1), dead (0) or unseen at a given census time (NA). 
 * Tree stem size can correspond to either diameter of circumference, and is measured in centimeters (cm) at a given default POM ( Point Of Measurement; generally at "breast height", i.e. 130 cm).
 * The dataset can include censuses for one or several forest plots. If there are several, a dedicated field must specify to which plot belongs each tree. 
+* To discriminate pioneer species from other species in tree size measurement correction functios, a field indicating taxonomic identification is needed.
 
 To illustrate the following explanations, a built-in example dataset will be used. It corresponds to the squares 1 and 3 of the 6th Plot of the Paracou Experiment database (more information [here](https://paracou.cirad.fr/))
 
-The dataset can be loaded using function `data` from the package "utils"
+The dataset can be loaded using function `data` from the package "utils". Let's take a look to its structure:
 
-```{r dataset, eval=FALSE}
+```{r dataset}
 data(example_census)
 str(example_census)
 ```
 
-## Use `prepare_forestdata` to simplify your workflow
+The information used by ForestData's functions is contained in the following columns of this dataset:
+
+* `idTree` contains unique tree IDs, which are used to discriminate trees and do corrections at the individual level.
+* `CensusYear` contains census year corresponding to each tree measurement. The census resolution is originally yearly from 1984 to 1995 included, then biannual from 1995 to 2003 included 
+* `Circ` contains the stem size measured as *circumference*. In most cases, circumference is measured *at breast height (default POM: 130 cm)*.
+* `binomial_name` contains the full species name of the measured trees. This information is used in `correct_size`
+* `Plot` contains the indices discriminating the two plots contained in this dataset. This is important for the functions `correct_alive` and `correct_recruits`, since the plots have different temporal resolution in this example.
+* `POM` contains the Point of Measurement (POM) values, that is, the height at which tree size (circumference of diameter) is measured. 
+
+All the other columns are only additional information that correspond to each tree: Family, Genus and Species are taxonomical information and Forest is a geographical indication (where is located the plot to which the tree belongs). This information is invariant for a given tree among its different measurements.
+
+
+
+### Use `prepare_forestdata` to simplify your workflow
 
 ForestData's function have a lot of arguments, including because there is no constraints on the user side for the dataset's column names, and also to allow the user set the functions entirely to adapt it to every specific dataset... However, most of these arguments are redundant and it can be exhausting to write long calls only to specify column names or that kind of stuff.
 
-Fortunately, there is a function that does the job for you: `prepare_forestdata`. If you specify everything only once using this function, your argument settings will be kept in memory as global variables and called automatically by the following functions:
+Fortunately, there is a function that does the job for you: `prepare_forestdata`. If you specify everything only once using this function, your argument settings will be kept in memory as global variables and called automatically by the correction functions.
 
-```{r prepare_forestdata, eval = FALSE}
+For example, let's specify the column names that ForestData needs to correct our dataset:
+
+```{r prepare_forestdata}
 # specify the example dataset's column names
 prepare_forestdata(example_census,
                    plot_col="Plot",
@@ -86,23 +104,215 @@ prepare_forestdata(example_census,
                    size_col="Circ",
                    measure_type = "C",
                    POM_col = "POM")
+```
+
+As you can see, the arguments of `prepare_forestdata` are the dataset you are going to run corrections on, the "type of measurement" (either "C" for circumference or "D" for diameter), and the names of the columns containing the informations needed for corrections to run, that is:
+* Plot indices
+* Unique tree ids
+* Census year
+* Tree vital status
+* Tree stem size measurement
+* Point of Measurement
+
+The column names are simply called with `getOption` in the next functions. Let's check that these values have been correctly set:
+```{r}
 # checking that the options have been set
 getOption("plot_col"); getOption("time_col")
 
-# If the function is run twice with similar specification for one or several options, a message indicates that these specific option.s kept unchanged
+```
+
+Note that if the function is run twice with similar specifications for one or several names, a message indicates that those ones kept unchanged
+```{r}
+# 
 prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
 
-## Note that if one column name is erroneous, then the function stops with explicit erro message
 ```
+Moreover, `prepare_forestdata` assures that your specifications are coherent: if one column name is erroneous, the function stops with an explicit error message.
+
 
 ## Use `correct_alive` to correct tree life status errors in your dataset
 
-Forest censuses are all about tree life statuses: mortality and recruitment depend directly on these variables, and other metrics such as basal area of growth rates should be only computed for live trees, right ? Thus, avoiding errors in tree life statuses is the prime step to ensure in order to work with dendrometric data. 
-correct_alive's algorithm takes as an input your data with uncorrected tree life status and detects unseen trees (with no corresponding line of with NA status for a given census year ; the function does it "by plot" if there are several plots with different censusing resolutions) and "reviving" events (when a tree is declared dead but seen alive later on), and corrects it by creating a new field names "status_corr".
+Forest censuses are all about tree life statuses: mortality and recruitment depend directly on these variables, and other metrics such as basal area of growth rates should be only computed for live trees, right ? Thus, avoiding errors in tree life statuses is the prime step to ensure that these metrics can be correctly calculated for your forest plots. 
+
+`correct_alive` takes your data with uncorrected tree life status as an input, and detects unseen trees (with no corresponding line or with NA status for a given census year). The function does it "by plot" if there are several plots with different censusing resolutions. It also spots "reviving" events (when a tree is declared dead but seen alive later on). The function returns the original dataset with additional lines created for unseen trees (in those cases, the trees are set with NA status, circumference, and POM), and a new field named "status_corr". 
+
+The function takes 9 arguments as an input:
+
+* The dataset to correct, a data.frame object.
+* The names of the 4 columns containing: tree IDs, census year, life status and plot (if relevant)
+* `byplot`, TRUE or FALSE, indicates whether the correction should be done by plot or not. If not, no need to set `plot_col`.
+* `dead_confirmation_censuses` is a threshold. It corresponds to the number of unsighting censuses, after which an unseen tree can be considered dead. In Paracou, we consider that a tree that hasn't been seen during two consecutive censuses is likely to be dead... except if it is seen alive again, later on.
+* `invariant_columns` contains the names of the columns that do not vary with time for a given tree (in our example dataset, taxonomic information and Forest). If new lines corresponding to unseen trees are added, this variables will be set to their unique value, and the other variables will be let to NA.
+* `use_size` is an optional argument that should be deprecated. It allows to create a tree life status from tree size measurement if this field doesn't exist in your dataset. It means that for any non-NA size measurement, the corresponding tree will be considered alive...
+
+Here is the full call for correct_alive, with our example dataset:
+
+```{r correct alive full}
+
+ #Correct it (full call)
+example_status_corr <- correct_alive(example_census,
+id_col = "idTree",
+time_col = "CensusYear",
+status_col = "CodeAlive",
+plot_col = "Plot",
+byplot = TRUE,
+dead_confirmation_censuses = 2,
+use_size = FALSE,
+invariant_columns = c("Genus",
+"Species",
+"Family",
+"Forest",
+"binomial_name"))
+
+
+```
+As you can see, warning messages a sent every time a tree has only one or several records with dead status. This is generally due to the succession of growth over minimum censusing size and death, between two consecutive census. Still, confirming it manually is always useful to ensure that there is no other anomaly.
+
+Also, note that the function includes a progress bar to give you a raw estimate of computation advancement, in case you deal with particularly big datasets.
+
+
+If you used prepare_forestdata to preset some of the arguments, the call can be written more shortly:
+
+```{r short alive, warning=F}
+#Correct it (short version with column names set with prepare_forestdata)
+
+example_status_corr <- correct_alive(example_census,
+invariant_columns = c("Genus",
+"Species",
+"Family",
+"Forest",
+"binomial_name"))
+
+```
+
+Let's now take a look to the corrected dataset's structure:
+
+```{r}
+nrow(example_census) #25533 
+str(example_status_corr)
+```
+
+Note that the function added 101 lines corresponding to unseen trees.
 
 ## Use `correct_size` to correct tree size measurements
 
+Note: Tree height correction is over the scope of this package. In this vignette "tree size" thus refers to either diameter or circumference.
+
+### Concept and method
+
+Tree sizes measurements are essential information to study the dynamics of a forest plot over time, through tree stem growth rates. This implies a need to ensure that size measurements are correct. 
+There is a consensus regarding the need to standardize these metrics using the same Point of Measurement (POM) for each tree whenever possible (breast height, 1.30m). However, some trees develop buttresses or defaults that prevent measuring stem size accurately at breast height, and imply to uprise the POM. Most of the error regarding tree size comes from either uncorrect to no report of POM shifts, or imprecisions using a measuring tape. We categorize size measurement errors according to the direction (negative, positive) and temporality (transient, permanent) of the anomalies.
+
+#### Thresholds and pioneer species
+
+Except for explicit POM changes, anomalies are detected by `correct_size` using thresholds defining abnormal increase/decrease in tree size. These thresholds depend on the protocol applied for a given census (e.g., basal measurement error rate and field verification protocols, if any) as well as empirical considerations regarding tree growth. 
+
+For the Paracou Disturbance Experiment, an abnormal decrease is considered to be under -2cm (absolute, between-census *diameter* growth) and an abnormal increase is over 5cm/year (annual *diameter* growth). These apparently permissive thresholds are due to the 35 years of experience gained from the begining of the experiment, as well as intensive and strict field verifications (apurement protocol by A. Dourdain) carried out in parallel of the censusing campaigns, allowing to verificate directly most of the doubtful measurements. 
+
+In reality, some heliophilous species car grow far more rapidly than others, and can cause "false positive" anomaly detections. To avoid uprising the growth threshold and the chance of non-detection for real anomalies, it seems better to discriminate, at least grossly, this group of species: In `correct_size`, we added two arguments to specify a list of generally fast growing (pioneer) species or genera, and a greater positive growth threshold to apply to those species. 
+
+For Paracou, practical experience suggests that 7.5cm/year is a reasonable threshold for these species.
+
+The choice of these thresholds is let to the user (although they default to values used for the Paracou database), and these must be set according to the dataset one wants to correct.
+
+#### Punctual errors
+
+Punctual errors are transient, abnormal increases or decreases in tree size measurement, that eventually returns to "normal" values. This implies to define a threshold to discriminate "abnormal" increases and decreases, as well as the concept of "return-to-normal". 
+
+In ForestData's `correct_size` function, we considered that an error is punctual if one of the two next census' values present a similar change in size, with opposite direction, that counterbalances the anomaly. These can be caused by an erroneous measurement or estimation of tree size at a given census, more rarely for two consecutive censuses.
+
+Punctual errors are corrected by replacing the abnormal values with more reasonable estimates. That is simply done by linearily interpolating these value between the no-NA measurements surrounding the anomaly: right before the increa/decrease, and at the "return-to-normal" point.
+
+#### Permanent errors, or shifts
+
+Permanent errors or shifts are definitive uprises or downrises of size measurement values, with no detectable "return-to-normal" point. 
+
+In most of the case, these are permanent decreases due to POM change: when POM is uprisen, due to the semi-conic shape of the trunk, the measured size is inferior than if it was measured accurately at breast height. Shifts can also (more rarely) be caused by size estimation rather than measurement (or even to the transition from estimation to actual measurement), for stems showing a highly non-cylindric conformation, and may be positive or negative in such cases.
+
+In `correct_size`, shifts are corrected using two methods:
+* Explicitely, for reported POM shifts, i.e. the sum of the difference in sizes before and after POM change and the expected growth value (linear interpolation) is added to the following size measurements, graphically resulting in a translation of the size trajectory after the POM uprise.
+* Upon detection, for anomalies without detected "return-to-normal", by re-aligning on the longest series of measurement (or the most recent, if both have the same number of points)
+
+### Example
+
+Here is the full call for correct_size. Note that we apply this correction to the dataset already corrected for life status. We recommend to follow this order.
+
+```{r correct size full, warning=F,results="hide"}
+example_size_corr <- correct_size(example_status_corr, #full
+  size_col = "Circ",
+  time_col = "CensusYear",
+  status_col = "status_corr", # Because we corrected life statuses beforehand
+  species_col = "binomial_name", 
+  id_col = "idTree",
+  POM_col = "POM",
+  measure_type = "C",
+  positive_growth_threshold = 5,
+  negative_growth_threshold = -2,
+  default_POM = 1.3,
+  pioneers = c("Cecropia", "Pourouma"), #Works with species or genera
+  pioneers_treshold = 7.5,
+  ignore_POM = FALSE
+)
+
+```
+Warnings are displayed for trees having only one or no non-NA measurement.
+
+If you used prepare_forestdata and corrected for life status beforehand, you only have to specify the column containig species names, the positive, negative and pioneers' thresholds, and the name of the fast growing taxa (genera/species) if not letting it to default
+
+```{r correct size short, eval=F}
+
+# Specifying different thresholds
+example_size_corr <- correct_size(example_status_corr,
+  species_col = "binomial_name", 
+  positive_growth_threshold = 4, #in cm(diameter)/year
+  negative_growth_threshold = -1.5, #in cm(diameter), absolute
+  pioneers = c("Albizia"), 
+  pioneers_treshold = 7)#in cm(diameter)/year
+  
+  # Letting all to default with out example dataset
+example_size_corr <- correct_size(example_status_corr, species_col="binomial_name")
+```
+
+
 ## Use `correct_recruits` to spot and correct overgrown recruits
+
+Most forest inventories focus on trees with DBH over 10cm, or sometimes 1cm, to reduce the number of stems to monitor and focus on trees that are relevant to describe forest structure. Every tree (or stem) is, supposedly, tagged with a label at the first inventory and followed accross censuses. 
+
+Recruited trees are those newcomers that reach over the minimum censusing diameter limit between two campaigns. Ideally, one expects these tree to measure just a bit more than this limit, especially if the temporal resolution of the inventory is low, because trees generally grow slow. Having defined a growth threshold T (in cm/year) and with I, the interval between two census (in years),  the size of a tree at recruitment time should not exceed 10+T*I.
+
+Overgrown recruits are trees that violate this assumption, generally because those weren't noticed before, for some reason. These individuals can be problematic when it comes to estimate basal area or biomass, especially if they are adult trees. `correct_recruits` re-creates the previous growth trajectory of those trees using linear extrapolation. Corrected size values for overgrown recruits should not be used to compute growth rates, and more generally, we advise to use this correction only for the specific cases that absolutely require it.
+
+Before correcting for overgrown recruits, we advise to correct life statuses and sizes beforehand.
+
+`correct_recruits` adds lines to the dataset corresponding to overgrown recruits' hypothetical sizes before first record. These lines are tagged with the column "corrected_recruits" (FALSE for regular data, TRUE for lines generated with this function). For these lines, only the corrected size (size_corr) is specified along with tree ID and invariant columns. The columns originally containing size, POM and life status (raw and corrected) are let to NA.
+
+Here is the full call of the function:
+
+```{r correct recruits full}
+example_recruits <- correct_recruits(example_size_corr,
+  dbh_min = 10,
+  positive_growth_threshold = 5,
+  time_col = "CensusYear",
+  id_col = "idTree",
+  plot_col = "Plot",
+  size_corr_col = "size_corr", #because we already corrected
+  status_corr_col = "status_corr", # both size and status
+  measure_type = "C",
+  invariant_columns = c("Forest", "Family", "Genus", "Species", "binomial_name"),
+  byplot = TRUE,
+  correct_status = FALSE
+)
+```
+
+Short version having used prepare_forestdata:
+
+```{r correct recruits}
+example_recruits <- correct_recruits(example_size_corr,
+  dbh_min = 10,
+  positive_growth_threshold = 5,
+  invariant_columns = c("Forest", "Family", "Genus", "Species", "binomial_name")
+)
+```
 
 ## Use `display_corrected_trees` to generate the graphs and check the corrections.
 

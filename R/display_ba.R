@@ -13,8 +13,7 @@
 #' @inheritParams display_rates
 #'
 #' @details
-#'
-#' \strong{\emph{Displaying multiple variables to avoid unreadability:}}
+#' \strong{\emph{Displaying multiple variables to avoid unreadability}}
 #'
 #' Imagine a basal area \code{table} computed for 3 species in 4 different
 #' plots, for 20 censuses, with corresponding columns named \code{"Plot"},
@@ -44,37 +43,35 @@
 #' arguments.
 #'
 #' \code{x.axis.name} and \code{y.axis.name} are the axis labels to be passed to
-#' \code{\link[ggplot2::xlab]{ggplot2::xlab} and \code{\link[ggplot2::ylab]{ggplot2::ylab}
+#' \code{\link[ggplot2::xlab]{ggplot2::xlab}} and \code{\link[ggplot2::ylab]{ggplot2::ylab}}
 #'
 #' \code{transparence} is the scalar value of \code{alpha} in
 #' \code{ggplot2::geom_*} functions.
 #'
 #' \code{linewidth} is the scalar value of \code{size} in
-#' \code{\link[ggplot2::geom_line]{ggplot2::geom_line} -to be used with
+#' \code{\link[ggplot2::geom_line]{ggplot2::geom_line}} -to be used with
 #' \code{type='line'}.
 #'
 #' Note that a variable's name -in the dataset- can also be provided to make
 #' vary these parameters according to the data. In such case, these arguments
-#' are passed to \code{\link[ggplot2::aes_string]{ggplot2::aes_string} instead.
+#' are passed to \code{\link[ggplot2::aes_string]{ggplot2::aes_string}} instead.
 #'
 #' display_ba originally uses \code{linetype=1} with \code{type = 'line'}. It
 #' means that linetype is passed to
-#' \code{\link[ggplot2::geom_line]{ggplot2::geom_line} as it is a constant scalar.
+#' \code{\link[ggplot2::geom_line]{ggplot2::geom_line}} as it is a constant scalar.
 #' In case the user wants to use it to differenciate groups, and use a variable
 #' \code{linetype} they just have to specify e.g.
 #' \code{linetype="variable_name"} and it will be passed to
-#' \code{\link[ggplot2::aes_string]{ggplot2::aes_string} instead.
+#' \code{\link[ggplot2::aes_string]{ggplot2::aes_string}} instead.
 #'
 #' \code{x.text.angle} and \code{y.text.angle} is the angle of the axis ticks
 #' labels. It is set to be 0 -horizontal- for y and 90 -vertical- for x, because
 #' it helps reading census times by avoiding overlaps. These are passed to
-#' \code{\link[ggplot2::element_text]{ggplot2::element_text} within \code{\link[ggplot2::theme]{ggplot2::theme}.
+#' \code{\link[ggplot2::element_text]{ggplot2::element_text}} within \code{\link[ggplot2::theme]{ggplot2::theme}}.
 #'
 #' @return A \code{ggplot2} graphical object. See
 #'   \code{\link[ggplot2::ggplot]{ggplot2::ggplot}}
 #' @export
-#'
-#' @examples
 display_ba <- function(basal_area,
                        type = "line",
                        time_col = "time",

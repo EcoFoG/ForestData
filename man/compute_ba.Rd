@@ -31,15 +31,23 @@ compute_ba(
 A dataframe containing, for each combination of grouping variables, the plot-level and per-ha basal area for a given census year.
 }
 \description{
-compute_ba computes Basal Area according to user-specified grouping variables -Plot, species, etc- and time.
+compute_ba computes Basal Area according to user-specified grouping variables -e.g. Plot, species, etc- and time.
 }
 \examples{
-data("example_census")
-ba <- compute_ba(example_census,
-size_col = "CircCorr",
+data("example_recruits_corr")
+
+ba_plots <- compute_ba(example_recruits_corr,
+size_col = "size_corr",
 measure_type = "C",
 time_col = "CensusYear",
-by = c("Species","Plot"),
+by = "Plot",
+surface = 1.5625)
+
+ba_taxa <- compute_ba(example_recruits_corr,
+size_col = "size_corr",
+measure_type = "C",
+time_col = "CensusYear",
+by = c("binomial_name","Plot"),
 surface = 1.5625)
 
 str(ba)

@@ -49,3 +49,19 @@ to be specified over and over when running each function.
 \code{prepare_forestdata} allows the user to specify these column names only
 once and then run all the functions without having to do it again
 }
+\examples{
+# Loading example dataset
+data(example_census)
+# specifying the example dataset's column names
+prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+# checking that the options have been set
+getOption("plot_col"); getOption("time_col")
+# If the function is run twice with similar specification for one or several options, a message indicates that these specific option.s kept unchanged
+prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+# If one column name is erroneous, then the function stops with explicit erro message
+\dontrun{
+prepare_forestdata(example_census,plot_col="SAUCISSON",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+## "Error in prepare_forestdata(example_census, plot_col = "SAUCISSON", id_col = "idTree",  :
+## plot_col is not any of your dataset's column name..."
+  }
+}

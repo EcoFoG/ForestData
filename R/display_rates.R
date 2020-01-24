@@ -119,8 +119,6 @@
 #' @export
 #' @return A \code{ggplot2} graphical object. See
 #'   \code{\link[ggplot2:ggplot]{ggplot2::ggplot}}.
-#'
-#' @examples
 display_rates <- function(mortality = NULL,
                           recruitment = NULL,
                           rates = NULL,

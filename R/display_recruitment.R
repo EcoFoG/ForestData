@@ -16,8 +16,6 @@
 #'
 #' @export
 #' @return A ggplot2 graphical object.
-#'
-#' @examples
 display_recruitment <- function(recruitment = NULL,
                           type = "line",
                           time_col = "time",

@@ -16,8 +16,6 @@
 #'
 #' @export
 #' @return A ggplot2 graphical object.
-#'
-#' @examples
 display_mortality <- function(mortality = NULL,
                           type = "line",
                           time_col = "time",

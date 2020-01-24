@@ -208,7 +208,7 @@ correct_size <- function(data,
   if(!isTRUE(ignore_POM)) data <- check_rename_variable_col(POM_col, "POM",data)
   else{
     warning("You decided to correct tree size measurements without explicitely accounting for POM changes.")
-    message("PLEASE BE AWARE THAT THE CORRECTIONS WILL THEREFORE BE SUB-OPTIMAL, LESS RELIABLE THAN WHAT THIS PACKAGE ORIGINALLY PROVIDES")
+    message("Please be aware that the corrections will therefore be sub-optimal, less reliable than what this package originally intends to provide.")
   }
 
 # Create size and status corr ---------------------------------------------
@@ -310,64 +310,66 @@ correct_size <- function(data,
     cresc[which(!is.na(size))[-1] - 1] <-
       diff(size[!is.na(size)]) / diff(time[!is.na(size)])
     cresc_abs[which(!is.na(size))[-1] - 1] <- diff(size[!is.na(size)])
-  }
-  else if(length(size == 1)){
-    message(paste0("Tree",i," has only one measurement and has no growth to correct"))
-  }
-  else message(paste0("Tree",i," has no data to correct, all size measurements are NA"))
+    if (length(cresc) > 0) {
 
-  if (length(cresc) > 0) {
-
-    if(!ignore_POM){
-      # print("here")
-      res <- .correct_POM_changes(size,
-                                  size_corr,
-                                  code_corr,
-                                  cresc,
-                                  time,
-                                  POM,
-                                  default_POM,
-                                  positive_growth_threshold,
-                                  negative_growth_threshold,
-                                  i)
-      # print("here2")
-      size_corr <- res$size_corr
-      code_corr <- as.character(res$code_corr)
-    }
+      if(!ignore_POM){
+        # print("here")
+        res <- .correct_POM_changes(size,
+                                    size_corr,
+                                    code_corr,
+                                    cresc,
+                                    time,
+                                    POM,
+                                    default_POM,
+                                    positive_growth_threshold,
+                                    negative_growth_threshold,
+                                    i)
+        # print("here2")
+        size_corr <- res$size_corr
+        code_corr <- as.character(res$code_corr)
+      }
 
 
-    if (sum(!is.na(size_corr)) > 1) {
-      cresc[which(!is.na(size_corr))[-1] - 1] <-
-        diff(size_corr[!is.na(size_corr)]) / diff(time[!is.na(size_corr)])
-      cresc_abs[which(!is.na(size_corr))[-1] - 1] <- diff(size_corr[!is.na(size_corr)])
-    }
-    else message("Tree has no data to correct, all size measurements are NA")
+      if (sum(!is.na(size_corr)) > 1) {
+        cresc[which(!is.na(size_corr))[-1] - 1] <-
+          diff(size_corr[!is.na(size_corr)]) / diff(time[!is.na(size_corr)])
+        cresc_abs[which(!is.na(size_corr))[-1] - 1] <- diff(size_corr[!is.na(size_corr)])
+      }
+      else message(paste("Tree ",i," has no data to correct, all size measurements are NA"))
 
 
-    res <- .correct_abnormal_growth_tree(size_corr,
-                                         code_corr,
-                                         cresc,
-                                         cresc_abs,
-                                         time,
-                                         positive_growth_threshold,
-                                         negative_growth_threshold,
-                                         i,
-                                         ignore_POM)
-# TAG CRESC ?
+      res <- .correct_abnormal_growth_tree(size_corr,
+                                           code_corr,
+                                           cresc,
+                                           cresc_abs,
+                                           time,
+                                           positive_growth_threshold,
+                                           negative_growth_threshold,
+                                           i,
+                                           ignore_POM)
+      # TAG CRESC ?
 
-    # size_corr <- res$size_corr
-    # code_corr <- res$code_corr
+      # size_corr <- res$size_corr
+      # code_corr <- res$code_corr
 
 
 
-    ## replace missing values
-    if (any(!is.na(res$size_corr)) & any(is.na(res$size_corr))) {
-      res$size_corr <- .replace_missing(res$size_corr, time, status)
+      ## replace missing values
+      if (any(!is.na(res$size_corr)) & any(is.na(res$size_corr))) {
+        res$size_corr <- .replace_missing(res$size_corr, time, status)
+      }
     }
   }
   else{
     res <- data.frame("size_corr" = size_corr, "code_corr" = as.character(code_corr))
+    if(length(size == 1)){
+      warning(paste0("Tree",i," has only one measurement and has no growth to correct"))
+    }
+    else warning(paste0("Tree",i," has no data to correct, all size measurements are NA"))
   }
+
+
+
 
   return(res)
 }

@@ -12,8 +12,6 @@
 #'
 #' @return
 #' @export
-#'
-#' @examples
 display_corrected_trees <- function(data,
                                     code_corr_col="code_corr",
                                     size_corr_col = "size_corr",

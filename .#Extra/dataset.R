@@ -39,6 +39,8 @@ example_census <- SubPlot1 %>%
   rename(Plot = SubPlot) %>%
   mutate(binomial_name=  paste(Genus, Species, sep="_")) %>%
   mutate(Forest = paste0(Forest,":P6"))
+example_census <- reconstitute_pom_paracou(example_census)
+
 save(example_census,file="./data/example_census.RData")
 
 data("example_census")

@@ -55,3 +55,8 @@ Either the input data.frame with individual-level calculated growth rates, or a 
 \description{
 Title
 }
+\examples{
+data(example_census)
+growth <- compute_growth(example_census)
+head(growth)
+}

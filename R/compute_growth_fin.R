@@ -12,6 +12,9 @@
 #' @export
 #'
 #' @examples
+#' data(example_census)
+#' growth <- compute_growth(example_census)
+#' head(growth)
 compute_growth <- function(data,
                            size_col = "Circ",
                            measure_type = "cir",
