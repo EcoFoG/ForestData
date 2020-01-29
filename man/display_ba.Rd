@@ -92,5 +92,59 @@ This function requires the installation of the package
 \code{\link[ggplot2]{ggplot2}}.
 }
 \details{
+\strong{\emph{Displaying multiple variables to avoid unreadability}}
 
+Imagine a basal area \code{table} computed for 3 species in 4 different
+plots, for 20 censuses, with corresponding columns named \code{"Plot"},
+\code{"Species"} and \code{"time"}. Then, imagine displaying it with this
+function using \code{type = 'line'}. All this information can be displayed in
+one call of display_ba, with different possible combinations:
+
+- One graph per forest plot, with the color of each line segregating species.
+This can be done with the arguments \code{color_col = "Species"} and
+\code{faceting = "Plot"}.
+
+- One graph per species, with the color of each line segregating plots. The
+function call has thus the arguments \code{color_col = "Species"} and
+\code{faceting = "Plot"}.
+
+The linetype,defaults to 1 -i.e. solid line- but can also be used to display
+additional categories, simply adding e.g. \code{linetype  = "Species"} to the
+function call. In this case, it must be done with some caution: if there are
+too many categories in the grouping variable, they would hardly -if not
+impossibly- be visually segregated by line types.
+
+\strong{\emph{Detail of the additionnal arguments}}
+
+The arguments corresponding to \code{...} here encompass a limited number of
+parameters that are \emph{internally set if not specified}. These parameters
+are passed to different sub-functions. Here is the detailed list of these
+arguments.
+
+\code{x.axis.name} and \code{y.axis.name} are the axis labels to be passed to
+\code{\link[ggplot2::xlab]{ggplot2::xlab}} and \code{\link[ggplot2::ylab]{ggplot2::ylab}}
+
+\code{transparence} is the scalar value of \code{alpha} in
+\code{ggplot2::geom_*} functions.
+
+\code{linewidth} is the scalar value of \code{size} in
+\code{\link[ggplot2::geom_line]{ggplot2::geom_line}} -to be used with
+\code{type='line'}.
+
+Note that a variable's name -in the dataset- can also be provided to make
+vary these parameters according to the data. In such case, these arguments
+are passed to \code{\link[ggplot2::aes_string]{ggplot2::aes_string}} instead.
+
+display_ba originally uses \code{linetype=1} with \code{type = 'line'}. It
+means that linetype is passed to
+\code{\link[ggplot2::geom_line]{ggplot2::geom_line}} as it is a constant scalar.
+In case the user wants to use it to differenciate groups, and use a variable
+\code{linetype} they just have to specify e.g.
+\code{linetype="variable_name"} and it will be passed to
+\code{\link[ggplot2::aes_string]{ggplot2::aes_string}} instead.
+
+\code{x.text.angle} and \code{y.text.angle} is the angle of the axis ticks
+labels. It is set to be 0 -horizontal- for y and 90 -vertical- for x, because
+it helps reading census times by avoiding overlaps. These are passed to
+\code{\link[ggplot2::element_text]{ggplot2::element_text}} within \code{\link[ggplot2::theme]{ggplot2::theme}}.
 }

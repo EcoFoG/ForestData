@@ -1,3 +1,29 @@
+#' Display annual growth rates using ggplot2
+#'
+#' @param growth A data.frame outputed from compute_growth
+#' @param type Character, the type of graph (recommended: "line" or "ribbon")
+#' @inheritParams display_rates
+#' @param ordered_percentiles Numeric, if plotting a ribbon, please indicate the percentiles used when aggregating the data.
+#' @param ... Additional arguments. Notably, verbose = F turns most warnings off
+#'
+#' @return A ggplot graph
+#' @export
+#'
+#' @examples
+#'
+#' data(example_size_corr)
+#' growth <- compute_growth(example_size_corr,
+#'                          size_col = "size_corr",
+#'                          measure_type = "cir",
+#'                          status_col = "CodeAlive",
+#'                          id_col= "idTree",
+#'                          time_col = "CensusYear",
+#'                          what_output = "annual",
+#'                          aggregate = T,
+#'                          by = c("Plot"),
+#'                          stat = "mean",
+#'                          percentiles = c(5,95))
+#'  display_growth(growth)
 display_growth <- function(growth,
                            type = "ribbon",
                            time_col = "time",
@@ -102,7 +128,7 @@ x.name <- "Census year"
 y.name <- "Annual rate"
 trans <- ifelse(type=="histogram",
                 1,
-                0.6)
+                0.4)
 lw <- 0.72
 x.angle <- ifelse(type=="histogram",
                   0,

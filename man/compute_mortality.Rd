@@ -7,11 +7,11 @@
 compute_mortality(
   data,
   status_col = "status_corr",
-  time_col = "CensusYear",
-  id_col = "idTree",
+  time_col = ifelse(is.null(getOption("time_col")), "CensusYear", getOption("time_col")),
+  id_col = ifelse(is.null(getOption("id_col")), "idTree", getOption("id_col")),
   dead_confirmation_censuses = 2,
   byplot = TRUE,
-  plot_col = "Plot",
+  plot_col = ifelse(is.null(getOption("plot_col")), "Plot", getOption("plot_col")),
   corrected = TRUE
 )
 }

@@ -1,4 +1,56 @@
 
+# check rename7 -----------------------------------------------------------
+
+# Check that a Column Name is in a Dataset and Replace it by a Temp Name
+#
+# Internal and unexported function of ForestData
+#
+# @param arg A character argument corresponding to a column name, that must be checked
+# @param name A name which replaces the original column name inside the function where the check/replace is called
+# @param data A data.frame
+#
+# @return A data.frame in which the target colname has been replaced by one that will be used internally
+#
+# @examples
+# \dontrun{
+# data <- check_rename_variable_col(status_col, "status",data)
+# }
+check_rename_variable_col <- function(arg, name, data){
+  if(!inherits(name,"character")){
+    stop('Internal error in check_variable_col(): name must be a character')
+  }
+  if(length(name) != 1){
+    stop('Internal error in check_variable_col(): name must be a character of length 1')
+  }
+  if(is.na(name)){
+    stop('Internal error in check_variable_col(): name must be non-NA')
+  }
+  if(!inherits(data, "data.frame")){
+    stop('Internal error in check_variable_col(): data must be a data.frame')
+  }
+
+  if(!inherits(arg,"character")){
+    stop(paste0(arg, ' must be a non NA, length 1 character corresponding to a column name. For more informations on what this argument corresponds to, see the help section.'))
+  }
+  if(length(arg) != 1){
+    stop((paste0(arg,' must be a character of length 1')))
+  }
+  if(is.na(arg)){
+    stop((paste0(arg,' must be non-NA')))
+  }
+  else if(!arg %in% names(data)){
+    stop(paste0('The specified name for ', name,' (',arg,') does not match with the names of your dataset. For more informations on what this argument corresponds to, see the help section.'))
+  }
+  else {
+    if(grepl("_col",name)){
+      names(data)[which(names(data) == arg)] <- strsplit(name, split = "_col")[[1]]
+    }
+    else names(data)[which(names(data) == arg)] <- name
+  }
+  return(data)
+}
+
+
 # Use geom_ribbon to make a graph -----------------------------------------
 
 .do_graph_ribbon <- function(table,
@@ -11,13 +63,14 @@
                            subtitle = "Default subtitle that has to be user-specified",
                            x.axis.name = "Census year",
                            y.axis.name = "Annual rate",
-                           transparence = 0.6,
+                           transparence = 0.4,
                            linewidth = 0.72,
                            x.text.angle = 90,
                            y.text.angle = 0){
 
   # Grab the ellipsis args
   args_dots <- list(...)
+
   if(length(args_dots[names(args_dots)=="fill"])== 0 & length(args_dots[names(args_dots)=="color"])== 1){
     args_dots["fill"] <- args_dots["color"]
   }
@@ -47,18 +100,22 @@
 
   # Conversely, isolate scalar constants to be passed to ggplot2::geom_line()
   if(!all(isTRUE(variables))){
-    scalars_line <- c(list(alpha= transparence, size=linewidth), args_dots[!variables])
+    # scalars_line <- c(list(alpha= transparence, size=linewidth), args_dots[!variables])
+    scalars_line <- c(list( size=linewidth), args_dots[!variables])
     scalars_ribbon <- c(list(alpha= transparence), args_dots[!variables & !names(args_dots)%in% c("linetype","size")])
   }else{
-    scalars_line <- list(alpha= transparence, size=linewidth)
+    # scalars_line <- list(alpha= transparence, size=linewidth)
+    scalars_line <- list(size=linewidth)
     scalars_ribbon <- list(alpha= transparence)
   }
-  print(aesthetics_ribbon)
+  # print(aesthetics_ribbon)
   # print("line")
   # print(aesthetics_line)
-print(scalars_ribbon)
+
   args_line <- c(list(mapping=do.call(what = ggplot2::aes_string, args = aesthetics_line)),scalars_line)
   args_ribbon <- c(list(mapping = do.call(what = ggplot2::aes_string, args = aesthetics_ribbon)),scalars_ribbon)
+
+  print(args_ribbon)
   # argues <-  c(list(mapping = do.call(aes_string,list(x="time",y="mean", color="Plot"))), list(linetype = 2, size = 3))
   # Make the graph. Variables are passed to aes() and constants to geom_line()
   graph <- ggplot2::ggplot(data = table)+
@@ -103,7 +160,7 @@ print(scalars_ribbon)
 # @return A graph made with ggplot2 - thus, fondamentally a list but perhaps a little bit more than it.
 #
 # @examples
-.do_graph_line <- function(table,
+.do_graph_line <- function(mytable,
                            x_variable,
                            y_variable,
                            ...,
@@ -118,39 +175,46 @@ print(scalars_ribbon)
 
   # Grab the ellipsis args
   args_dots <- list(...)
-
   # separate them into two categories: variable names, or not
+  # print(args_dots)
   variables <- lapply(names(args_dots),
                       function(n){
-                        if(args_dots[[n]] %in% names(table)){
+                        # print(args_dots[[n]])
+                        if(args_dots[[n]] %in% names(mytable)){
                           return(TRUE)
                         }
                         else
                           return(FALSE)
                       })
+  # print(args_dots[unlist(variables)])
 
   # Isolate variable names to be passed to ggplot2::aes()
-  if(!all(isFALSE(unlist(variables)))){
+  if(any(unlist(variables) == T)){
     aesthetics <- c(x = x_variable, y = y_variable,args_dots[unlist(variables)])
+    # print(aesthetics)
   }else{
-    aesthetics <- c(x = x_variable, y = y_variable)
+    aesthetics <- list(x = x_variable, y = y_variable)
   }
-
+  # print(mytable)
   # Conversely, isolate scalar constants to be passed to ggplot2::geom_line()
-  if(!all(isTRUE(unlist(variables)))){
+  # print(unlist(variables))
+  if(any(unlist(variables) == F)){
+    # print("args_dots[!unlist(variables)]")
     scalars <- c(alpha= transparence, size=linewidth, args_dots[!unlist(variables)])
   }else{
-    scalars <- c(alpha= transparence, size=linewidth)
+    scalars <- list(alpha= transparence, size=linewidth)
   }
-
+  # print(aesthetics)
+  # print(scalars)
+  # print(names(args_dots))
 # Ancien code
-  # graph <- ggplot2::ggplot(data = table, mapping=aes_string(x = x_variable, y = y_variable, ...))+
+  # graph <- ggplot2::ggplot(data = mytable, mapping=aes_string(x = x_variable, y = y_variable, ...))+
   # geom_line(alpha = transparence,size = linewidth)+
 
   # Make the graph. Variables are passed to aes() and constants to geom_line()
-  graph <- ggplot2::ggplot(data = table, mapping=do.call(what = ggplot2::aes_string, args = aesthetics))+
+  graph <- ggplot2::ggplot(data = mytable, mapping=do.call(what = ggplot2::aes_string, args = aesthetics))+
     do.call(what = ggplot2::geom_line, args = scalars)+
-    ggplot2::scale_x_continuous(breaks = table[,which(names(table)==x_variable)], labels = table[,which(names(table)==x_variable)])+
+    ggplot2::scale_x_continuous(breaks = mytable[,which(names(mytable)==x_variable)], labels = mytable[,which(names(mytable)==x_variable)])+
     ggplot2::xlab(x.axis.name)+
     ggplot2::ylab(y.axis.name)+
     ggplot2::ggtitle(label = title, subtitle = subtitle)+
@@ -177,7 +241,7 @@ print(scalars_ribbon)
 #   ggplot(aes(x = value, fill = rate))+
 #   geom_histogram(position = "dodge")+
 #   facet_wrap(~treatment)
-.do_graph_histogram  <- function(table,
+.do_graph_histogram  <- function(mytable,
                                  x_variable,
                                  position = "dodge",
                                  ...,
@@ -196,7 +260,7 @@ print(scalars_ribbon)
   # separate them into two categories: variable names, or not
   variables <- lapply(names(args_dots),
                       function(n){
-                        if(args_dots[[n]] %in% names(table)){
+                        if(args_dots[[n]] %in% names(mytable)){
                           return(TRUE)
                         }
                         else
@@ -219,13 +283,13 @@ print(unlist(variables))
   }
 
   # Ancien code
-  # graph <- ggplot2::ggplot(data = table, mapping=aes_string(x = x_variable, y = y_variable, ...))+
+  # graph <- ggplot2::ggplot(data = mytable, mapping=aes_string(x = x_variable, y = y_variable, ...))+
   # geom_line(alpha = transparence,size = linewidth)+
 
   # Make the graph. Variables are passed to aes() and constants to geom_line()
-  graph <- ggplot2::ggplot(data = table, mapping=do.call(what = ggplot2::aes_string, args = aesthetics))+
+  graph <- ggplot2::ggplot(data = mytable, mapping=do.call(what = ggplot2::aes_string, args = aesthetics))+
     do.call(what = ggplot2::geom_histogram, args = scalars)+
-    ggplot2::scale_x_continuous(breaks = table[,which(names(table)==x_variable)], labels = table[,which(names(table)==x_variable)])+
+    ggplot2::scale_x_continuous(breaks = mytable[,which(names(mytable)==x_variable)], labels = mytable[,which(names(mytable)==x_variable)])+
     ggplot2::xlab(x.axis.name)+
     ggplot2::ylab(y.axis.name)+
     ggplot2::ggtitle(label = title, subtitle = subtitle)+
@@ -239,7 +303,7 @@ print(unlist(variables))
 # Use geom_bar to make a graph --------------------------------------------
 # Title
 #
-# @param table
+# @param mytable
 # @param x_variable
 # @param y_variable
 # @param linetype
@@ -255,7 +319,7 @@ print(unlist(variables))
 # @return
 #
 # @examples
-.do_graph_barplot <- function(table,
+.do_graph_barplot <- function(mytable,
                            x_variable,
                            y_variable,
                            linetype = 1,
@@ -267,7 +331,7 @@ print(unlist(variables))
                            position = "dodge",
                            x.text.angle = 90,
                            y.text.angle = 0){
-  ggplot2::ggplot(table, aes(x = x_variable, y = y_variable, linetype = linetype, ...))+
+  ggplot2::ggplot(mytable, aes(x = x_variable, y = y_variable, linetype = linetype, ...))+
     geom_bar(stat = "identity", position=position)+
     xlab(x.axis.name)+
     ylab(x.axis.name)+
@@ -292,7 +356,7 @@ print(unlist(variables))
 #   geom_bar(stat = "identity", position = "dodge")+
 #   facet_wrap(~treatment)
 
-# Merge recruitment and mortality tables with checks ----------------------
+# Merge recruitment and mortality mytables with checks ----------------------
 
 
 # Internally Merging Recruitment and Mortality Rates with Checks
@@ -303,7 +367,7 @@ print(unlist(variables))
 # @param recruitment data.frame, output of compute_recruitment
 # @param by character, specified the columns that have to correspond - defaults to both census time and plot index, but could be time and taxonomic group if the purpose of the analysis is to do so.
 #
-# @return a merged table of #'
+# @return a merged mytable of #'
 # @examplesmortality and recruitment rates for the categories you chooses -no matter whether plot, subplot, species- and census time... Or any other variable to be used as a graph's x axis.
 
 .merge_rates <- function(mortality,
@@ -312,16 +376,16 @@ print(unlist(variables))
 
   # Check args
   if(length(names(mortality)) != length(names(recruitment))){
-    stop("The mortality and recruitment tables must have corresponding columns.")
+    stop("The mortality and recruitment mytables must have corresponding columns.")
   }
   # if(nrow(mortality) != nrow(recruitment)){
-  #   stop("The mortality and recruitment tables must have corresponding information (i.e. must be computed from the same inventories).")
+  #   stop("The mortality and recruitment mytables must have corresponding information (i.e. must be computed from the same inventories).")
   # }
-  if(length(names(mortality)) != length(by)+1){
-    message <- paste0("The mortality table is supposed to have ",length(by)+1, "columns: you specified that by=c(",paste(by, sep = ","),"). If there are other variables in the table, you should 1. specify it, 2. ensure that both tables contain the same information. ")
+  if(length(names(mortality)) != length(by)+2){
+    message <- paste0("The mortality mytable is supposed to have ",length(by)+1, "columns: you specified that by=c(",paste(by, sep = ","),"). If there are other variables in the mytable, you should 1. specify it, 2. ensure that both mytables contain the same information. ")
     stop(message)
   }
-  if(length(names(recruitment)) != length(by)+1){
+  if(length(names(recruitment)) != length(by)+2){
     message <- paste0("The recruitment table is supposed to have ",length(by)+1, "columns: you specified that by=c(",paste(by, sep = ","),"). If there are other variables in the table, you should 1. specify it, 2. ensure that both tables contain the same information. ")
     stop(message)
   }
@@ -433,8 +497,10 @@ print(unlist(variables))
               stop(paste0(package, " could not be installed. It could be because of version incompatibility? Try to update R and your packages, then try to install ",package," again."))
             }
             ok <- require(package, character.only = TRUE)
+
             if(!ok){
-              stop(paste0("An error has occurred when trying to load ggplot2. Please re-install it or check what it going bad with it."))
+              print(ok)
+              message(paste0("An error has occurred when trying to load ggplot2. Please re-install it or check what it going bad with it."))
             }
             else return(0)
           }
@@ -456,7 +522,8 @@ print(unlist(variables))
       message(paste0("Loading package ",package," for the function ",fun," to run."))
       ok <- require(package)
       if(!ok){
-        stop(paste0("An error has occurred when trying to load ggplot2. Please re-install it or check what it going bad with it."))
+       return(0) #dirtyhack
+        # stop(paste0("An error has occurred when trying to load ggplot2. Please re-install it or check what it going bad with it."))
       }
       else return(0)
     }
@@ -499,7 +566,8 @@ print(unlist(variables))
 reshape_rates <- function(merged){
   #Set the names as reshape "wants" it.
   # print(names(merged))
-  names(merged)[which(names(merged) %in% c("time","plot","annual_recruitment_rate","annual_deathrate"))] <- c("interval","plot","rate.1","rate.2")
+  merged <- merged[,-which(names(merged) == "interval")]
+  names(merged)[which(names(merged) %in% c("time","plot","annual_recruitment_rate","annual_deathrate"))] <- c("time","plot","rate.1","rate.2")
   #Use base's reshape function
   reshaped <- stats::reshape(merged,        #dataframe
                             direction="long",       #wide to long
@@ -520,18 +588,20 @@ reshape_rates <- function(merged){
   #                            else
   #                              return(FALSE)
   #                          }))
+
   # print(factors)
-  for(i in 1:length(names(reshaped))){
-    if(is.factor(reshaped[,i])){
-      reshaped[,i] <- as.character(reshaped[,i])
-    }
-  }
+
+  # for(i in 1:length(names(reshaped))){
+  #   if(is.factor(reshaped[,i])){
+  #     reshaped[,i] <- as.character(reshaped[,i])
+  #   }
+  # }
 
   # reshaped[,factors] <- as.character(reshaped[,factors])
-
-
+# print("resh")
+# print(reshaped)
   #Create a new time column rather than time interval... we'll implement the use of intervals later on, but for the moment it is problematic since between-census intervals are not homogenous.
-  reshaped$time <- as.numeric(unlist(strsplit(reshaped$interval, split = "_"))[seq.default(from = 2, to = 2*nrow(reshaped), by = 2)])
+  # reshaped$time <- as.numeric(unlist(strsplit(reshaped$interval, split = "_"))[seq.default(from = 2, to = 2*nrow(reshaped), by = 2)])
   return(reshaped)
 }
 

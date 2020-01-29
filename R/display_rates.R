@@ -152,11 +152,12 @@ display_rates <- function(mortality = NULL,
     rates <- .merge_rates(mortality, recruitment, by = c(time_col, color_col))
   }
   else{
+    # print(names(rates)[(length(names(rates))-1):length(names(rates))])
     if(!is.data.frame(rates)){
-      stop("The rates rates table must be a data.frame")
+      stop("The rates table must be a data.frame")
     }
-    if(!names(rates)[(length(names(rates))-1):length(names(rates))] == c("recruitment","mortality")){
-      stop("The rates rates table must be a data.frame outputed by the function compute_rates, or of exactly the same format")
+    if(!identical(names(rates)[(length(names(rates))-1):length(names(rates))], c("annual_recruitment_rate","annual_deathrate"))){
+      stop("The rates table must be a data.frame outputed by the function compute_rates, or of exactly the same format")
     }
   }
 
@@ -232,6 +233,10 @@ display_rates <- function(mortality = NULL,
 # Reshape the table to long format ----------------------------------------
 
 reshaped <- reshape_rates(rates)
+  # print(reshaped)
+  # print(names(reshaped))
+  ### DEBUG: Last fix
+# reshaped$plot <- factor(reshaped$plot)
 
 # Set the arguments from the ellipsis content -----------------------------
 arguments <- list(...)
@@ -244,37 +249,39 @@ x.angle <- 90
 y.angle <- 0
 position <- "position"
 linetype <- "rate"
-
-# print(names(arguments))
-for(a in names(arguments)){
-switch(a,
-       "x.axis.name" = {
-         x.name <- arguments[[a]]
-       },
-       "y.axis.name" = {
-         y.name <- arguments[[a]]
-       },
-       "transparence" = {
-         trans <- arguments[[a]]
-       },
-       "linewidth" = {
-         lw <- arguments[[a]]
-       },
-       "x.text.angle" = {
-         x.angle <- arguments[[a]]
-       },
-       "y.text.angle" = {
-         y.angle <- arguments[[a]]
-       },
-       "linetype" = {
-         linetype <- arguments[[a]]
-       },
-       warning(paste0("argument ", a, " is unused")))
+if(length(arguments) > 0){
+  print(names(arguments))
+  for(a in names(arguments)){
+    switch(a,
+           "x.axis.name" = {
+             x.name <- arguments[[a]]
+           },
+           "y.axis.name" = {
+             y.name <- arguments[[a]]
+           },
+           "transparence" = {
+             trans <- arguments[[a]]
+           },
+           "linewidth" = {
+             lw <- arguments[[a]]
+           },
+           "x.text.angle" = {
+             x.angle <- arguments[[a]]
+           },
+           "y.text.angle" = {
+             y.angle <- arguments[[a]]
+           },
+           "linetype" = {
+             linetype <- arguments[[a]]
+           },
+           warning(paste0("argument ", a, " is unused")))
+  }
 }
-# print("ok")
+
 
 # Do the appropriate graph ------------------------------------------------
 names(reshaped)[names(reshaped)==color_col] <- firstup(color_col)
+
 if(!is.null(linetype))
   names(reshaped)[names(reshaped)==linetype] <- ifelse(is.character(linetype),
                                                        firstup(linetype),
@@ -283,8 +290,10 @@ else
   print(ifelse(is.null(linetype),
                1,
                firstup(linetype)))
+
+
 switch(type,
-       "line" = {graph <- .do_graph_line(table=reshaped,
+       "line" = {graph <- .do_graph_line(mytable=reshaped,
                                          x_variable = "time",
                                          y_variable = "value",
                                          color = firstup(color_col),
@@ -325,6 +334,7 @@ switch(type,
 
 # print("ok2")
 ## Faceting variable
+faceting <- F
 if(!isFALSE(faceting)){
   if(!is.character(faceting))
     stop("faceting must be a character of length 1")

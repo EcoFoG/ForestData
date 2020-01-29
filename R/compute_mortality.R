@@ -27,11 +27,17 @@
 #'
 compute_mortality <- function(data,
                               status_col="status_corr",
-                              time_col="CensusYear",
-                              id_col="idTree",
+                              time_col=ifelse(is.null(getOption("time_col")),
+                                              "CensusYear",
+                                              getOption("time_col")),
+                              id_col=ifelse(is.null(getOption("id_col")),
+                                            "idTree",
+                                            getOption("id_col")),
                               dead_confirmation_censuses=2,
                               byplot = TRUE,
-                              plot_col = "Plot",
+                              plot_col = ifelse(is.null(getOption("plot_col")),
+                                                "Plot",
+                                                getOption("plot_col")),
                               corrected = TRUE){
 
   # Checks ------------------------------------------------------------------
@@ -51,7 +57,18 @@ compute_mortality <- function(data,
 
 
   if(!corrected){
-    data <- correct_alive(data,status_col=status_col,time_col=time_col)
+    # print(names(data))
+    data <- correct_alive(data,
+                          status_col="status_corr",
+                          id_col = "id",
+                          time_col="time",
+                          byplot=byplot,
+                          plot_col = ifelse(byplot, "plot",plot_col),
+                          dead_confirmation_censuses = dead_confirmation_censuses,
+                          invariant_columns = ifelse(byplot,
+                                                     c("plot","id"),
+                                                     "id"),
+                          use_size = F)
     warning("You specified that your dataset was not corrected beforehand. It has been automatically corrected prior to mortality rate computation.")
   }
   # prepare dataset ---------------------------------------------------------
@@ -78,20 +95,23 @@ compute_mortality <- function(data,
     plots <- unique(data$plot)
 
     times <- sort(unique(data$time[which(data$plot == plots[1])]), decreasing = F)
-    mortality <- data.frame(time = paste(times[-((length(times)-(dead_confirmation_censuses-1)):length(times))],times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))], sep = "_" ),
+    mortality <- data.frame(interval = paste(times[-((length(times)-(dead_confirmation_censuses-1)):length(times))],times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))], sep = "_" ),
+                            time = times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))],
                             annual_deathrate = NA,
                             plot = plots[1])
-    mortality$time
+    # mortality$time
     for(p in plots[-1]){
+      # print(plots[-1])
       times <- sort(unique(data$time[which(data$plot == p)]), decreasing = F)
-      temp <- data.frame(time = paste(times[-((length(times)-(dead_confirmation_censuses-1)):length(times))],times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))], sep = "_" ),
+      temp <- data.frame(interval = paste(times[-((length(times)-(dead_confirmation_censuses-1)):length(times))],times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))], sep = "_" ),
+                         time = times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))],
                          annual_deathrate = NA,
                          plot = p)
       mortality <- rbind(mortality, temp)
       # times
       # times[-((length(times)-(dead_confirmation_censuses-1)):length(times))]
       # times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))]
-      rm(temp); rm(times)
+      # rm(temp); rm(times)
     }
   }
   else{
@@ -151,8 +171,8 @@ compute_mortality <- function(data,
 
     # print(data$status_corr == 1)
     # print(data$status_lagged)
-    print("next")
-    mortality_plot[which(mortality_plot$time == paste(t0, t1, sep = "_")),"annual_deathrate"] <- 1-(N1/N0) ^ (1/(t1-t0))
+    # print("next")
+    mortality_plot[which(mortality_plot$interval == paste(t0, t1, sep = "_")),"annual_deathrate"] <- 1-(N1/N0) ^ (1/(t1-t0))
       # 1-((N1/N0) ^ (1/(t1-t0)))
 if((1-(N1/N0) ^ (1/(t1-t0))) < 0){
   print(paste("t0 :", t0))

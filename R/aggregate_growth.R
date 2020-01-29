@@ -66,5 +66,7 @@ aggregate_growth <- function(growth,
       }
     }
   }
+  # print(by)
+  for(b in by[-which(by=="time")]) growth_by[,b] <- factor(growth_by[,b])
   return(growth_by)
 }

@@ -10,7 +10,7 @@ display_recruitment(
   time_col = "time",
   color_col = "plot",
   faceting = FALSE,
-  title = "Annual recruitment and recruitment rates in function of census intervals.",
+  title = "Annual recruitment rates in function of census intervals.",
   subtitle = NULL,
   save_graph = FALSE,
   device = "png",

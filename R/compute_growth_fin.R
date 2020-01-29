@@ -50,7 +50,7 @@ compute_growth <- function(data,
   data <- check_rename_variable_col(id_col,"id_col",data)
   data <- check_rename_variable_col(time_col,"time_col",data)
   data <- check_rename_variable_col(status_col,"status_col",data)
-  print(names(data))
+  # print(names(data))
   # if(!isTRUE(pmatch(x=measure_type,table="Circumference"))){
   #   data$size <- data$size/pi
   # }
@@ -96,7 +96,7 @@ compute_growth <- function(data,
 
 
   data <- data[order(data$id, data$time),]
-  print(-nrow(data))
+  # print(-nrow(data))
   # print(data$time[])
   data$time_lag <- c(NA, data$time[-nrow(data)])
   data$id_lag <- c(NA, data$id[-nrow(data)])
@@ -108,7 +108,7 @@ compute_growth <- function(data,
   data$absolute_growth[which(!(data$id == data$id_lag | is.na(data$id)))] <- NA
   data$time_interval[which(!(data$id == data$id_lag | is.na(data$id)))] <- NA
   if(any(is.na(data$status) | (data$status == 0))){
-    print(verbose)
+    # print(verbose)
     if(isTRUE(verbose)){
       message("The growth rates were not computed when tree life status was 0 (dead) or NA (unseen or uncertain), thus the growth rate on these lines was set to NA")
     }
@@ -117,6 +117,8 @@ compute_growth <- function(data,
   if(what_output == "annual"){
     data$annual_growth <- data$absolute_growth/(data$time-data$time_lag)
   }
+  #minor quickfix
+  data <- data[!is.na(data$absolute_growth),]
 
   if(isTRUE(aggregate)){
     if(!stat %in% c("mean","median","sum")){

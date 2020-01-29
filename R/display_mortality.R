@@ -21,12 +21,12 @@ display_mortality <- function(mortality = NULL,
                           time_col = "time",
                           color_col = "plot",
                           faceting = FALSE,
-                          title = "Annual mortality and recruitment rates in function of census intervals.",
+                          title = "Annual mortality rates in function of time.",
                           subtitle = NULL,
                           save_graph = FALSE,
                           device="png",
-                          path_save = file.path("ForestGraphs",paste0("annual_mortality_recruitment_",type,".png")),
-                          name = "Annual Mortality and Recruitment rates for each between-census interval",
+                          path_save = file.path("ForestGraphs",paste0("annual_mortality_",type,".png")),
+                          name = "Annual Mortality rates for each between-census interval",
                           create_folder = FALSE,
                           overwrite = FALSE,
                           ...){
@@ -49,12 +49,21 @@ display_mortality <- function(mortality = NULL,
     stop("argument 'type' must be one of the following: line, histogram, barplot.")
   }
 
-  if(!(time_col %in% names(merged) & length(time_col)==1)){
+  if(!(time_col %in% names(mortality) & length(time_col)==1)){
     stop("The name of the dataset's column containing census intervals (time_col) is apparently erroneous. It must be a character of length one corresponding to a column name.")
   }
-  if(!(color_col %in% names(merged) & length(color_col)==1)){
+  if(!(color_col %in% names(mortality) & length(color_col)==1)){
     stop("The name of the dataset's column containing the categories used as colors (color_col) is apparently erroneous. It must be a character of length one corresponding to a column name.")
   }
+
+  # print(class(recruitment[,time_col]))
+  ## Add time column and fix plot
+  if(is.character(mortality[,time_col])|is.factor(mortality[,time_col])){
+    mortality$interval <- mortality[,time_col]
+    mortality$time <- as.numeric(unlist(strsplit(as.character(mortality[,time_col]), split = "_"))[seq.default(from = 2, to = 2*nrow(mortality), by = 2)])
+    # print(recruitment$time)
+  }
+  if(!is.factor(mortality[,color_col])) mortality[,color_col] <- factor(mortality[,color_col])
 
 
   ## Package ggplot2
@@ -124,7 +133,7 @@ display_mortality <- function(mortality = NULL,
   x.angle <- 90
   y.angle <- 0
   position <- "position"
-  linetype <- NULL
+  linetype <- 1
 
   for(a in names(arguments)){
     switch(a,
@@ -151,9 +160,9 @@ display_mortality <- function(mortality = NULL,
 
   # Do the appropriate graph ------------------------------------------------
   switch(type,
-         "line" = {graph <- .do_graph_line(mortality,
+         "line" = {graph <- .do_graph_line(mytable=mortality,
                                            x_variable = "time",
-                                           y_variable = "value",
+                                           y_variable = "annual_deathrate",
                                            colour = color_col,
                                            linetype = linetype,
                                            title = title,

@@ -27,13 +27,19 @@
 #' corrected = TRUE)
 #' }
 compute_recruitment <- function(data,
-                              status_col="status_corr",
-                              time_col = "CensusYear",
-                              id_col = "idTree",
-                              dead_confirmation_censuses=2,
-                              byplot = TRUE,
-                              plot_col = "Plot",
-                              corrected = TRUE){
+                                status_col="status_corr",
+                                time_col=ifelse(is.null(getOption("time_col")),
+                                                "CensusYear",
+                                                getOption("time_col")),
+                                id_col=ifelse(is.null(getOption("id_col")),
+                                              "idTree",
+                                              getOption("id_col")),
+                                dead_confirmation_censuses=2,
+                                byplot = TRUE,
+                                plot_col = ifelse(is.null(getOption("plot_col")),
+                                                  "Plot",
+                                                  getOption("plot_col")),
+                                corrected = TRUE){
 
   # Checks ------------------------------------------------------------------
 
@@ -51,7 +57,18 @@ compute_recruitment <- function(data,
   if(byplot) data <- check_rename_variable_col(plot_col, "plot_col",data)
 
   if(!corrected){
-    data <- correct_alive(data,status_col=status_col,time_col=time_col)
+    print(names(data))
+    data <- correct_alive(data,
+                          status_col="status_corr",
+                          id_col = "id",
+                          time_col="time",
+                          byplot=byplot,
+                          plot_col = ifelse(byplot, "plot",plot_col),
+                          dead_confirmation_censuses = dead_confirmation_censuses,
+                          invariant_columns = ifelse(byplot,
+                                                     c("plot","id"),
+                                                     "id"),
+                          use_size = F)
     warning("You specified that your dataset was not corrected beforehand. It has been automatically corrected prior to recruitment rate computation.")
   }
   # prepare dataset ---------------------------------------------------------
@@ -77,13 +94,15 @@ compute_recruitment <- function(data,
     plots <- unique(data$plot)
 
     times <- sort(unique(data$time[which(data$plot == plots[1])]), decreasing = F)
-    recruitment <- data.frame(time = paste(times[-((length(times)-(dead_confirmation_censuses-1)):length(times))],times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))], sep = "_" ),
-                            annual_recruitment_rate = NA,
-                            plot = plots[1])
-    recruitment$time
+    recruitment <- data.frame(interval = paste(times[-((length(times)-(dead_confirmation_censuses-1)):length(times))],times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))], sep = "_" ),
+                              time = times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))],
+                              annual_recruitment_rate = NA,
+                              plot = plots[1])
+    # recruitment$time
     for(p in plots[-1]){
       times <- sort(unique(data$time[which(data$plot == p)]), decreasing = F)
-      temp <- data.frame(time = paste(times[-((length(times)-(dead_confirmation_censuses-1)):length(times))],times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))], sep = "_" ),
+      temp <- data.frame(interval = paste(times[-((length(times)-(dead_confirmation_censuses-1)):length(times))],times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))], sep = "_" ),
+                         time = times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))],
                          annual_recruitment_rate = NA,
                          plot = p)
       recruitment <- rbind(recruitment, temp)
@@ -92,15 +111,16 @@ compute_recruitment <- function(data,
   }
   else{
     times <- sort(unique(data$time), decreasing = F)
-    recruitment <- data.frame(time = paste(times[-((length(times)-dead_confirmation_censuses):length(times))],times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))], sep = "_" ),
-                            annual_recruitment_rate = NA)
+    recruitment <- data.frame(interval = paste(times[-((length(times)-dead_confirmation_censuses):length(times))],times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))], sep = "_" ),
+                              time = times[c(-1,-((length(times)-(dead_confirmation_censuses-2)):length(times)))],
+                              annual_recruitment_rate = NA)
   }
 
 
   if(byplot){
     plots <- unique(data$plot)
     for(p in plots){
-      print(recruitment[which(recruitment$plot == p),])
+      # print(recruitment[which(recruitment$plot == p),])
       recruitment <- rbind(recruitment[which(recruitment$plot != p),],
                          .compute_recruitment_plotlevel(data[which(data$plot == p),],
                                                       recruitment[which(recruitment$plot == p),],
@@ -108,10 +128,18 @@ compute_recruitment <- function(data,
                          )
       )
     }
-    return(recruitment)
   }
-  else return(.compute_recruitment_plotlevel(data, recruitment, dead_confirmation_censuses))
+  else recruitment <- .compute_recruitment_plotlevel(data, recruitment, dead_confirmation_censuses)
+
+  ## Add time column and fix plot
+  if(byplot)
+    # print(plot_col)
+    if(!is.factor(recruitment[,"plot"])) recruitment[,"plot"] <- factor(recruitment[,"plot"])
+
+  return(recruitment)
+
 }
+
 
 
 # internals ---------------------------------------------------------------
@@ -135,7 +163,7 @@ compute_recruitment <- function(data,
                 data_plot$status_corr == 1 &
                 is.na(data_plot$status_lagged))
 
-    recruitment_plot[which(recruitment_plot$time == paste(t0, t1, sep = "_")),"annual_recruitment_rate"] <- ((N1/N0) ^ (1/(t1-t0)))
+    recruitment_plot[which(recruitment_plot$interval == paste(t0, t1, sep = "_")),"annual_recruitment_rate"] <- ((N1/N0) ^ (1/(t1-t0)))
 
   }
   return(recruitment_plot)

@@ -21,7 +21,7 @@ display_recruitment <- function(recruitment = NULL,
                           time_col = "time",
                           color_col = "plot",
                           faceting = FALSE,
-                          title = "Annual recruitment and recruitment rates in function of census intervals.",
+                          title = "Annual recruitment rates in function of census intervals.",
                           subtitle = NULL,
                           save_graph = FALSE,
                           device="png",
@@ -36,7 +36,7 @@ display_recruitment <- function(recruitment = NULL,
 
 
 
-  ## recruitment and recruitment, or merged
+  ## recruitment
   if(!is.data.frame(recruitment)){
     stop("The recruitment table must be a data.frame outputed by the function compute_recruitment, or of the exactly same format")
   }
@@ -49,14 +49,21 @@ display_recruitment <- function(recruitment = NULL,
     stop("argument 'type' must be one of the following: line, histogram, barplot.")
   }
 
-  if(!(time_col %in% names(merged) & length(time_col)==1)){
+  if(!(time_col %in% names(recruitment) & length(time_col)==1)){
     stop("The name of the dataset's column containing census intervals (time_col) is apparently erroneous. It must be a character of length one corresponding to a column name.")
   }
-  if(!(color_col %in% names(merged) & length(color_col)==1)){
+  if(!(color_col %in% names(recruitment) & length(color_col)==1)){
     stop("The name of the dataset's column containing the categories used as colors (color_col) is apparently erroneous. It must be a character of length one corresponding to a column name.")
   }
 
-
+# print(class(recruitment[,time_col]))
+  ## Add time column and fix plot
+  # if(is.character(recruitment[,time_col])|is.factor(recruitment[,time_col])){
+  #   recruitment$interval <- recruitment[,time_col]
+  #   recruitment$time <- as.numeric(unlist(strsplit(as.character(recruitment[,time_col]), split = "_"))[seq.default(from = 2, to = 2*nrow(recruitment), by = 2)])
+# print(recruitment$time)
+  # }
+  if(!is.factor(recruitment[,color_col])) recruitment[,color_col] <- factor(recruitment[,color_col])
   ## Package ggplot2
   test <-.test_install_package("ggplot2","display_rates")
   if(!test == 0){
@@ -124,7 +131,7 @@ display_recruitment <- function(recruitment = NULL,
   x.angle <- 90
   y.angle <- 0
   position <- "position"
-  linetype <- NULL
+  linetype <- 1
 
   for(a in names(arguments)){
     switch(a,
@@ -148,12 +155,12 @@ display_recruitment <- function(recruitment = NULL,
            },
            warning(paste0("argument ", a, " is unused")))
   }
-
+# print(recruitment)
   # Do the appropriate graph ------------------------------------------------
   switch(type,
          "line" = {graph <- .do_graph_line(recruitment,
                                            x_variable = "time",
-                                           y_variable = "value",
+                                           y_variable = "annual_recruitment_rate",
                                            colour = color_col,
                                            linetype = linetype,
                                            title = title,
