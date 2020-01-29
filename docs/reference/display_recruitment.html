@@ -6,15 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Display Mortality Rates with ggplot2 — display_recruitment • ForestData</title>
-
+<title>Display recruitment Rates with ggplot2 — display_recruitment • ForestData</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -34,12 +32,10 @@
 
 
 
+<meta property="og:title" content="Display recruitment Rates with ggplot2 — display_recruitment" />
 
-<meta property="og:title" content="Display Mortality Rates with ggplot2 — display_recruitment" />
-<meta property="og:description" content="Display Mortality Rates with ggplot2
-Display recruitment Rates with ggplot2" />
+<meta property="og:description" content="Display recruitment Rates with ggplot2" />
 <meta name="twitter:card" content="summary" />
-
 
 
 
@@ -85,7 +81,20 @@ Display recruitment Rates with ggplot2" />
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/forestdata-vignette.html">How to use ForestData's corrections</a>
+    </li>
+  </ul>
+</li>
       </ul>
+      
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
@@ -101,14 +110,15 @@ Display recruitment Rates with ggplot2" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Display Mortality Rates with ggplot2</h1>
+    <h1>Display recruitment Rates with ggplot2</h1>
     
     <div class="hidden name"><code>display_recruitment.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Display Mortality Rates with ggplot2</p>
-<p>Display recruitment Rates with ggplot2</p>
+    
+    <p>Display recruitment Rates with ggplot2</p>
+    
     </div>
 
     <pre class="usage"><span class='fu'>display_recruitment</span>(
@@ -117,25 +127,7 @@ Display recruitment Rates with ggplot2" />
   <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"time"</span>,
   <span class='kw'>color_col</span> <span class='kw'>=</span> <span class='st'>"plot"</span>,
   <span class='kw'>faceting</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>"Annual recruitment and recruitment rates in function of census intervals."</span>,
-  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>save_graph</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>device</span> <span class='kw'>=</span> <span class='st'>"png"</span>,
-  <span class='kw'>path_save</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"ForestGraphs"</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"annual_recruitment_recruitment_"</span>, <span class='no'>type</span>,
-    <span class='st'>".png"</span>)),
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"Annual recruitment and Recruitment rates for each between-census interval"</span>,
-  <span class='kw'>create_folder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>...</span>
-)
-
-<span class='fu'>display_recruitment</span>(
-  <span class='kw'>recruitment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"line"</span>,
-  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"time"</span>,
-  <span class='kw'>color_col</span> <span class='kw'>=</span> <span class='st'>"plot"</span>,
-  <span class='kw'>faceting</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>"Annual recruitment and recruitment rates in function of census intervals."</span>,
+  <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>"Annual recruitment rates in function of census intervals."</span>,
   <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>save_graph</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>device</span> <span class='kw'>=</span> <span class='st'>"png"</span>,
@@ -146,7 +138,7 @@ Display recruitment Rates with ggplot2" />
   <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='no'>...</span>
 )</pre>
-
+    
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -202,24 +194,21 @@ Display recruitment Rates with ggplot2" />
       <th>overwrite</th>
       <td><p>Logical, indicating whether a file already existing under the same name must be overwritten, or kept. In the second case, the function aborts with an explicit error message.</p></td>
     </tr>
-    <tr>
-      <th>mortality</th>
-      <td><p>data.frame, output of compute_mortality</p></td>
-    </tr>
     </table>
-
+    
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A ggplot2 graphical object.</p>
-<p>A ggplot2 graphical object.</p>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      
       <li><a href="#value">Value</a></li>
-    </ul>
+          </ul>
 
   </div>
 </div>

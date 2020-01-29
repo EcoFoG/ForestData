@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' data("example_census")
-#' compute_mortality(example_census)
+#' compute_mortality(example_census,
 #' status_col="status_corr",
 #' time_col="CensusYear",
 #' id_col="idTree",

@@ -8,13 +8,11 @@
 
 <title>Correct Trees Life Status in a Forest Inventory — correct_alive • ForestData</title>
 
-
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -34,12 +32,11 @@
 
 
 
-
 <meta property="og:title" content="Correct Trees Life Status in a Forest Inventory — correct_alive" />
+
 <meta property="og:description" content="correct_alive spots unseen trees, adds corresponding lines and corrects their
 status." />
 <meta name="twitter:card" content="summary" />
-
 
 
 
@@ -85,7 +82,20 @@ status." />
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/forestdata-vignette.html">How to use ForestData's corrections</a>
+    </li>
+  </ul>
+</li>
       </ul>
+      
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
@@ -107,8 +117,10 @@ status." />
     </div>
 
     <div class="ref-description">
+    
     <p>correct_alive spots unseen trees, adds corresponding lines and corrects their
 status.</p>
+    
     </div>
 
     <pre class="usage"><span class='fu'>correct_alive</span>(
@@ -122,7 +134,7 @@ status.</p>
   <span class='kw'>use_size</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>invariant_columns</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Forest"</span>, <span class='st'>"Family"</span>, <span class='st'>"Genus"</span>, <span class='st'>"Species"</span>, <span class='st'>"binomial_name"</span>)
 )</pre>
-
+    
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -179,7 +191,7 @@ for invariant columns are taken from the value for other censuses. Defaults
 to null</p></td>
     </tr>
     </table>
-
+    
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>a data.frame containing the corrected data, with trees' corrected
@@ -190,6 +202,7 @@ to null</p></td>
   id, plot, census year, corrected status, and the columns specified in
   <code>invariant_columns</code> argument. Useless lines, with NA status before
   first sight alive, or after death statement, are suppressed.</p>
+    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><strong><em>Argument <code>death_confirmation_censuses</code></em></strong>
@@ -211,6 +224,7 @@ this case, this option must not be activated, and the status field has to be
 created manually. If your data ALREADY contains a field indicating whether
 the tree is dead -0 or FALSE-, or alive -1 or TRUE-, please let
 <code>use_size</code> to its default value.</p>
+    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>#Load the provided example dataset</span>
@@ -274,8 +288,11 @@ the tree is dead -0 or FALSE-, or alive -1 or TRUE-, please let
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      
       <li><a href="#value">Value</a></li>
+
       <li><a href="#details">Details</a></li>
+      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

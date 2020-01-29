@@ -8,13 +8,11 @@
 
 <title>Compute Annual Mortality Rates in Forest Inventories — compute_mortality • ForestData</title>
 
-
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -34,11 +32,10 @@
 
 
 
-
 <meta property="og:title" content="Compute Annual Mortality Rates in Forest Inventories — compute_mortality" />
+
 <meta property="og:description" content="This function computes mortality in forest inventories according to plot if there are several" />
 <meta name="twitter:card" content="summary" />
-
 
 
 
@@ -84,7 +81,20 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/forestdata-vignette.html">How to use ForestData's corrections</a>
+    </li>
+  </ul>
+</li>
       </ul>
+      
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
@@ -106,20 +116,22 @@
     </div>
 
     <div class="ref-description">
+    
     <p>This function computes mortality in forest inventories according to plot if there are several</p>
+    
     </div>
 
     <pre class="usage"><span class='fu'>compute_mortality</span>(
   <span class='no'>data</span>,
   <span class='kw'>status_col</span> <span class='kw'>=</span> <span class='st'>"status_corr"</span>,
-  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"CensusYear"</span>,
-  <span class='kw'>id_col</span> <span class='kw'>=</span> <span class='st'>"idTree"</span>,
+  <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NULL.html'>is.null</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"time_col"</span>)), <span class='st'>"CensusYear"</span>, <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"time_col"</span>)),
+  <span class='kw'>id_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NULL.html'>is.null</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"id_col"</span>)), <span class='st'>"idTree"</span>, <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"id_col"</span>)),
   <span class='kw'>dead_confirmation_censuses</span> <span class='kw'>=</span> <span class='fl'>2</span>,
   <span class='kw'>byplot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>plot_col</span> <span class='kw'>=</span> <span class='st'>"Plot"</span>,
+  <span class='kw'>plot_col</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NULL.html'>is.null</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"plot_col"</span>)), <span class='st'>"Plot"</span>, <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"plot_col"</span>)),
   <span class='kw'>corrected</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
-
+    
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -156,10 +168,11 @@
       <td><p>Logical. Indicates whether the dataset has been corrected for errors in tree life status; if not it will be corrected beforehand using correct_alive function</p></td>
     </tr>
     </table>
-
+    
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A data.frame with absolute and annual mortality rates by plot and census interval.</p>
+    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"></pre>
@@ -168,7 +181,9 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      
       <li><a href="#value">Value</a></li>
+      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

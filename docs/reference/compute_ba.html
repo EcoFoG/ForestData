@@ -8,13 +8,11 @@
 
 <title>Compute Basal Area in Forest Inventories — compute_ba • ForestData</title>
 
-
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -34,11 +32,10 @@
 
 
 
-
 <meta property="og:title" content="Compute Basal Area in Forest Inventories — compute_ba" />
-<meta property="og:description" content="compute_ba computes Basal Area according to user-specified grouping variables -Plot, species, etc- and time." />
-<meta name="twitter:card" content="summary" />
 
+<meta property="og:description" content="compute_ba computes Basal Area according to user-specified grouping variables -e.g. Plot, species, etc- and time." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -84,7 +81,20 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/forestdata-vignette.html">How to use ForestData's corrections</a>
+    </li>
+  </ul>
+</li>
       </ul>
+      
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
@@ -106,7 +116,9 @@
     </div>
 
     <div class="ref-description">
-    <p>compute_ba computes Basal Area according to user-specified grouping variables -Plot, species, etc- and time.</p>
+    
+    <p>compute_ba computes Basal Area according to user-specified grouping variables -e.g. Plot, species, etc- and time.</p>
+    
     </div>
 
     <pre class="usage"><span class='fu'>compute_ba</span>(
@@ -118,7 +130,7 @@
   <span class='kw'>status_col</span> <span class='kw'>=</span> <span class='st'>"status_corr"</span>,
   <span class='kw'>surface</span> <span class='kw'>=</span> <span class='fl'>1.5625</span>
 )</pre>
-
+    
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -147,19 +159,26 @@
       <td><p>Either a scalar containing the surface area of each plot -if they have the same dimensions- or a data.frame of the surface area according to some of the grouping variables -e.g. Plot and subplot. However, defaults to FALSE and in this case, only absolute BA is returned.</p></td>
     </tr>
     </table>
-
+    
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A dataframe containing, for each combination of grouping variables, the plot-level and per-ha basal area for a given census year.</p>
+    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"example_census"</span>)
-<span class='no'>ba</span> <span class='kw'>&lt;-</span> <span class='fu'>compute_ba</span>(<span class='no'>example_census</span>,
-<span class='kw'>size_col</span> <span class='kw'>=</span> <span class='st'>"CircCorr"</span>,
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"example_recruits_corr"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: data set 'example_recruits_corr' not found</span></div><div class='input'>
+<span class='no'>ba_plots</span> <span class='kw'>&lt;-</span> <span class='fu'>compute_ba</span>(<span class='no'>example_recruits_corr</span>,
+<span class='kw'>size_col</span> <span class='kw'>=</span> <span class='st'>"size_corr"</span>,
 <span class='kw'>measure_type</span> <span class='kw'>=</span> <span class='st'>"C"</span>,
 <span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"CensusYear"</span>,
-<span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Species"</span>,<span class='st'>"Plot"</span>),
-<span class='kw'>surface</span> <span class='kw'>=</span> <span class='fl'>1.5625</span>)</div><div class='output co'>#&gt; <span class='error'>Error in compute_ba(example_census, size_col = "CircCorr", measure_type = "C",     time_col = "CensusYear", by = c("Species", "Plot"), surface = 1.5625): Argument size_col does not match any column name in the forest inventory you provided</span></div><div class='input'>
+<span class='kw'>by</span> <span class='kw'>=</span> <span class='st'>"Plot"</span>,
+<span class='kw'>surface</span> <span class='kw'>=</span> <span class='fl'>1.5625</span>)</div><div class='output co'>#&gt; <span class='error'>Error in status_col %in% names(data): objet 'example_recruits_corr' introuvable</span></div><div class='input'>
+<span class='no'>ba_taxa</span> <span class='kw'>&lt;-</span> <span class='fu'>compute_ba</span>(<span class='no'>example_recruits_corr</span>,
+<span class='kw'>size_col</span> <span class='kw'>=</span> <span class='st'>"size_corr"</span>,
+<span class='kw'>measure_type</span> <span class='kw'>=</span> <span class='st'>"C"</span>,
+<span class='kw'>time_col</span> <span class='kw'>=</span> <span class='st'>"CensusYear"</span>,
+<span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"binomial_name"</span>,<span class='st'>"Plot"</span>),
+<span class='kw'>surface</span> <span class='kw'>=</span> <span class='fl'>1.5625</span>)</div><div class='output co'>#&gt; <span class='error'>Error in status_col %in% names(data): objet 'example_recruits_corr' introuvable</span></div><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>(<span class='no'>ba</span>)</div><div class='output co'>#&gt; <span class='error'>Error in str(ba): objet 'ba' introuvable</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>ba</span>)</div><div class='output co'>#&gt; <span class='error'>Error in head(ba): objet 'ba' introuvable</span></div><div class='input'>
 </div></pre>
   </div>
@@ -167,7 +186,9 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      
       <li><a href="#value">Value</a></li>
+      
       <li><a href="#examples">Examples</a></li>
     </ul>
 
