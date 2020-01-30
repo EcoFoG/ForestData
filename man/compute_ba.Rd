@@ -25,6 +25,8 @@ compute_ba(
 
 \item{time_col}{A single character containing the name of the column corresponding to census years}
 
+\item{status_col}{Single character, the name of the column containing (corrected) tree life status}
+
 \item{surface}{Either a scalar containing the surface area of each plot -if they have the same dimensions- or a data.frame of the surface area according to some of the grouping variables -e.g. Plot and subplot. However, defaults to FALSE and in this case, only absolute BA is returned.}
 }
 \value{
@@ -34,23 +36,23 @@ A dataframe containing, for each combination of grouping variables, the plot-lev
 compute_ba computes Basal Area according to user-specified grouping variables -e.g. Plot, species, etc- and time.
 }
 \examples{
-data("example_recruits_corr")
+data("example_recruits")
 
-ba_plots <- compute_ba(example_recruits_corr,
+ba_plots <- compute_ba(example_recruits,
 size_col = "size_corr",
 measure_type = "C",
 time_col = "CensusYear",
 by = "Plot",
 surface = 1.5625)
 
-ba_taxa <- compute_ba(example_recruits_corr,
+ba_taxa <- compute_ba(example_recruits,
 size_col = "size_corr",
 measure_type = "C",
 time_col = "CensusYear",
 by = c("binomial_name","Plot"),
 surface = 1.5625)
 
-str(ba)
-head(ba)
+str(ba_plots)
+head(ba_taxa)
 
 }

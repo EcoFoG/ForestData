@@ -38,10 +38,10 @@
 #'
 #' ## From a bare dataset - better using after correct_alive and correct_size
 #'
-#' data("example_census")
+#' data("example_size_corr")
 #'
 
-#' correct_recruits(data,
+#' correct_recruits(example_size_corr,
 #' dbh_min = 10,
 #' positive_growth_threshold = 5,
 #' time_col = "CensusYear",
@@ -50,10 +50,12 @@
 #' size_corr_col = "size_corr",
 #' status_corr_col = "status_corr",
 #' measure_type = "circumference",
-#' invariant_columns = c("SubPlot","species","Genus","binomial_name"),
+#' invariant_columns = c("Forest","Family","Genus","Species","binomial_name"),
 #' byplot = TRUE,
 #' correct_status = FALSE)
-#'
+#' @param size_corr_col Character, the name of the column containing corrected size measurements.
+#' @param status_corr_col  Character, the name of the column containing corrected tree life status.
+#' @param correct_status Logical, indicating whether the life status has to be corrected beforhand or not.
 correct_recruits <- function(data,
                              dbh_min = 10,
                              positive_growth_threshold = 5,
@@ -163,7 +165,7 @@ correct_recruits <- function(data,
 
   if(byplot){
     plots <- unique(data$plot)
-    pb <- txtProgressBar(min = 0, max = length(plots), style = 3)
+    pb <- utils::txtProgressBar(min = 0, max = length(plots), style = 3)
     if(!is.character(data$plot)) data$plot = as.character(data$plot)
 
     # for(p in plots){
@@ -173,7 +175,7 @@ correct_recruits <- function(data,
     # }
     # print(head(data[which(data$plot == 1),]))
     data <- do.call(rbind,lapply(plots, function(p){
-      setTxtProgressBar(pb, which(plots == p))
+      utils::setTxtProgressBar(pb, which(plots == p))
       # print(head(data[which(data$plot == p),]))
       .correct_recruits_plot(data_plot=data[which(data$plot == p),],
                              dbh_min = dbh_min,
@@ -368,7 +370,7 @@ correct_recruits <- function(data,
           }
 
           # print(c("after",nrow(tree)))
-          if(nrow(tree) == 0) print(tree1 %>%  mutate(Dcorr = size_corr/pi,D = size/pi) %>% select(time, D, Dcorr, corrected_recruit, status_corr, species,Plotsub))
+          # if(nrow(tree) == 0) print(tree1 %>%  mutate(Dcorr = size_corr/pi,D = size/pi) %>% select(time, D, Dcorr, corrected_recruit, status_corr, species,Plotsub))
 
 
         }

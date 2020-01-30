@@ -48,6 +48,8 @@ display_recruitment(
 \item{create_folder}{Logical, indicated whether the folders in the given path must be created in case they do not exist yet, or not}
 
 \item{overwrite}{Logical, indicating whether a file already existing under the same name must be overwritten, or kept. In the second case, the function aborts with an explicit error message.}
+
+\item{...}{additional graphical arguments to pass to ggplot's functions}
 }
 \value{
 A ggplot2 graphical object.

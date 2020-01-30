@@ -218,7 +218,14 @@ str(example_status_corr)
 
 #Correct it (short version with column names set with prepare_forestdata)
 
-prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+prepare_forestdata(example_census,
+plot_col="Plot",
+id_col="idTree",
+time_col="CensusYear",
+status_col = "CodeAlive",
+size_col="Circ",
+measure_type = "C",
+POM_col = "POM")
 
 example_size_corr <- correct_size(example_status_corr,
 species_col = "binomial_name",#tag pioneer

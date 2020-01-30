@@ -149,7 +149,14 @@
 #'
 #' #Correct it (short version with column names set with prepare_forestdata)
 #'
-#' prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+#' prepare_forestdata(example_census,
+#' plot_col="Plot",
+#' id_col="idTree",
+#' time_col="CensusYear",
+#' status_col = "CodeAlive",
+#' size_col="Circ",
+#' measure_type = "C",
+#' POM_col = "POM")
 #'
 #' example_size_corr <- correct_size(example_status_corr,
 #' species_col = "binomial_name",#tag pioneer
@@ -239,10 +246,10 @@ correct_size <- function(data,
 
   ids <- unique(data$id)
 
-  pb <- txtProgressBar(min = 0, max = length(ids), style = 3)
+  pb <- utils::txtProgressBar(min = 0, max = length(ids), style = 3)
   res <- do.call(rbind,lapply(ids,
                               function(i){
-                                setTxtProgressBar(pb, which(ids == i))
+                                utils::setTxtProgressBar(pb, which(ids == i))
                                 tree <- data[which(data$id == i),]
                                 #tag pioneer
                                 if(unique(tree$species %in% pioneer_sp)){

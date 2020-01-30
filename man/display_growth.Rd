@@ -34,6 +34,8 @@ display_growth(
 \item{color_col}{Character, name of the colomn used to define lines' colors,
 defaults to "Plot".}
 
+\item{growth_variable}{Character}
+
 \item{faceting}{Character, name of the variable used for faceting -see after-
 but defaults to FALSE i.e. no faceting. NB: faceting refers to using a
 grouping variable to layout multiple plots, each corresponding to a
@@ -85,16 +87,16 @@ Display annual growth rates using ggplot2
 \examples{
 
 data(example_size_corr)
-growth <- compute_growth(example_size_corr,
+growth <- suppressWarnings(compute_growth(example_size_corr,
                          size_col = "size_corr",
                          measure_type = "cir",
                          status_col = "CodeAlive",
                          id_col= "idTree",
                          time_col = "CensusYear",
                          what_output = "annual",
-                         aggregate = T,
+                         aggregate = TRUE,
                          by = c("Plot"),
                          stat = "mean",
-                         percentiles = c(5,95))
+                         percentiles = c(5,95)))
  display_growth(growth)
 }

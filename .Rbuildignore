@@ -2,3 +2,13 @@
 ^\.Rproj\.user$
 ^doc$
 ^Meta$
+^LICENCE$
+^\.travis\.yml$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^_Rhistory$
+^_gitignore.txt$
+^_travis\.yml$
+^packages\.rds$
+^\.\#Extra$

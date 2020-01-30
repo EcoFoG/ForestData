@@ -39,8 +39,8 @@ A data.frame with absolute and annual mortality rates by plot and census interva
 This function computes mortality in forest inventories according to plot if there are several
 }
 \examples{
-data("example_census")
-compute_mortality(example_census)
+data("example_status_corr")
+compute_mortality(example_status_corr,
 status_col="status_corr",
 time_col="CensusYear",
 id_col="idTree",

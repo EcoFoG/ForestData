@@ -179,10 +179,10 @@ display_rates <- function(mortality = NULL,
 
 
 ## Package ggplot2
-  test <-.test_install_package("ggplot2","display_rates")
-  if(!test == 0){
-    stop("ggplot2 is needed to run display_rates, but unavailable...")
-  }
+  # test <-.test_install_package("ggplot2","display_rates")
+  # if(!test == 0){
+  #   stop("ggplot2 is needed to run display_rates, but unavailable...")
+  # }
 
 
 ## subtitle
@@ -319,13 +319,14 @@ switch(type,
                                                y.axis.name = y.name,
                                                x.text.angle = x.angle,
                                                y.text.angle = y.angle)},
-       "histogram" = {graph <- .do_graph_histogram(reshaped,
-                                                   x_variable,
-                                                   color_col,
-                                                   title = title,
-                                                   subtitle = subtitle,
-                                                   x.axis.name =  "Annual rate",
-                                                   y.axis.name = "Count")},
+       # "histogram" = {graph <- .do_graph_histogram(reshaped,
+       #                                             x_variable,
+       #                                             color_col,
+       #                                             title = title,
+       #                                             subtitle = subtitle,
+       #                                             x.axis.name =  "Annual rate",
+       #                                             y.axis.name = "Count")
+       # },
        stop("Type must be one of the following: line, histogram, bar")
 )
 
@@ -344,14 +345,14 @@ if(!isFALSE(faceting)){
   else if(!(faceting %in% names(reshaped))){
     if(firstup(faceting) %in% names(reshaped)){
 
-      graph <- graph+ggplot2::facet_wrap(as.formula(paste("~", firstup(faceting))), scales = "free_x")
+      graph <- graph+ggplot2::facet_wrap(stats::as.formula(paste("~", firstup(faceting))), scales = "free_x")
     }
     else
       stop("The faceting variable you indicated is apparently not in your dataset")
   }
   else{
     print(faceting)
-    graph <- graph+facet_wrap(as.formula(paste("~", faceting)), scales = "free_x")
+    graph <- graph+ggplot2::facet_wrap(stats::as.formula(paste("~", faceting)), scales = "free_x")
   }
 }
 

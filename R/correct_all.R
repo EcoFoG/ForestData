@@ -66,15 +66,23 @@
 #'   corrected tree vital status and size, code_corr for correction tag and
 #'   types.
 #'
+#' @export
 #' @examples
 #'
 #' data(example_census)
 #'
-#' # Short version with parameters specified using prepare_forestdata and default values
+#' # Short version: parameters specified using prepare_forestdata and default values
 #'
-#' prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+#' prepare_forestdata(example_census,
+#' plot_col="Plot",
+#' id_col="idTree",
+#' time_col="CensusYear",
+#'  status_col = "CodeAlive",
+#'  size_col="Circ",
+#'  measure_type = "C",
+#'  POM_col = "POM")
 #'
-#' correct_all(example_census,
+#' all_cors <- suppressWarnings(correct_all(example_census,
 #' invariant_columns = c("Genus",
 #'                       "Species",
 #'                       "binomial_name",
@@ -83,11 +91,11 @@
 #' species_col = "binomial_name",#tag pioneer
 #' measure_type = getOption("measure_type"),
 #' pioneers = c("Cecropia","Pourouma"),#tag pioneer
-#' pioneers_treshold = 7.5)
+#' pioneers_treshold = 7.5))
 #'
 #' # Full call:
 #'
-#' correct_all(example_census,
+#' all_cors <- suppressWarnings(correct_all(example_census,
 #' id_col = "idTree",
 #' time_col = "CensusYear",
 #' status_col = "CodeAlive",
@@ -109,7 +117,9 @@
 #' default_POM = 1.3,
 #' pioneers = c("Cecropia","Pourouma"),#tag pioneer
 #' pioneers_treshold = 7.5,
-#' dbh_min = 10)
+#' dbh_min = 10))
+#'
+#' str(all_cors)
 correct_all <- function(data,
                         id_col = getOption("id_col"),
                         time_col = getOption("time_col"),

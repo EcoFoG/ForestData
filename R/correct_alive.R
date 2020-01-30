@@ -47,7 +47,14 @@
 #'
 #' #Correct it (short version with column names set with prepare_forestdata)
 #'
-#' prepare_forestdata(example_census,plot_col="Plot",id_col="idTree",time_col="CensusYear", status_col = "CodeAlive",size_col="Circ",measure_type = "C",POM_col = "POM")
+#' prepare_forestdata(example_census,
+#' plot_col="Plot",
+#' id_col="idTree",
+#' time_col="CensusYear",
+#' status_col = "CodeAlive",
+#' size_col="Circ",
+#' measure_type = "C",
+#' POM_col = "POM")
 #'
 #' example_status_corr <- correct_alive(example_census,
 #' invariant_columns = c("Genus",
@@ -74,10 +81,10 @@
 #'
 #' str(example_status_corr)
 correct_alive <- function(data,
-                          id_col = getOption("id_col"),
-                          time_col = getOption("time_col"),
-                          status_col = getOption("status_col"),
-                          plot_col = getOption("plot_col"),
+                          id_col = ifelse(is.null(getOption("id_col")), "idTree",getOption("id_col")),
+                          time_col = ifelse(is.null(getOption("time_col")), "CensusYear",getOption("time_col")),
+                          status_col = ifelse(is.null(getOption("status_col")), "CodeAlive",getOption("status_col")),
+                          plot_col = ifelse(is.null(getOption("plot_col")), "Plot",getOption("plot_col")),
                           byplot = TRUE,
                           dead_confirmation_censuses = 2,
                           use_size = FALSE,
@@ -139,7 +146,7 @@ correct_alive <- function(data,
     ischar <- is.character(data$plot)
     if(!ischar){
       initial_class <- class(data$plot)
-      data$plot <- as(data$plot, "character")
+      data$plot <- methods::as(data$plot, "character")
     }
   }
 
@@ -162,7 +169,7 @@ correct_alive <- function(data,
 
     plots <- unique(data$plot)
     #create progressbar
-    pb <- txtProgressBar(min = 0, max = length(plots), style = 3)
+    pb <- utils::txtProgressBar(min = 0, max = length(plots), style = 3)
 
 
 
@@ -173,7 +180,7 @@ correct_alive <- function(data,
                     lapply(plots,
                            function(p){
                              # Update between-plots progress bar
-                             setTxtProgressBar(pb, which(plots == p), title = "Plot")
+                             utils::setTxtProgressBar(pb, which(plots == p), title = "Plot")
                              .correct_status_plotlevel(data[which(data$plot == p), ],
                                                        dead_confirmation_censuses,
                                                        use_size,
@@ -198,7 +205,7 @@ correct_alive <- function(data,
   names(data)[which(names(data) == "status")] <- status_col
   if(byplot){
     if(!ischar){
-      data$plot <- as(data$plot, initial_class)
+      data$plot <- methods::as(data$plot, initial_class)
     }
     names(data)[which(names(data) == "plot")] <- plot_col
   }
@@ -276,8 +283,9 @@ correct_alive <- function(data,
   }else{
     #If there is an actual first record, let's take a look to when the tree was not seen (i.e. no corresponding line)
 
-    if(any(tree_temp$status == 0)){ # if tree has ever been recorded dead
-      last_death_record <- max(tree_temp$time[tree_temp$status==0]) # we take the last census for which it has been recorded dead (in case there are several)
+    if(any(!is.na(tree_temp$status) & tree_temp$status == 0)){ # if tree has ever been recorded dead
+      last_death_record <- max(tree_temp$time[!is.na(tree_temp$status) & tree_temp$status==0]) # we take the last census for which it has been recorded dead (in case there are several)
+      # print(last_death_record)
       if(any(tree_temp$time > last_death_record)){ # We then test if lines exist for censuses after last tree death
         after <- which(tree_temp$time > last_death_record) #let's call these censuses "after" if they exist
         if(any(!is.na(tree_temp$status[after]) & tree_temp$status[after] == TRUE)){ #If there is any "alive" report after last reported death
@@ -326,21 +334,23 @@ correct_alive <- function(data,
         newnames <- c("id","time","status","status_corr")
       }
 
-      # new.rows[,vars[-which(vars%in%newnames)]] <- NA
-      new.rows[,invariant_columns] <- NA
-      # if(i == 75599){
-      #   print(new.rows)
-      #   print("-----------------------")
-      # }
-      # print(invariant_columns)
-      # new.rows[,vars[vars%in%invariant_columns]] <- reattribute_invariant_columns(new.rows = new.rows,
-      #                                                                             invariant_columns = invariant_columns,
-      #                                                                             tree_temp = tree_temp,
-      #                                                                             i=i)
-      new.rows <- reattribute_invariant_columns(new.rows = new.rows,
-                                                invariant_columns = invariant_columns,
-                                                tree_temp = tree_temp,
-                                                i=i)
+      if(length(invariant_columns) > 0){
+        # new.rows[,vars[-which(vars%in%newnames)]] <- NA
+        new.rows[,invariant_columns] <- NA
+        # if(i == 75599){
+        #   print(new.rows)
+        #   print("-----------------------")
+        # }
+        # print(invariant_columns)
+        # new.rows[,vars[vars%in%invariant_columns]] <- reattribute_invariant_columns(new.rows = new.rows,
+        #                                                                             invariant_columns = invariant_columns,
+        #                                                                             tree_temp = tree_temp,
+        #                                                                             i=i)
+        new.rows <- reattribute_invariant_columns(new.rows = new.rows,
+                                                  invariant_columns = invariant_columns,
+                                                  tree_temp = tree_temp,
+                                                  i=i)
+      }
       # print(new.rows)
       # if(i == 75599){
       #   # print(tree_tempsav)
@@ -356,7 +366,7 @@ correct_alive <- function(data,
       #   print("###########tree1")
       #   print(tree_temp)
       # }
-      tree_temp[new_rows_init:new_rows_end,invariant_columns] <- new.rows[,invariant_columns]
+      if(length(invariant_columns) > 0) tree_temp[new_rows_init:new_rows_end,invariant_columns] <- new.rows[,invariant_columns]
 
       tree_temp <- tree_temp[order(tree_temp$time),]
       # if(i == 75599){
@@ -406,9 +416,8 @@ correct_alive <- function(data,
 .use_size_status <- function(data_plot, use_size) {
   data_plot$status <- NA
   size_index = which(names(data_plot) == use_size)
-  rows_alive <- which(!is.na(data[,size_index]))
-  data_plot$status[rows_alive] <-
-    1
+  rows_alive <- which(!is.na(data_plot[,size_index]))
+  data_plot$status[rows_alive] <- 1
   return(data_plot)
 }
 

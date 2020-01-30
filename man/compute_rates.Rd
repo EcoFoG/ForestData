@@ -40,10 +40,13 @@ data by plot (TRUE)or for the whole dataset (FALSE).}
 \item{plot_col}{character, name of the column containing plot indices or
 names.}
 
-\item{corrected}{LOGICAL}
+\item{corrected}{Logical, indicates whether the dataset has been corrected
+(for tree status errors) beforehand. If TRUE, triggers correct_alive,
+defaults to TRUE.}
 }
 \value{
-
+a data.frame that contains recruitment and mortality rates, in the
+  same format as the outputs of compute_mortality and compute_recruitment
 }
 \description{
 Title

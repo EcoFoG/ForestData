@@ -1,22 +1,25 @@
 Package: ForestData
 Type: Package
-Title: Post-inventory processing of forest plot data
+Title: Post-inventory processing of Forest Census datasets
 Version: 0.1.0
 Authors@R: c(
+    person("Nino", "Page", email="page.nino@gmail.com", role=c("aut", "cre")),
     person("Géraldine", "Derroire", email="geraldine.derroire@ecofog.gf", role="aut"),
     person("Bruno", "Hérault", email="bruno.herault@cirad.fr", role="aut"),
     person("Eric", "Marcon", email="eric.marcon@ecofog.gf", role="aut"),
-    person("Elie", "Guedj", email="elie.guedj@ecofog.gf", role=c("aut", "cre")),
+    person("Elie", "Guedj", email="elie.guedj@ecofog.gf", role="aut"),
     person("Gaëlle", "Jaouen", email="gaelle.jaouen@ecofog.gf", role="aut"),
     person("Camille", "Piponiot", email="camille.piponiot@ecofog.gf", role="aut")
     )
-Description: TODO.
-License: GNU General Public License
-Imports: dplyr, ggplot2, ggrepel
+Description: ForestData provides simple and generic corrections for Forest Census datasets, and also includes routines to compute and display classical metrics used in Forest Science.
+License: GPL-3 + file LICENSE
+Depends: R (>= 3.0.1)
+Imports: dplyr, ggplot2, ggrepel, methods
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2
 Suggests: 
+    devtools,
     testthat,
     covr,
     knitr,

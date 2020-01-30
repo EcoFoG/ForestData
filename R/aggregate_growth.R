@@ -62,7 +62,7 @@ aggregate_growth <- function(growth,
     growth_by[f,eval(stat)] <- do.call(eval(stat),args = list(x=growth[which(growth$bys == rowval),growth_col], na.rm = TRUE))
     if(!is.null(percentiles)){
       for(p in percentiles){
-        growth_by[f,paste0("P",p)] <- quantile(growth[which(growth$bys == rowval),growth_col],p/100, na.rm = TRUE)
+        growth_by[f,paste0("P",p)] <- stats::quantile(growth[which(growth$bys == rowval),growth_col],p/100, na.rm = TRUE)
       }
     }
   }

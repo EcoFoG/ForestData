@@ -10,7 +10,7 @@
 #' @param info_cols Single or multiple character, the name(s) of the column containing the information that has to appear in the graphs' subtitle.
 #' @param tag_pom Logical, whether POM shifts should be displayed with a vertical line on the graph, or not. Use only if you have a POm field in your dataset.
 #'
-#' @return
+#' @return Nothing, in practical terms, this function is designed to save the graphs directly into a directory.
 #' @export
 display_corrected_trees <- function(data,
                                     code_corr_col="code_corr",
@@ -19,7 +19,7 @@ display_corrected_trees <- function(data,
                                     plot_col = "plot",
                                     measure_type = "Circ",
                                     time_col = "CensusYear",
-                                    status_corr = "status_corr",
+                                    status_corr_col = "status_corr",
                                     id_col = "id",
                                     info_cols = c("species", "plot"),
                                     path_save = "./graphs",
@@ -56,7 +56,7 @@ display_corrected_trees <- function(data,
       stop(paste(n,"is not a dataset's column name"))
   }
 
-  .test_install_package("ggrepel","display_corrected_trees")
+  # .test_install_package("ggrepel","display_corrected_trees")
   if(!dir.exists(path_save)){
     if(create_folder){
       dir.create(path_save)
@@ -131,7 +131,7 @@ display_corrected_trees <- function(data,
 
 
   names(data_corr)[which(names(data_corr) %in% c("time","plot","size","size_corr"))] <- c("census","plot","size.1","size.2")
-print(head(data_corr))
+# print(head(data_corr))
   #Use base's reshape function
   reshaped <- stats::reshape(data_corr,        #dataframe
                              direction="long",       #wide to long
@@ -147,7 +147,7 @@ print(head(data_corr))
   names(reshaped)[names(reshaped) == "id_t"] <- "id"
   #Set the rownames back to 1:nrow(reshaped)
   row.names(reshaped) <- NULL
-  print(head(reshaped))
+  # print(head(reshaped))
 
 
   # variables = c("c","d")
@@ -177,12 +177,12 @@ print(head(data_corr))
     title <- paste0("Raw and Corrected ", measure_type," for tree ",i)
 
 
-      g <- ggplot(data=tree, mapping=aes_string(x="census", y="value", color="size"))+
-        geom_point()+
-        ggrepel::geom_text_repel(aes(label = tree$size),size = 3)
+      g <- ggplot2::ggplot(data=tree, mapping=ggplot2::aes_string(x="census", y="value", color="size"))+
+        ggplot2::geom_point()+
+        ggrepel::geom_text_repel(ggplot2::aes(label = tree$size),size = 3)
       if(!isFALSE(tag_pom) & any(tree$shift)){
         g <- g+
-          geom_vline(xintercept = tree$time[which(tree$shift)],
+          ggplot2::geom_vline(xintercept = tree$time[which(tree$shift)],
                      color = "brown",
                      size = 1,
                      linetype = 2,
@@ -190,13 +190,13 @@ print(head(data_corr))
       }
 
       g <- g +
-        ggtitle(label = title, subtitle = subtitle)+
-        scale_x_continuous(breaks = recruitment:death)+
-        xlab("Census year")+
-        ylab("Diameter (cm)")+
-        theme(axis.text.x = element_text(angle=45))+
-        labs(color = "Series")
+        ggplot2::ggtitle(label = title, subtitle = subtitle)+
+        ggplot2::scale_x_continuous(breaks = recruitment:death)+
+        ggplot2::xlab("Census year")+
+        ggplot2::ylab("Diameter (cm)")+
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle=45))+
+        ggplot2::labs(color = "Series")
 
-      ggsave(g, filename = file.path(path_save,paste0(name,i,".",device)), device = device)
+      ggplot2::ggsave(g, filename = file.path(path_save,paste0(name,i,".",device)), device = device)
   }
 }

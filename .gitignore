@@ -4,7 +4,8 @@
 
 # Session Data files
 .RData
-Paracou.RData
+
+# Extras
 
 # Example code in package build process
 *-Ex.R

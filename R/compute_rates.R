@@ -1,9 +1,12 @@
 #' Title
 #'
 #' @inheritParams correct_all
-#' @param corrected LOGICAL
+#' @param corrected Logical, indicates whether the dataset has been corrected
+#'   (for tree status errors) beforehand. If TRUE, triggers correct_alive,
+#'   defaults to TRUE.
 #'
-#' @return
+#' @return a data.frame that contains recruitment and mortality rates, in the
+#'   same format as the outputs of compute_mortality and compute_recruitment
 #' @export
 compute_rates <- function(data,
                           status_col="status_corr",

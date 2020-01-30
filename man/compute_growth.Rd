@@ -57,6 +57,6 @@ Title
 }
 \examples{
 data(example_census)
-growth <- compute_growth(example_census)
+growth <- suppressWarnings(compute_growth(example_census))
 head(growth)
 }

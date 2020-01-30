@@ -2,6 +2,7 @@
 #'
 #' @param growth A data.frame outputed from compute_growth
 #' @param type Character, the type of graph (recommended: "line" or "ribbon")
+#' @param growth_variable Character
 #' @inheritParams display_rates
 #' @param ordered_percentiles Numeric, if plotting a ribbon, please indicate the percentiles used when aggregating the data.
 #' @param ... Additional arguments. Notably, verbose = F turns most warnings off
@@ -12,17 +13,17 @@
 #' @examples
 #'
 #' data(example_size_corr)
-#' growth <- compute_growth(example_size_corr,
+#' growth <- suppressWarnings(compute_growth(example_size_corr,
 #'                          size_col = "size_corr",
 #'                          measure_type = "cir",
 #'                          status_col = "CodeAlive",
 #'                          id_col= "idTree",
 #'                          time_col = "CensusYear",
 #'                          what_output = "annual",
-#'                          aggregate = T,
+#'                          aggregate = TRUE,
 #'                          by = c("Plot"),
 #'                          stat = "mean",
-#'                          percentiles = c(5,95))
+#'                          percentiles = c(5,95)))
 #'  display_growth(growth)
 display_growth <- function(growth,
                            type = "ribbon",
@@ -74,10 +75,10 @@ if(!(color_col %in% names(growth) & length(color_col)==1)){
 
 
 ## Package ggplot2
-test <-.test_install_package("ggplot2","display_growth")
-if(!test == 0){
-  stop("ggplot2 is needed to run display_rates, but unavailable...")
-}
+# test <-.test_install_package("ggplot2","display_growth")
+# if(!test == 0){
+#   stop("ggplot2 is needed to run display_rates, but unavailable...")
+# }
 
 
 ## subtitle
@@ -240,14 +241,14 @@ if(!isFALSE(faceting)){
   else if(!(faceting %in% names(growth))){
     if(firstup(faceting) %in% names(growth)){
 
-      graph <- graph+ggplot2::facet_wrap(as.formula(paste("~", firstup(faceting))), scales = "free_x")
+      graph <- graph+ggplot2::facet_wrap(stats::as.formula(paste("~", firstup(faceting))), scales = "free_x")
     }
     else
       stop("The faceting variable you indicated is apparently not in your dataset")
   }
   else{
     print(faceting)
-    graph <- graph+facet_wrap(as.formula(paste("~", faceting)), scales = "free_x")
+    graph <- graph+ggplot2::facet_wrap(stats::as.formula(paste("~", faceting)), scales = "free_x")
   }
 }
 

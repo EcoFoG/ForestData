@@ -39,6 +39,10 @@ which an annual DIAMETER growth is considered abnormal (in cm). Defaults to
 \item{plot_col}{character, name of the column containing plot indices or
 names.}
 
+\item{size_corr_col}{Character, the name of the column containing corrected size measurements.}
+
+\item{status_corr_col}{Character, the name of the column containing corrected tree life status.}
+
 \item{measure_type}{character, partially matching “Circumference” or
 “Diameter”, indicating what is the type of the measurements.}
 
@@ -50,6 +54,8 @@ to null}
 
 \item{byplot}{logical, indicating whether the function has to process the
 data by plot (TRUE)or for the whole dataset (FALSE).}
+
+\item{correct_status}{Logical, indicating whether the life status has to be corrected beforhand or not.}
 }
 \value{
 A forest inventory with added lines, which correspond to overgrown
@@ -88,9 +94,9 @@ If a tree is recruited (first registered after the initial census)
 
 ## From a bare dataset - better using after correct_alive and correct_size
 
-data("example_census")
+data("example_size_corr")
 
-correct_recruits(data,
+correct_recruits(example_size_corr,
 dbh_min = 10,
 positive_growth_threshold = 5,
 time_col = "CensusYear",
@@ -99,8 +105,7 @@ plot_col = "Plot",
 size_corr_col = "size_corr",
 status_corr_col = "status_corr",
 measure_type = "circumference",
-invariant_columns = c("SubPlot","species","Genus","binomial_name"),
+invariant_columns = c("Forest","Family","Genus","Species","binomial_name"),
 byplot = TRUE,
 correct_status = FALSE)
-
 }

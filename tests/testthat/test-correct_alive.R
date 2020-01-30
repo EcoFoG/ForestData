@@ -11,10 +11,21 @@
 # getwd()
 context("test-correct_alive")
 library(testthat)
+# load datasets
+# cat(getwd())
+# print(getwd())
+# cat(identical(Sys.getenv("TESTTHAT"), "true"))
+# print(identical(Sys.getenv("TESTTHAT"), "true"))
+load("./test_data/example_alive.rda")
+load("./test_data/example_alive_mini.rda")
+# load("./tests/testthat/test_data/example_alive_mini.rda")
+load("./test_data/expected_2_unseen.rda")
+load("./test_data/expected_3_unseen_mini.rda")
+load("./test_data/expected_3_unseen.rda")
+load("./test_data/expected_2_unseen_mini.rda")
 
 # Test error messages -----------------------------------------------------
 
-load("test_data/example_alive.rda")
 
 expect_error(correct_alive(data = as.list(example_alive),
                            id_col = "id",
@@ -107,15 +118,15 @@ test_that("correct_status_tree gives accurate results for control datasets", {
   ## We are going to test two datasets, for 2 modalities of death_confirmation_censuses, which
   ## represents the number of censuses needed to declare dead a tree if unsighted for such a duration.
   # Load dataset 1: When trees are unsighted, a corresponding line appears in the table with status NA
-  load("test_data/example_alive.rda")
+  # data("example_alive")
   # Load dataset 2, where unsighted trees have no corresponding line in the table (realistic case)
-  load("test_data/example_alive_mini.rda")
+  # data("example_alive_mini")
   # Corresponding hand-corrected datasets for death_confirmation_censuses = 3
-  load("test_data/expected_2_unseen.rda")
-  load("test_data/expected_2_unseen_mini.rda")
+  # data("expected_2_unseen")
+  # data("expected_2_unseen_mini")
   # Corresponding hand-corrected datasets for death_confirmation_censuses = 3
-  load("test_data/expected_3_unseen.rda")
-  load("test_data/expected_3_unseen_mini.rda")
+  # data("expected_3_unseen")
+  # data("expected_3_unseen_mini")
 
 
   # Remove one of the columns of the initial dataset. Unimportant step.
@@ -149,19 +160,23 @@ test_that("correct_status_tree gives accurate results for control datasets", {
     res_tree <- .correct_alive_tree(tree_temp = tree,
                                     censuses = cens,
                                     dead_confirmation_censuses =2,
-                                    i = i)
+                                    i = i,
+                                    invariant_columns = NULL)
     res_tree_mini <- .correct_alive_tree(tree_temp = tree_mini,
                                           censuses = cens_mini,
                                           dead_confirmation_censuses =2,
-                                          i = i)
+                                          i = i,
+                                         invariant_columns = NULL)
     res_tree_3 <- .correct_alive_tree(tree_temp = tree,
                                       censuses = cens,
                                       dead_confirmation_censuses =3,
-                                      i)
+                                      i,
+                                      invariant_columns = NULL)
     res_tree_mini_3 <- .correct_alive_tree(tree_temp = tree_mini,
                                            censuses = cens_mini,
                                            dead_confirmation_censuses =3,
-                                           i)
+                                           i,
+                                           invariant_columns = NULL)
 
 
     # Rearrange row.names because .correct_alive_tree adds missing and erases useless lines.
@@ -197,16 +212,28 @@ test_that("correct_status_tree gives accurate results for control datasets", {
 
 test_that("correct_status_plotlevel gives accurate results for control datasets", {
 
-  # Load dataset 1: When trees are unsighted, a corresponding line appears in the table with status NA
-  load("test_data/example_alive.rda")
-  # Load dataset 2, where unsighted trees have no corresponding line in the table (realistic case)
-  load("test_data/example_alive_mini.rda")
-  # Corresponding hand-corrected datasets
-  load("test_data/expected_2_unseen.rda")
-  load("test_data/expected_2_unseen_mini.rda")
-  load("test_data/expected_3_unseen.rda")
-  load("test_data/expected_3_unseen_mini.rda")
+  # # Load dataset 1: When trees are unsighted, a corresponding line appears in the table with status NA
+  # load("test_data/example_alive.rda")
+  # # Load dataset 2, where unsighted trees have no corresponding line in the table (realistic case)
+  # load("test_data/example_alive_mini.rda")
+  # # Corresponding hand-corrected datasets
+  # load("test_data/expected_2_unseen.rda")
+  # load("test_data/expected_2_unseen_mini.rda")
+  # load("test_data/expected_3_unseen.rda")
+  # load("test_data/expected_3_unseen_mini.rda")
 
+  ## We are going to test two datasets, for 2 modalities of death_confirmation_censuses, which
+  ## represents the number of censuses needed to declare dead a tree if unsighted for such a duration.
+  # Load dataset 1: When trees are unsighted, a corresponding line appears in the table with status NA
+  # data("example_alive")
+  # Load dataset 2, where unsighted trees have no corresponding line in the table (realistic case)
+  # data("example_alive_mini")
+  # Corresponding hand-corrected datasets for death_confirmation_censuses = 3
+  # data("expected_2_unseen")
+  # data("expected_2_unseen_mini")
+  # Corresponding hand-corrected datasets for death_confirmation_censuses = 3
+  # data("expected_3_unseen")
+  # data("expected_3_unseen_mini")
 
   names(expected_3_unseen)[which(names(expected_3_unseen)== "status_altern")] <- "status_corr"
   names(expected_3_unseen_mini)[which(names(expected_3_unseen_mini)== "status_altern")] <- "status_corr"
@@ -244,20 +271,33 @@ test_that("correct_status_plotlevel gives accurate results for control datasets"
 
 
 
+
   res1 <- .correct_status_plotlevel(data_plot = plot1,
                                     dead_confirmation_censuses = 2,
-                                    use_size = FALSE)
+                                    use_size = FALSE,
+                                    invariant_columns = NULL,
+                                    plots = unique(example_alive$plot),
+                                    p = 1)
   res1_3 <- .correct_status_plotlevel(data_plot = plot1,
-                                    dead_confirmation_censuses = 3,
-                                    use_size = FALSE)
+                                      dead_confirmation_censuses = 3,
+                                      use_size = FALSE,
+                                      invariant_columns = NULL,
+                                      plots = unique(example_alive$plot),
+                                      p = 1)
 
   res1_mini <- .correct_status_plotlevel(data_plot = plot1_mini,
                                          dead_confirmation_censuses = 2,
-                                         use_size = FALSE)
+                                         use_size = FALSE,
+                                         invariant_columns = NULL,
+                                         plots = unique(example_alive$plot),
+                                         p = 1)
 
   res1_mini_3 <- .correct_status_plotlevel(data_plot = plot1_mini,
                                            dead_confirmation_censuses = 3,
-                                           use_size = FALSE)
+                                           use_size = FALSE,
+                                           invariant_columns = NULL,
+                                           plots = unique(example_alive$plot),
+                                           p = 1)
 
   row.names(res1) <- 1:nrow(res1)
   row.names(res1_mini) <- 1:nrow(res1_mini)
@@ -282,16 +322,28 @@ test_that("correct_status_plotlevel gives accurate results for control datasets"
 
   res2 <- .correct_status_plotlevel(data_plot = plot2,
                                     dead_confirmation_censuses = 2,
-                                    use_size = FALSE)
+                                    use_size = FALSE,
+                                    invariant_columns = NULL,
+                                    plots = unique(example_alive$plot),
+                                    p = 2)
   res2_mini <- .correct_status_plotlevel(data_plot = plot2_mini,
                                          dead_confirmation_censuses = 2,
-                                         use_size = FALSE)
+                                         use_size = FALSE,
+                                         invariant_columns = NULL,
+                                         plots = unique(example_alive$plot),
+                                         p = 2)
   res2_3 <- .correct_status_plotlevel(data_plot = plot2,
                                       dead_confirmation_censuses = 3,
-                                      use_size = FALSE)
+                                      use_size = FALSE,
+                                      invariant_columns = NULL,
+                                      plots = unique(example_alive$plot),
+                                      p = 2)
   res2_mini_3 <- .correct_status_plotlevel(data_plot = plot2_mini,
                                            dead_confirmation_censuses = 3,
-                                           use_size = FALSE)
+                                           use_size = FALSE,
+                                           invariant_columns = NULL,
+                                           plots = unique(example_alive$plot),
+                                           p = 2)
 
   row.names(res2) <- 1:nrow(res2)
   row.names(res2_mini) <- 1:nrow(res2_mini)
@@ -320,14 +372,14 @@ test_that("correct_status_plotlevel gives accurate results for control datasets"
 test_that("correct_alive gives accurate results for control datasets", {
 
   # Load dataset 1: When trees are unsighted, a corresponding line appears in the table with status NA
-  load("test_data/example_alive.rda")
+  # data("example_alive")
   # Load dataset 2, where unsighted trees have no corresponding line in the table (realistic case)
-  load("test_data/example_alive_mini.rda")
+  # data("example_alive_mini")
   # Corresponding hand-corrected datasets
-  load("test_data/expected_2_unseen.rda")
-  load("test_data/expected_2_unseen_mini.rda")
-  load("test_data/expected_3_unseen.rda")
-  load("test_data/expected_3_unseen_mini.rda")
+  # data("expected_2_unseen")
+  # data("expected_2_unseen_mini")
+  # data("expected_3_unseen")
+  # data("expected_3_unseen_mini")
 
 
   example_alive <- example_alive[,which(names(example_alive) != "status_altern")]
@@ -348,7 +400,8 @@ test_that("correct_alive gives accurate results for control datasets", {
                        plot_col = "plot",
                        byplot = TRUE,
                        dead_confirmation_censuses = 2,
-                       use_size = FALSE)
+                       use_size = FALSE,
+                       invariant_columns = NULL)
   res_mini <- correct_alive(data = example_alive_mini,
                             id_col = "id",
                             time_col = "time",
@@ -356,7 +409,8 @@ test_that("correct_alive gives accurate results for control datasets", {
                             plot_col = "plot",
                             byplot = TRUE,
                             dead_confirmation_censuses = 2,
-                            use_size = FALSE)
+                            use_size = FALSE,
+                            invariant_columns = NULL)
   res_3 <- correct_alive(data = example_alive,
                          id_col = "id",
                          time_col = "time",
@@ -364,7 +418,8 @@ test_that("correct_alive gives accurate results for control datasets", {
                          plot_col = "plot",
                          byplot = TRUE,
                          dead_confirmation_censuses = 3,
-                         use_size = FALSE)
+                         use_size = FALSE,
+                         invariant_columns = NULL)
   res_mini_3 <- correct_alive(data = example_alive_mini,
                               id_col = "id",
                               time_col = "time",
@@ -372,7 +427,8 @@ test_that("correct_alive gives accurate results for control datasets", {
                               plot_col = "plot",
                               byplot = TRUE,
                               dead_confirmation_censuses = 3,
-                              use_size = FALSE)
+                              use_size = FALSE,
+                              invariant_columns = NULL)
 
 
 

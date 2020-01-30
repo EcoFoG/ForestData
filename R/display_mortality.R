@@ -13,6 +13,7 @@
 #' @param name Character, the name of the folder containing the graph. It can be followd by the extension corresponding to the device - avoid .jpg for the jpeg device, use .jpeg instead. If the extension is missing, it is automatically added according to the selected device.
 #' @param create_folder Logical, indicated whether the folders in the given path must be created in case they do not exist yet, or not
 #' @param overwrite Logical, indicating whether a file already existing under the same name must be overwritten, or kept. In the second case, the function aborts with an explicit error message.
+#' @param ... additional graphical arguments to pass to ggplot's functions
 #'
 #' @export
 #' @return A ggplot2 graphical object.
@@ -67,10 +68,10 @@ display_mortality <- function(mortality = NULL,
 
 
   ## Package ggplot2
-  test <-.test_install_package("ggplot2","display_rates")
-  if(!test == 0){
-    stop("ggplot2 is needed to run display_rates, but unavailable...")
-  }
+  # test <-.test_install_package("ggplot2","display_rates")
+  # if(!test == 0){
+  #   stop("ggplot2 is needed to run display_rates, but unavailable...")
+  # }
 
   ## Faceting variable
   if(!isFALSE(faceting)){
@@ -79,7 +80,7 @@ display_mortality <- function(mortality = NULL,
     if(!length(faceting)== 1){
       stop("Please specify only 1 faceting column.")
     }
-    else if(!faceting %in% names(reshaped)){
+    else if(!faceting %in% names(mortality)){
       stop("The faceting variable you indicated is apparently not in your dataset")
     }
   }
@@ -173,7 +174,7 @@ display_mortality <- function(mortality = NULL,
                                            linewidth = lw,
                                            x.text.angle = x.angle,
                                            y.text.angle = y.angle)},
-         "barplot" = {graph <- .do_graph_barplot(reshaped,
+         "barplot" = {graph <- .do_graph_barplot(mortality,
                                                  x_variable = "time",
                                                  y_variable = "value",
                                                  fill = color_col,
@@ -184,13 +185,13 @@ display_mortality <- function(mortality = NULL,
                                                  y.axis.name = y.name,
                                                  x.text.angle = x.angle,
                                                  y.text.angle = y.angle)},
-         "histogram" = {graph <- .do_graph_histogram(reshaped,
-                                                     x_variable,
-                                                     color_col,
-                                                     title = title,
-                                                     subtitle = subtitle,
-                                                     x.axis.name =  "Annual rate",
-                                                     y.axis.name = "Count")},
+         # "histogram" = {graph <- .do_graph_histogram(reshaped,
+         #                                             x_variable,
+         #                                             color_col,
+         #                                             title = title,
+         #                                             subtitle = subtitle,
+         #                                             x.axis.name =  "Annual rate",
+         #                                             y.axis.name = "Count")},
          stop("Type must be one of the following: line, histogram, bar")
   )
 
@@ -199,7 +200,7 @@ display_mortality <- function(mortality = NULL,
 
 
   if(!isFALSE(faceting)){
-    graph <- graph+facet_wrap(as.formula(paste("~", faceting)), scales = "free.x")
+    graph <- graph+ggplot2::facet_wrap(stats::as.formula(paste("~", faceting)), scales = "free.x")
   }
 
 

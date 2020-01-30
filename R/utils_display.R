@@ -331,13 +331,13 @@ print(unlist(variables))
                            position = "dodge",
                            x.text.angle = 90,
                            y.text.angle = 0){
-  ggplot2::ggplot(mytable, aes(x = x_variable, y = y_variable, linetype = linetype, ...))+
-    geom_bar(stat = "identity", position=position)+
-    xlab(x.axis.name)+
-    ylab(x.axis.name)+
-    ggtitle(label = title, subtitle = subtitle)+
-    theme(axis.text.x = element_text(angle=x.text.angle),
-          axis.text.y = element_text(angle=y.text.angle))
+  ggplot2::ggplot(mytable, ggplot2::aes(x = x_variable, y = y_variable, linetype = linetype, ...))+
+    ggplot2::geom_bar(stat = "identity", position=position)+
+    ggplot2::xlab(x.axis.name)+
+    ggplot2::ylab(x.axis.name)+
+    ggplot2::ggtitle(label = title, subtitle = subtitle)+
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle=x.text.angle),
+          axis.text.y = ggplot2::element_text(angle=y.text.angle))
 
 }
 # reshaped2 <- reshaped
@@ -452,7 +452,7 @@ print(unlist(variables))
   }
   if(name %in% list.files(path_save)){
     if(overwrite){
-      ggsave(filename=file.path(path_save,name), plot=graph, device=device)
+      ggplot2::ggsave(filename=file.path(path_save,name), plot=graph, device=device)
     }
     else{
       stop(paste0("The file ",file.path(path_save, name)," already exists. To overwrite it, run the function again with the argument setting 'overwrite=TRUE' "))
@@ -478,58 +478,58 @@ print(unlist(variables))
 # @return Basically, nothing... Well, maybe a 0 or a null, but who cares.
 #
 # @examples
-.test_install_package <- function(package,fun){
-  # package = "ggplot2"
-  # fun = "fun"
-  if(!package %in% loadedNamespaces()){
-    if(!package %in% installed.packages()){
-      if(.canPingSite("www.cran.rstudio.com")){
-        mess <- paste0(package," is needed to run the ",fun," function , but is not installed on your computer.")
-        message(mess)
-        agreement <- "dunno"
-        while(!agreement %in% c("y","n")){
-          agreement <- readline(prompt="Do you want to install it now? y(yes)/n(no): ")
-          # print("ok")
-
-          if(agreement == "y"){
-            install.packages(package, dependencies = TRUE)
-            if(!package %in% installed.packages()){
-              stop(paste0(package, " could not be installed. It could be because of version incompatibility? Try to update R and your packages, then try to install ",package," again."))
-            }
-            ok <- require(package, character.only = TRUE)
-
-            if(!ok){
-              print(ok)
-              message(paste0("An error has occurred when trying to load ggplot2. Please re-install it or check what it going bad with it."))
-            }
-            else return(0)
-          }
-          else if(agreement == "n"){
-            mess <- paste0("Terminating. Sorry, the ",fun," function need to have the ",package," package installed to run.")
-            stop(mess)
-          }
-          else{
-            message("You neither typed 'y' (for YES) nor 'n' (for NO). Thus, lets try again:")
-          }
-        }
-      }
-      else{
-        mess <- paste0(package," is not installed on your computer, and you apparently have no access to the internet. The",fun," function cannot run without this package.")
-        stop(mess)
-      }
-    }
-    else{
-      message(paste0("Loading package ",package," for the function ",fun," to run."))
-      ok <- require(package)
-      if(!ok){
-       return(0) #dirtyhack
-        # stop(paste0("An error has occurred when trying to load ggplot2. Please re-install it or check what it going bad with it."))
-      }
-      else return(0)
-    }
-  }
-  else return(0)
-}
+# .test_install_package <- function(package,fun){
+#   # package = "ggplot2"
+#   # fun = "fun"
+#   if(!package %in% loadedNamespaces()){
+#     if(!package %in% installed.packages()){
+#       if(.canPingSite("www.cran.rstudio.com")){
+#         mess <- paste0(package," is needed to run the ",fun," function , but is not installed on your computer.")
+#         message(mess)
+#         agreement <- "dunno"
+#         while(!agreement %in% c("y","n")){
+#           agreement <- readline(prompt="Do you want to install it now? y(yes)/n(no): ")
+#           # print("ok")
+#
+#           if(agreement == "y"){
+#             install.packages(package, dependencies = TRUE)
+#             if(!package %in% installed.packages()){
+#               stop(paste0(package, " could not be installed. It could be because of version incompatibility? Try to update R and your packages, then try to install ",package," again."))
+#             }
+#             ok <- require(package, character.only = TRUE)
+#
+#             if(!ok){
+#               print(ok)
+#               message(paste0("An error has occurred when trying to load ggplot2. Please re-install it or check what it going bad with it."))
+#             }
+#             else return(0)
+#           }
+#           else if(agreement == "n"){
+#             mess <- paste0("Terminating. Sorry, the ",fun," function need to have the ",package," package installed to run.")
+#             stop(mess)
+#           }
+#           else{
+#             message("You neither typed 'y' (for YES) nor 'n' (for NO). Thus, lets try again:")
+#           }
+#         }
+#       }
+#       else{
+#         mess <- paste0(package," is not installed on your computer, and you apparently have no access to the internet. The",fun," function cannot run without this package.")
+#         stop(mess)
+#       }
+#     }
+#     else{
+#       message(paste0("Loading package ",package," for the function ",fun," to run."))
+#       ok <- require(package)
+#       if(!ok){
+#        return(0) #dirtyhack
+#         # stop(paste0("An error has occurred when trying to load ggplot2. Please re-install it or check what it going bad with it."))
+#       }
+#       else return(0)
+#     }
+#   }
+#   else return(0)
+# }
 
 
 # Test connexion to a site ------------------------------------------------
