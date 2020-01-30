@@ -51,3 +51,8 @@ a data.frame that contains recruitment and mortality rates, in the
 \description{
 Title
 }
+\examples{
+data(example_status_corr)
+suppressWarnings(
+compute_rates(example_status_corr))
+}

@@ -8,6 +8,10 @@
 #' @return a data.frame that contains recruitment and mortality rates, in the
 #'   same format as the outputs of compute_mortality and compute_recruitment
 #' @export
+#' @examples
+#' data(example_status_corr)
+#' suppressWarnings(
+#' compute_rates(example_status_corr))
 compute_rates <- function(data,
                           status_col="status_corr",
                           time_col=ifelse(is.null(getOption("time_col")),

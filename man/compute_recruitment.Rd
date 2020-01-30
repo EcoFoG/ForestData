@@ -40,14 +40,14 @@ This function computes recruitment in forest inventories according to plot
 }
 \examples{
 \dontrun{
-data("Paracou6")
-compute_recruitment(Paracou6,
+data("example_census")
+suppressWarnings(compute_recruitment(example_census,
 status_col="status_corr",
 time_col="CensusYear",
 id_col="idTree",
 dead_confirmation_censuses=2,
 byplot = TRUE,
 plot_col = "Plot",
-corrected = TRUE)
+corrected = TRUE))
 }
 }

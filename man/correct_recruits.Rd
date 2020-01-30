@@ -96,7 +96,7 @@ If a tree is recruited (first registered after the initial census)
 
 data("example_size_corr")
 
-correct_recruits(example_size_corr,
+cors <- suppressWarnings(correct_recruits(example_size_corr,
 dbh_min = 10,
 positive_growth_threshold = 5,
 time_col = "CensusYear",
@@ -107,5 +107,6 @@ status_corr_col = "status_corr",
 measure_type = "circumference",
 invariant_columns = c("Forest","Family","Genus","Species","binomial_name"),
 byplot = TRUE,
-correct_status = FALSE)
+correct_status = FALSE))
+str(cors)
 }

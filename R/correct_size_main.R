@@ -158,16 +158,16 @@
 #' measure_type = "C",
 #' POM_col = "POM")
 #'
-#' example_size_corr <- correct_size(example_status_corr,
+#' example_size_corr <- suppressWarnings(correct_size(example_status_corr,
 #' species_col = "binomial_name",#tag pioneer
 #' pioneers = c("Cecropia","Pourouma"),
 #' pioneers_treshold = 7.5,
-#' ignore_POM = FALSE)
+#' ignore_POM = FALSE))
 #'
-#' str(example_status_corr)
+#' str(example_size_corr)
 #'
 #' #Correct it (full call)
-#' example_size_corr <- correct_size(example_status_corr,
+#' example_size_corr <- suppressWarnings(correct_size(example_status_corr,
 #' size_col = "Circ",
 #' time_col = "CensusYear",
 #' status_col = "status_corr",
@@ -180,10 +180,9 @@
 #' default_POM = 1.3,
 #' pioneers = c("Cecropia","Pourouma"),
 #' pioneers_treshold = 7.5,
-#' ignore_POM = FALSE)
+#' ignore_POM = FALSE))
 #'
 #'
-#' str(example_status_corr)
 correct_size <- function(data,
                          size_col = getOption("size_col"),
                          time_col = getOption("time_col"),

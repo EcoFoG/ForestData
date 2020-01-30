@@ -40,13 +40,13 @@ This function computes mortality in forest inventories according to plot if ther
 }
 \examples{
 data("example_status_corr")
-compute_mortality(example_status_corr,
+suppressWarnings(compute_mortality(example_status_corr,
 status_col="status_corr",
 time_col="CensusYear",
 id_col="idTree",
 dead_confirmation_censuses=2,
 byplot = TRUE,
 plot_col = "Plot",
-corrected = TRUE)
+corrected = TRUE))
 
 }

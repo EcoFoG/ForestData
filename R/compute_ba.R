@@ -16,19 +16,19 @@
 #' @examples
 #' data("example_recruits")
 #'
-#' ba_plots <- compute_ba(example_recruits,
+#' ba_plots <- suppressWarnings(compute_ba(example_recruits,
 #' size_col = "size_corr",
 #' measure_type = "C",
 #' time_col = "CensusYear",
 #' by = "Plot",
-#' surface = 1.5625)
+#' surface = 1.5625))
 #'
-#' ba_taxa <- compute_ba(example_recruits,
+#' ba_taxa <- suppressWarnings(compute_ba(example_recruits,
 #' size_col = "size_corr",
 #' measure_type = "C",
 #' time_col = "CensusYear",
 #' by = c("binomial_name","Plot"),
-#' surface = 1.5625)
+#' surface = 1.5625))
 #'
 #' str(ba_plots)
 #' head(ba_taxa)

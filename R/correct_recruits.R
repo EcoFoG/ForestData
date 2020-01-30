@@ -10,6 +10,9 @@
 #' with a logical field named "corrected_recruit".
 #'
 #' @inheritParams correct_all
+#' @param size_corr_col Character, the name of the column containing corrected size measurements.
+#' @param status_corr_col  Character, the name of the column containing corrected tree life status.
+#' @param correct_status Logical, indicating whether the life status has to be corrected beforhand or not.
 #'
 #' @details If a tree is recruited (first registered after the initial census)
 #'   with an excessive size, its size trajectory is reconstituted using a linear
@@ -40,8 +43,7 @@
 #'
 #' data("example_size_corr")
 #'
-
-#' correct_recruits(example_size_corr,
+#' cors <- suppressWarnings(correct_recruits(example_size_corr,
 #' dbh_min = 10,
 #' positive_growth_threshold = 5,
 #' time_col = "CensusYear",
@@ -52,10 +54,8 @@
 #' measure_type = "circumference",
 #' invariant_columns = c("Forest","Family","Genus","Species","binomial_name"),
 #' byplot = TRUE,
-#' correct_status = FALSE)
-#' @param size_corr_col Character, the name of the column containing corrected size measurements.
-#' @param status_corr_col  Character, the name of the column containing corrected tree life status.
-#' @param correct_status Logical, indicating whether the life status has to be corrected beforhand or not.
+#' correct_status = FALSE))
+#' str(cors)
 correct_recruits <- function(data,
                              dbh_min = 10,
                              positive_growth_threshold = 5,

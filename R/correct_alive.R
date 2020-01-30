@@ -56,15 +56,15 @@
 #' measure_type = "C",
 #' POM_col = "POM")
 #'
-#' example_status_corr <- correct_alive(example_census,
+#' example_status_corr <- suppressWarnings(correct_alive(example_census,
 #' invariant_columns = c("Genus",
 #' "Species",
 #' "Family",
 #' "Forest",
-#' "binomial_name"))
+#' "binomial_name")))
 #'
 #' #Correct it (full call)
-#' example_status_corr <- correct_alive(example_census,
+#' example_status_corr <- suppressWarnings(correct_alive(example_census,
 #' id_col = "idTree",
 #' time_col = "CensusYear",
 #' status_col = "CodeAlive",
@@ -76,7 +76,7 @@
 #' "Species",
 #' "Family",
 #' "Forest",
-#' "binomial_name"))
+#' "binomial_name")))
 #'
 #'
 #' str(example_status_corr)
