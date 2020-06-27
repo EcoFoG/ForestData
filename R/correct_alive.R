@@ -262,6 +262,7 @@ correct_alive <- function(data,
 
 .correct_alive_tree <- function(tree_temp, censuses, dead_confirmation_censuses, i, invariant_columns){
   #Store the names of the measured variables for tree_temp, for later use
+  # print("here1")
   vars <- names(tree_temp)
   # tree_tempsav <- tree_temp
   if(!length(unique(tree_temp$plot)) == 1){
@@ -270,13 +271,13 @@ correct_alive <- function(data,
 
   #Find when the tree is first recorded ALIVE
   first_record <- ifelse(any(tree_temp$status==1),min(tree_temp$time[which(tree_temp$status == 1)]), NA)
-
+  # if(is.na(first_record)) View(tree_temp)
 
 
   if(is.na(first_record)){ #Sometimes, there is no first record. It can correspond to two cases for which we warn explicitely. We choosed not to stop the function for these cases. The user must be careful enough to read the warning messages.
     if(all(is.na(tree_temp$status))){ #It could be that the tree's status is always NA, which is unlikely to happen but we still take this into consideration. Who knows?
       message <- paste0("tree ",i," has only NA life status. If it is a isolated outlyer, please manually check it. If there is no life status column in your dataset, you can create it from size measurement (see the vignette)")
-    }else if(all(isFALSE(tree_temp$status))){ #It could be that recruitment AND death happened on the SAME between-censuses interval.
+    }else if(all(tree_temp$status == 0)){ #It could be that recruitment AND death happened on the SAME between-censuses interval.
       message <- paste0("tree ",i," has only been recorded dead. It might be that it has been recruited and died on the same between-censuses interval. Please verify it")
     }
     warning(message)
@@ -288,7 +289,8 @@ correct_alive <- function(data,
       # print(last_death_record)
       if(any(tree_temp$time > last_death_record)){ # We then test if lines exist for censuses after last tree death
         after <- which(tree_temp$time > last_death_record) #let's call these censuses "after" if they exist
-        if(any(!is.na(tree_temp$status[after]) & tree_temp$status[after] == TRUE)){ #If there is any "alive" report after last reported death
+
+        if(any(!is.na(tree_temp$status[after]) & tree_temp$status[after] == 1)){ #If there is any "alive" report after last reported death
           absents <- (censuses > first_record & !censuses %in% tree_temp$time) #  we search for unsightings in all the censuses.
         }
         else{ # else we just search up to last death record...
@@ -298,6 +300,7 @@ correct_alive <- function(data,
         }
       }
       else{ #idem, if there are no lines for censuses ulterior to tree death report, we search for unsightings until tree death.
+
         absents <- (censuses > first_record &
                       censuses < last_death_record &
                       !censuses %in% tree_temp$time)
@@ -402,7 +405,7 @@ correct_alive <- function(data,
       }
     }
   }
-
+  # print("here2")
   return(tree_temp)
 }
 
@@ -453,9 +456,10 @@ reattribute_invariant_columns <- function(new.rows, invariant_columns, tree_temp
 
     if(any(is.na(new.rows[,j]))){
       uni <- unique(tree_temp[, j])
-      if(any(is.na(uni)))
-        warning(paste0("The tree ",i," has NA values for the variable ",j, " that is supposed to be invariant"))
-      uni <- uni[which(!is.na(uni))]
+      # if(any(is.na(uni)))
+        # warning(paste0("The tree ",i," has NA values for the variable ",j, " that is supposed to be invariant"))
+        # UNACTIVATED ON DEMAND FOR DANI.
+      # uni <- uni[which(!is.na(uni))]
       if(length(uni) > 1){
         message = paste0("attribute ",
                          j,
