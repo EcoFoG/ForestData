@@ -5,7 +5,8 @@
 \alias{example_recruits}
 \title{Example dataset for ForestData: Paracou, plot 6, corrected for status and
 size, then for overgrown recruits}
-\format{A data frame with 25634 rows and 12 variables:
+\format{
+A data frame with 25634 rows and 12 variables:
 \describe{
   \item{Forest}{Character, general information: Forest sector where the plot
   to which trees belong is located. Here, always Paracou:P6}
@@ -28,7 +29,8 @@ size, then for overgrown recruits}
   \item{code_corr}{Character, indicates the type of correction done for each
   measurement, if any. Obtained with \code{correct_size}}
   \item{corrected_recruit}{Logical. Flags the lines added by \code{correct_recruits} if any}
-  }}
+  }
+}
 \source{
 \url{https://paracou.cirad.fr/}
 }

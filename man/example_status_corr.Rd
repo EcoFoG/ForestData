@@ -4,7 +4,8 @@
 \name{example_status_corr}
 \alias{example_status_corr}
 \title{Example dataset for ForestData: Paracou, plot 6, with corrected status}
-\format{A data frame with 25634 rows and 13 variables:
+\format{
+A data frame with 25634 rows and 13 variables:
 \describe{
   \item{Forest}{Character, Forest sector where the plot is located}
   \item{Plot}{Integer (could be character), the index of the plot to which
@@ -27,7 +28,8 @@
   \item{POM}{Numeric. Point of Measurement, in meters.}
   \item{status_corr}{Integer, interpretable as logical. Corrected vital
   status obtained with \code{correct_alive}}
-  }}
+  }
+}
 \source{
 \url{https://paracou.cirad.fr/}
 }

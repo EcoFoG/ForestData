@@ -7,7 +7,8 @@
 compute_recruitment(
   data,
   status_col = "status_corr",
-  time_col = ifelse(is.null(getOption("time_col")), "CensusYear", getOption("time_col")),
+  time_col = ifelse(is.null(getOption("time_col")), "CensusYear",
+    getOption("time_col")),
   id_col = ifelse(is.null(getOption("id_col")), "idTree", getOption("id_col")),
   dead_confirmation_censuses = 2,
   byplot = TRUE,

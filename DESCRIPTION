@@ -1,12 +1,12 @@
 Package: ForestData
 Type: Package
 Title: Post-inventory processing of Forest Census datasets
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person("Nino", "Page", email="page.nino@gmail.com", role=c("aut", "cre")),
     person("Géraldine", "Derroire", email="geraldine.derroire@ecofog.gf", role="aut"),
     person("Bruno", "Hérault", email="bruno.herault@cirad.fr", role="aut"),
-    person("Eric", "Marcon", email="eric.marcon@agroparistech.fr", role=c("aut", "cre"), comment = c(ORCID = "0000-0002-5249-321X")),
+    person("Eric", "Marcon", email="eric.marcon@agroparistech.fr", role=c("aut"), comment = c(ORCID = "0000-0002-5249-321X")),
     person("Elie", "Guedj", email="elie.guedj@ecofog.gf", role="aut"),
     person("Gaëlle", "Jaouen", email="gaelle.jaouen@ecofog.gf", role="aut"),
     person("Camille", "Piponiot", email="camille.piponiot@ecofog.gf", role="aut")
@@ -17,11 +17,12 @@ Depends: R (>= 3.0.1)
 Imports: dplyr, ggplot2, ggrepel, methods
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 Suggests: 
     devtools,
     testthat,
     covr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    pkgdown
 VignetteBuilder: knitr

@@ -7,7 +7,8 @@
 correct_alive(
   data,
   id_col = ifelse(is.null(getOption("id_col")), "idTree", getOption("id_col")),
-  time_col = ifelse(is.null(getOption("time_col")), "CensusYear", getOption("time_col")),
+  time_col = ifelse(is.null(getOption("time_col")), "CensusYear",
+    getOption("time_col")),
   status_col = ifelse(is.null(getOption("status_col")), "CodeAlive",
     getOption("status_col")),
   plot_col = ifelse(is.null(getOption("plot_col")), "Plot", getOption("plot_col")),

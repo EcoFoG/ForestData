@@ -5,7 +5,8 @@
 \alias{example_size_corr}
 \title{Example dataset for ForestData: Paracou, plot 6, corrected for status and
 size}
-\format{A data frame with 25634 rows and 12 variables:
+\format{
+A data frame with 25634 rows and 12 variables:
 \describe{
   \item{Forest}{Character, general information: Forest sector where the plot
   to which trees belong is located. Here, always Paracou:P6}
@@ -33,7 +34,8 @@ size}
   Corrected tree size (here, circumference) obtained with \code{correct_size}}
   \item{code_corr}{Character, indicates the type of correction done for each
   measurement, if any. Obtained with \code{correct_size}}
-  }}
+  }
+}
 \source{
 \url{https://paracou.cirad.fr/}
 }

@@ -1,3 +1,4 @@
 url: https://ecofog.github.io/ForestData/
 
-destination: docs
+development:
+  mode: auto
