@@ -6,7 +6,7 @@ Authors@R: c(
     person("Nino", "Page", email="page.nino@gmail.com", role=c("aut", "cre")),
     person("Géraldine", "Derroire", email="geraldine.derroire@ecofog.gf", role="aut"),
     person("Bruno", "Hérault", email="bruno.herault@cirad.fr", role="aut"),
-    person("Eric", "Marcon", email="eric.marcon@ecofog.gf", role="aut"),
+    person("Eric", "Marcon", email="eric.marcon@agroparistech.fr", role=c("aut", "cre"), comment = c(ORCID = "0000-0002-5249-321X")),
     person("Elie", "Guedj", email="elie.guedj@ecofog.gf", role="aut"),
     person("Gaëlle", "Jaouen", email="gaelle.jaouen@ecofog.gf", role="aut"),
     person("Camille", "Piponiot", email="camille.piponiot@ecofog.gf", role="aut")
