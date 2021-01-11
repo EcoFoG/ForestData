@@ -2,8 +2,8 @@ pandoc: 2.7.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
-  forestdata-vignette: forestdata-vignette.html
-last_built: 2021-01-11T13:02Z
+  ForestData: ForestData.html
+last_built: 2021-01-11T13:22Z
 urls:
   reference: https://ecofog.github.io/ForestData//reference
   article: https://ecofog.github.io/ForestData//articles
