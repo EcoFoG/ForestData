@@ -17,25 +17,27 @@ knitr::opts_chunk$set(
 
 ```
 
-# What is ForestData ?
+# What is ForestData?
 
 ForestData is a package that gathers methods to works with dendrometric censuses datasets. 
 
 In particular, ForestData has been designed especially to implement and make available Camille Piponiot's corrections algorithms, but it also includes other functions to compute classical rates or metrics (basal area, stem growth, mortality and recruitment) and display them efficiently.
 
-This vignette details how to use these functions, step by step and using the built-in example dataset. ForestData has three main "families" of functions depending on what is intended to do: `correct_`,`compute_` and `display_`. Each "family" will be detailed, so if you only are interested by one of these items, you can jump directly to the corresponding section.
+This vignette details how to use these functions, step by step and using the built-in example dataset. 
+ForestData has three main "families" of functions depending on what is intended to do: `correct_`,`compute_` and `display_`. Each "family" will be detailed, so if you only are interested by one of these items, you can jump directly to the corresponding section.
 
 # Install and load the package 
 
-ForestData is not yet published on the CRAN. It can easily be downloaded from EcoFoG's github repository (on [this page](https://github.com/EcoFoG/ForestData)) and compiled locally, and even more easily be installed directly into R with devtools' `install_github` function. You can use the following code to install ForestData.
+ForestData is not yet published on the CRAN. It can easily be downloaded from EcoFoG's Github repository (on [this page](https://github.com/EcoFoG/ForestData)) and compiled locally, and even more easily be installed directly into R with **remotes** `install_github()` function. 
+You can use the following code to install ForestData.
 ```{r setup}
 if(!"ForestData" %in% installed.packages()){
   
-  if(!"devtools" %in% installed.packages()){
-    install.packages("devtools")
+  if(!"remotes" %in% installed.packages()){
+    install.packages("remotes")
   }
   
-  devtools::install_github("EcoFoG/ForestData")
+  remotes::install_github("EcoFoG/ForestData")
 } 
 
 library(ForestData)
@@ -43,8 +45,8 @@ library(ForestData)
 
 # Use ForestData to correct dendrometric censuses data
 
-
-The main goal of ForestData is to provide generic and simple corrections adapted for forest censuse.Three functions are implemented in order to correct different error sources in such datasets:
+The main goal of ForestData is to provide generic and simple corrections adapted for forest censuses.
+Three functions are implemented in order to correct different error sources in such datasets:
 
 + Tree life status can have errors due to non-observation of some trees, or mistaken death statement. This impacts mortality computations. The implemented function is able to spot when a tree has not been seen, or if it has been stated dead but is seen alive afterwards, and thus correct the tree's life history, and re-creates the missing lines (with NA measurements) when needed. 
 + Tree size measurements can be mistaken due to many reasons, including POM shifts or difficulties in measurement due to non-cylindric conformation. With POM reports, the implemented algorithm first corrects the size series shifts due to POM changes and then spot abnormal increases or decreases in size, and correct them according to the nature of such anomalies (punctual, permanent...), accounting for positive and negative thresholds as well as whether the trees belong to pioneer species or not.
@@ -66,7 +68,8 @@ The type of dataset that Forestdata's function are designed to treat is a long-f
 + The dataset can include censuses for one or several forest plots. If there are several, a dedicated field must specify to which plot belongs each tree. 
 + A field indicating taxonomic identification (binomial species name) is needed.
 
-To illustrate the following explanations, a built-in example dataset will be used. It corresponds to the squares 1 and 3 of the 6th Plot of the Paracou Experiment database (more information [here](https://paracou.cirad.fr/))
+To illustrate the following explanations, a built-in example dataset will be used.
+It corresponds to the squares 1 and 3 of the 6th Plot of the Paracou Experiment database (more information [here](https://paracou.cirad.fr/))
 
 The dataset can be loaded using the function `utils::data`. 
 
@@ -86,7 +89,8 @@ The information used by ForestData's functions is contained in the following col
 * `Plot` contains plot indices. This is important for the functions `correct_alive` and `correct_recruits`, since the plots have different temporal resolution in this example.
 * `POM` contains the Point of Measurement (POM) values, that is, the height at which tree size (circumference of diameter) is measured. 
 
-All the other columns are only additional information: Family, Genus and Species are taxonomical information and Forest is a geographical indication (where is located the plot to which the tree belongs). This information is invariant for a given tree among its different measurements.
+All the other columns are only additional information: Family, Genus and Species are taxonomical information and Forest is a geographical indication (where is located the plot to which the tree belongs). 
+This information is invariant for a given tree among its different measurements.
 
 
 
@@ -260,9 +264,13 @@ example_size_corr <- correct_size(example_status_corr, species_col="binomial_nam
 
 ## Use `correct_recruits` to spot and correct overgrown recruits
 
-`correct_recruits` spots overgrown recruits according to the specified minimum diameter limit, and a tolerated growth threshold. It adds lines to the dataset corresponding to overgrown recruits' hypothetical sizes before first record. These lines are tagged with the column "corrected_recruits" (FALSE for regular data, TRUE for lines generated with this function). For those, only the corrected size (size_corr) is specified along with tree ID and invariant columns. The columns originally containing size, POM and life status (raw and corrected) are let to NA. 
+`correct_recruits` spots overgrown recruits according to the specified minimum diameter limit, and a tolerated growth threshold. 
+It adds lines to the dataset corresponding to overgrown recruits' hypothetical sizes before first record. 
+These lines are tagged with the column "corrected_recruits" (FALSE for regular data, TRUE for lines generated with this function). 
+For those, only the corrected size (size_corr) is specified along with tree ID and invariant columns. The columns originally containing size, POM and life status (raw and corrected) are let to NA. 
 
-Corrected size values for overgrown recruits should not be used to compute growth rates, and more generally, we advise to use this correction only for the specific cases that absolutely require it. Before correcting for overgrown recruits, we advise to correct life statuses and sizes beforehand.
+Corrected size values for overgrown recruits should not be used to compute growth rates, and more generally, we advise to use this correction only for the specific cases that absolutely require it. 
+Before correcting for overgrown recruits, we advise to correct life statuses and sizes beforehand.
 
 Here is the full call of the function:
 
@@ -309,16 +317,23 @@ Oncoming section
 
 ### Size corrections
 
-Tree sizes measurements are essential information to study the dynamics of a forest plot over time, through tree stem growth rates. This implies a need to ensure that size measurements are correct. 
-There is a consensus regarding the need to standardize these metrics using the same Point of Measurement (POM) for each tree whenever possible (breast height, 1.30m). However, some trees develop buttresses or defaults that prevent measuring stem size accurately at breast height, and imply to uprise the POM. Most of the error regarding tree size comes from either uncorrect to no report of POM shifts, or imprecisions using a measuring tape. We categorize size measurement errors according to the direction (negative, positive) and temporality (transient, permanent) of the anomalies.
+Tree sizes measurements are essential information to study the dynamics of a forest plot over time, through tree stem growth rates. 
+This implies a need to ensure that size measurements are correct. 
+There is a consensus regarding the need to standardize these metrics using the same Point of Measurement (POM) for each tree whenever possible (breast height, 1.30m). 
+However, some trees develop buttresses or defaults that prevent measuring stem size accurately at breast height, and imply to uprise the POM. Most of the error regarding tree size comes from either uncorrect to no report of POM shifts, or imprecisions using a measuring tape. 
+We categorize size measurement errors according to the direction (negative, positive) and temporality (transient, permanent) of the anomalies.
+
 
 #### Thresholds and pioneer species
 
-Except for explicit POM changes, anomalies are detected by `correct_size` using thresholds defining abnormal increase/decrease in tree size. These thresholds depend on the protocol applied for a given census (e.g., basal measurement error rate and field verification protocols, if any) as well as empirical considerations regarding tree growth. 
+Except for explicit POM changes, anomalies are detected by `correct_size` using thresholds defining abnormal increase/decrease in tree size. 
+These thresholds depend on the protocol applied for a given census (e.g., basal measurement error rate and field verification protocols, if any) as well as empirical considerations regarding tree growth. 
 
-For the Paracou Disturbance Experiment, an abnormal decrease is considered to be under -2cm (absolute, between-census *diameter* growth) and an abnormal increase is over 5cm/year (annual *diameter* growth). These apparently permissive thresholds are due to the 35 years of experience gained from the begining of the experiment, as well as intensive and strict field verifications (apurement protocol by A. Dourdain) carried out in parallel of the censusing campaigns, allowing to verificate directly most of the doubtful measurements. 
+For the Paracou Disturbance Experiment, an abnormal decrease is considered to be under -2cm (absolute, between-census *diameter* growth) and an abnormal increase is over 5cm/year (annual *diameter* growth). 
+These apparently permissive thresholds are due to the 35 years of experience gained from the begining of the experiment, as well as intensive and strict field verifications (apurement protocol by A. Dourdain) carried out in parallel of the censusing campaigns, allowing to verificate directly most of the doubtful measurements. 
 
-In reality, some heliophilous species car grow far more rapidly than others, and can cause "false positive" anomaly detections. To avoid uprising the growth threshold and the chance of non-detection for real anomalies, it seems better to discriminate, at least grossly, this group of species: In `correct_size`, we added two arguments to specify a list of generally fast growing (pioneer) species or genera, and a greater positive growth threshold to apply to those species. 
+In reality, some heliophilous species car grow far more rapidly than others, and can cause "false positive" anomaly detections. 
+To avoid uprising the growth threshold and the chance of non-detection for real anomalies, it seems better to discriminate, at least grossly, this group of species: In `correct_size`, we added two arguments to specify a list of generally fast growing (pioneer) species or genera, and a greater positive growth threshold to apply to those species. 
 
 For Paracou, practical experience suggests that 7.5cm/year is a reasonable threshold for these species.
 
@@ -326,27 +341,36 @@ The choice of these thresholds is let to the user (although they default to valu
 
 #### Punctual errors
 
-Punctual errors are transient, abnormal increases or decreases in tree size measurement, that eventually returns to "normal" values. This implies to define a threshold to discriminate "abnormal" increases and decreases, as well as the concept of "return-to-normal". 
+Punctual errors are transient, abnormal increases or decreases in tree size measurement, that eventually returns to "normal" values. 
+This implies to define a threshold to discriminate "abnormal" increases and decreases, as well as the concept of "return-to-normal". 
 
-In ForestData's `correct_size` function, we considered that an error is punctual if one of the two next census' values present a similar change in size, with opposite direction, that counterbalances the anomaly. These can be caused by an erroneous measurement or estimation of tree size at a given census, more rarely for two consecutive censuses.
+In ForestData's `correct_size` function, we considered that an error is punctual if one of the two next census' values present a similar change in size, with opposite direction, that counterbalances the anomaly. 
+These can be caused by an erroneous measurement or estimation of tree size at a given census, more rarely for two consecutive censuses.
 
-Punctual errors are corrected by replacing the abnormal values with more reasonable estimates. That is simply done by linearily interpolating these value between the no-NA measurements surrounding the anomaly: right before the increa/decrease, and at the "return-to-normal" point.
+Punctual errors are corrected by replacing the abnormal values with more reasonable estimates. 
+That is simply done by linearily interpolating these value between the no-NA measurements surrounding the anomaly: right before the increa/decrease, and at the "return-to-normal" point.
 
 #### Permanent errors, or shifts
 
 Permanent errors or shifts are definitive uprises or downrises of size measurement values, with no detectable "return-to-normal" point. 
 
-In most of the case, these are permanent decreases due to POM change: when POM is uprisen, due to the semi-conic shape of the trunk, the measured size is inferior than if it was measured accurately at breast height. Shifts can also (more rarely) be caused by size estimation rather than measurement (or even to the transition from estimation to actual measurement), for stems showing a highly non-cylindric conformation, and may be positive or negative in such cases.
+In most of the case, these are permanent decreases due to POM change: when POM is uprisen, due to the semi-conic shape of the trunk, the measured size is inferior than if it was measured accurately at breast height. 
+Shifts can also (more rarely) be caused by size estimation rather than measurement (or even to the transition from estimation to actual measurement), for stems showing a highly non-cylindric conformation, and may be positive or negative in such cases.
 
 In `correct_size`, shifts are corrected using two methods:
+
 * Explicitely, for reported POM shifts, i.e. the sum of the difference in sizes before and after POM change and the expected growth value (linear interpolation) is added to the following size measurements, graphically resulting in a translation of the size trajectory after the POM uprise.
 * Upon detection, for anomalies without detected "return-to-normal", by re-aligning on the longest series of measurement (or the most recent, if both have the same number of points)
 
 ### Overgrown recruits
 
-Most forest inventories focus on trees with DBH over 10cm, or sometimes 1cm. Every tree (or stem) is, supposedly, tagged with a label at the first inventory and followed accross censuses. Recruited trees are newcomers that pass the minimum censusing diameter limit between two campaigns. Ideally, one expects these tree to measure just a few more than this limit, especially if the temporal resolution of the inventory is low - trees generally grow slowly. Having defined a growth threshold T (in cm/year) and with I, the interval between two census (in years),  the size of a tree at recruitment time should not exceed 10+T*I.
+Most forest inventories focus on trees with DBH over 10cm, or sometimes 1cm. Every tree (or stem) is, supposedly, tagged with a label at the first inventory and followed accross censuses. Recruited trees are newcomers that pass the minimum censusing diameter limit between two campaigns. 
+Ideally, one expects these tree to measure just a few more than this limit, especially if the temporal resolution of the inventory is low - trees generally grow slowly. 
+Having defined a growth threshold T (in cm/year) and with I, the interval between two census (in years),  the size of a tree at recruitment time should not exceed 10+T*I.
 
-Overgrown recruits are trees that violate this assumption, generally because those weren't noticed before, for some reason. These individuals can be problematic when it comes to estimate basal area or biomass, especially if they are adult trees. `correct_recruits` re-creates the previous growth trajectory of those trees using linear extrapolation.
+Overgrown recruits are trees that violate this assumption, generally because those weren't noticed before, for some reason. 
+These individuals can be problematic when it comes to estimate basal area or biomass, especially if they are adult trees. 
+`correct_recruits` re-creates the previous growth trajectory of those trees using linear extrapolation.
 
 Being highly hypothetical, corrected size values for overgrown recruits should not be used to compute growth rates, and more generally, we advise to use this correction only for the specific cases that absolutely require it.
 
@@ -354,7 +378,8 @@ Being highly hypothetical, corrected size values for overgrown recruits should n
 
 # Use ForestData to compute and display classical metrics in Forest Ecology
 
-In addition to the corrections the package provides functions to compute and display the classical metrics used in Forest Science: annual or absolute growth rates, annual recruitment and mortality rates, and basal area. In this section, we will go through examples of these features to show the possibilities of these tools.
+In addition to the corrections the package provides functions to compute and display the classical metrics used in Forest Science: annual or absolute growth rates, annual recruitment and mortality rates, and basal area. 
+In this section, we will go through examples of these features to show the possibilities of these tools.
 
 ## Compute and display mortality and growth rates, or both
 
@@ -444,6 +469,7 @@ rates <- compute_rates(example_status_corr,
 
 str(rates)
 ```
+
 The use of `corrected = FALSE` is similar to what we saw above.
 ```{r, eval=F}
 data(example_census)
