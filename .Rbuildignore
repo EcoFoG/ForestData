@@ -12,3 +12,4 @@
 ^_travis\.yml$
 ^packages\.rds$
 ^\.\#Extra$
+^.github$
